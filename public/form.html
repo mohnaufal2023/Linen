@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serah Terima Pencucian Linen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+    --line-soft: #EAEFED;
+    --teal: #2E7D6B;
+    --teal-deep: #1F5E51;
+    --teal-tint: #E7F2EE;
+    --amber: #B8722E;
+    --amber-tint: #FBF0E3;
+    --danger: #B34A3E;
+    --radius: 10px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .brand .unit{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    letter-spacing: 0.02em;
+  }
+
+  h1{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 26px;
+    margin: 2px 0 0;
+    color: var(--ink);
+  }
+
+  .tanggal-hariini{
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+
+  /* ---------- Info fields ---------- */
+  .info-row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .field{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .field input{
+    font-family: inherit;
+    font-size: 16px;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .field input:focus-visible{
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+    border-color: var(--teal);
+  }
+
+  /* ---------- Table ---------- */
+  .table-shell{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .table-scroll{
+    max-height: 62vh;
+    overflow-y: auto;
+  }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+
+  thead th{
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 2;
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  thead th.col-no{ width: 44px; text-align: center; }
+  thead th.col-kotor, thead th.col-bersih{ width: 104px; text-align: center; }
+  thead th.col-ket{ width: 160px; }
+
+  thead th.hdr-kotor{ color: var(--amber); }
+  thead th.hdr-bersih{ color: var(--teal-deep); }
+
+  tbody td{
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td{ border-bottom: none; }
+  tbody tr:hover{ background: #FAFBFA; }
+
+  td.col-no{
+    text-align: center;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+  }
+
+  td.col-nama{
+    font-weight: 500;
+  }
+
+  .qty-input{
+    width: 100%;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .qty-input.kotor{ background: var(--amber-tint); }
+  .qty-input.kotor:focus-visible{ outline: 2px solid var(--amber); background: #fff; }
+  .qty-input.bersih{ background: var(--teal-tint); }
+  .qty-input.bersih:focus-visible{ outline: 2px solid var(--teal); background: #fff; }
+
+  .qty-input::-webkit-outer-spin-button,
+  .qty-input::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .ket-input{
+    width: 100%;
+    font-size: 13.5px;
+    padding: 8px 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ink);
+  }
+  .ket-input:hover, .ket-input:focus{
+    border-color: var(--line);
+    background: var(--bg);
+  }
+  .ket-input:focus-visible{ outline: 2px solid var(--teal); }
+
+  /* ---------- Footer / totals ---------- */
+  .footer-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+  }
+
+  .totals{
+    display: flex;
+    gap: 22px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+
+  .totals strong{
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  .totals .dot-kotor{ color: var(--amber); }
+  .totals .dot-bersih{ color: var(--teal-deep); }
+
+  button#submit-btn{
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--teal);
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  button#submit-btn:hover{ background: var(--teal-deep); }
+  button#submit-btn:disabled{ background: #A9B6B2; cursor: not-allowed; }
+
+  /* ---------- Status banner ---------- */
+  .banner{
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .banner.show{ display: flex; }
+  .banner.success{ background: var(--teal-tint); color: var(--teal-deep); border: 1px solid #BFDED4; }
+  .banner.error{ background: #FBEAE7; color: var(--danger); border: 1px solid #EFC7C0; }
+
+  .loading-row td{
+    text-align: center;
+    color: var(--ink-soft);
+    padding: 30px 12px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 620px){
+    .info-row{ grid-template-columns: 1fr; }
+    header{ flex-direction: column; align-items: flex-start; gap: 6px; }
+    .tanggal-hariini{ text-align: left; }
+    thead th.col-ket, td.col-ket{ display: none; }
+    .footer-bar{ flex-direction: column; align-items: stretch; }
+    .totals{ justify-content: space-between; }
+    button#submit-btn{ width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="unit">Instalasi Loundry</span>
+      <h1>Serah Terima Pencucian Linen</h1>
+    </div>
+    <div class="tanggal-hariini" id="tanggal-hariini"></div>
+  </header>
+
+  <form id="form-linen">
+    <div class="info-row">
+      <div class="field">
+        <label for="ruangan">Ruangan</label>
+        <input type="text" id="ruangan" name="ruangan" placeholder="Contoh: ICU, Bedah, VK" required>
+      </div>
+      <div class="field">
+        <label for="tanggal">Tanggal</label>
+        <input type="date" id="tanggal" name="tanggal" required>
+      </div>
+    </div>
+
+    <div class="table-shell">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th>Jenis Linen</th>
+              <th class="col-kotor hdr-kotor">Kotor</th>
+              <th class="col-bersih hdr-bersih">Bersih</th>
+              <th class="col-ket">Keterangan</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-linen">
+            <tr class="loading-row"><td colspan="5">Memuat daftar linen…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footer-bar">
+        <div class="totals">
+          <span><span class="dot-kotor">●</span> Total kotor <strong id="total-kotor">0</strong></span>
+          <span><span class="dot-bersih">●</span> Total bersih <strong id="total-bersih">0</strong></span>
+        </div>
+        <button type="submit" id="submit-btn">Simpan serah terima</button>
+      </div>
+    </div>
+
+    <div class="banner" id="banner"></div>
+  </form>
+
+</div>
+
+<script>
+  const tbody = document.getElementById('tbody-linen');
+  const banner = document.getElementById('banner');
+  const submitBtn = document.getElementById('submit-btn');
+  const totalKotorEl = document.getElementById('total-kotor');
+  const totalBersihEl = document.getElementById('total-bersih');
+  const tanggalInput = document.getElementById('tanggal');
+  const tanggalHariIni = document.getElementById('tanggal-hariini');
+
+  const todayISO = new Date().toISOString().split('T')[0];
+  tanggalInput.value = todayISO;
+  tanggalHariIni.textContent = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  function showBanner(type, message){
+    banner.textContent = message;
+    banner.className = 'banner show ' + type;
+  }
+
+  function hitungTotal(){
+    let kotor = 0, bersih = 0;
+    document.querySelectorAll('.qty-input.kotor').forEach(el => kotor += Number(el.value) || 0);
+    document.querySelectorAll('.qty-input.bersih').forEach(el => bersih += Number(el.value) || 0);
+    totalKotorEl.textContent = kotor;
+    totalBersihEl.textContent = bersih;
+  }
+
+  async function muatJenisLinen(){
+    try{
+      const res = await fetch('/api/jenis-linen');
+      if(!res.ok) throw new Error('Gagal memuat');
+      const data = await res.json();
+
+      tbody.innerHTML = '';
+      data.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="col-no">${idx + 1}</td>
+          <td class="col-nama">${item.nama}</td>
+          <td class="col-kotor">
+            <input type="number" min="0" inputmode="numeric" class="qty-input kotor"
+                   data-id="${item.id}" value="0">
+          </td>
+          <td class="col-bersih">
+            <input type="number" min="0" inputmode="numeric" class="qty-input bersih"
+                   data-id="${item.id}" value="0">
+          </td>
+          <td class="col-ket">
+            <input type="text" class="ket-input" data-id="${item.id}" placeholder="—">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.addEventListener('input', hitungTotal);
+    }catch(err){
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Gagal memuat daftar linen. Coba muat ulang halaman.</td></tr>';
+    }
+  }
+
+  document.getElementById('form-linen').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    banner.className = 'banner';
+
+    const ruangan = document.getElementById('ruangan').value.trim();
+    const tanggal = tanggalInput.value;
+
+    const detail = [];
+    document.querySelectorAll('#tbody-linen tr').forEach(tr => {
+      const kotorInput = tr.querySelector('.qty-input.kotor');
+      const bersihInput = tr.querySelector('.qty-input.bersih');
+      const ketInput = tr.querySelector('.ket-input');
+      if(!kotorInput) return;
+      const kotor = Number(kotorInput.value) || 0;
+      const bersih = Number(bersihInput.value) || 0;
+      if(kotor === 0 && bersih === 0) return;
+      detail.push({
+        jenis_linen_id: Number(kotorInput.dataset.id),
+        jumlah_kotor: kotor,
+        jumlah_bersih: bersih,
+        keterangan: ketInput.value.trim() || null
+      });
+    });
+
+    if(detail.length === 0){
+      showBanner('error', 'Isi minimal satu jumlah linen (kotor atau bersih) sebelum menyimpan.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Menyimpan…';
+
+    try{
+      const res = await fetch('/api/serah-terima', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ruangan, tanggal, detail })
+      });
+      const result = await res.json();
+
+      if(!res.ok) throw new Error(result.error || 'Gagal menyimpan');
+
+      showBanner('success', `Tersimpan. Data serah terima untuk ruangan "${ruangan}" berhasil dicatat.`);
+      document.getElementById('ruangan').value = '';
+      document.querySelectorAll('.qty-input').forEach(el => el.value = 0);
+      document.querySelectorAll('.ket-input').forEach(el => el.value = '');
+      hitungTotal();
+    }catch(err){
+      showBanner('error', err.message || 'Terjadi kesalahan saat menyimpan data.');
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Simpan serah terima';
+    }
+  });
+
+  muatJenisLinen();
+</script>
+
+</body>
+</html>
