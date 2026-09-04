@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riwayat Serah Terima Linen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+    --line-soft: #EAEFED;
+    --teal: #2E7D6B;
+    --teal-deep: #1F5E51;
+    --teal-tint: #E7F2EE;
+    --amber: #B8722E;
+    --amber-tint: #FBF0E3;
+    --danger: #B34A3E;
+    --radius: 10px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+
+  .wrap{
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  header{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand{ display: flex; flex-direction: column; gap: 2px; }
+  .brand .unit{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    letter-spacing: 0.02em;
+  }
+  h1{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 26px;
+    margin: 2px 0 0;
+  }
+
+  a.nav-link{
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    text-decoration: none;
+    padding: 9px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  a.nav-link:hover{ background: var(--teal-tint); border-color: #BFDED4; }
+
+  .filter-row{
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .filter-row input{
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .filter-row input#cari-ruangan{ flex: 1; min-width: 180px; }
+  .filter-row input:focus-visible{
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+    border-color: var(--teal);
+  }
+
+  .layout{
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* ---------- List panel ---------- */
+  .list-panel{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .list-scroll{
+    max-height: 68vh;
+    overflow-y: auto;
+  }
+
+  .trx-item{
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    border: none;
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--surface);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .trx-item:last-child{ border-bottom: none; }
+  .trx-item:hover{ background: #FAFBFA; }
+  .trx-item.active{ background: var(--teal-tint); }
+
+  .trx-item .ruangan{
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .trx-item.active .ruangan{ color: var(--teal-deep); }
+
+  .trx-item .meta{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+
+  .empty-state{
+    padding: 30px 16px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  /* ---------- Detail panel ---------- */
+  .detail-panel{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    min-height: 300px;
+  }
+
+  .detail-placeholder{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    text-align: center;
+    padding: 30px;
+  }
+
+  .detail-head{
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .detail-head h2{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 21px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .detail-head .tanggal-lengkap{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+
+  .detail-totals{
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .detail-totals strong{
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .dot-kotor{ color: var(--amber); }
+  .dot-bersih{ color: var(--teal-deep); }
+
+  .detail-actions{
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn{
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .btn:hover{ background: #FAFBFA; }
+  .btn.btn-primary{ background: var(--teal); border-color: var(--teal); color: #fff; }
+  .btn.btn-primary:hover{ background: var(--teal-deep); }
+  .btn.btn-danger{ color: var(--danger); border-color: #EFC7C0; }
+  .btn.btn-danger:hover{ background: #FBEAE7; }
+
+  .edit-field{
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .edit-field:focus-visible{ outline: 2px solid var(--teal); border-color: var(--teal); }
+
+  .qty-edit{
+    width: 72px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    padding: 6px 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .ket-edit{
+    width: 100%;
+    font-size: 13.5px;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+  thead th{
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    padding: 10px 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  thead th.col-kotor, thead th.col-bersih{ width: 90px; text-align: center; }
+  thead th.hdr-kotor{ color: var(--amber); }
+  thead th.hdr-bersih{ color: var(--teal-deep); }
+
+  tbody td{
+    padding: 10px 22px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  tbody tr:last-child td{ border-bottom: none; }
+
+  td.col-kotor, td.col-bersih{
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  td.col-kotor{ color: var(--amber); }
+  td.col-bersih{ color: var(--teal-deep); }
+
+  td.col-ket{
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .loading-row td, .empty-detail td{
+    text-align: center;
+    color: var(--ink-soft);
+    padding: 26px 12px;
+  }
+
+  @media (max-width: 760px){
+    .layout{ grid-template-columns: 1fr; }
+    header{ flex-direction: column; align-items: flex-start; gap: 10px; }
+    thead th.col-ket, td.col-ket{ display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="unit">Instalasi Loundry</span>
+      <h1>Riwayat Serah Terima Linen</h1>
+    </div>
+    <a class="nav-link" href="/form.html">+ Serah terima baru</a>
+  </header>
+
+  <div class="filter-row">
+    <input type="text" id="cari-ruangan" placeholder="Cari ruangan…">
+    <input type="date" id="filter-tanggal">
+  </div>
+
+  <div class="layout">
+    <div class="list-panel">
+      <div class="list-scroll" id="list-scroll">
+        <div class="empty-state">Memuat riwayat…</div>
+      </div>
+    </div>
+
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-placeholder">Pilih salah satu transaksi di sebelah kiri untuk melihat rinciannya.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const listScroll = document.getElementById('list-scroll');
+  const detailPanel = document.getElementById('detail-panel');
+  const cariRuangan = document.getElementById('cari-ruangan');
+  const filterTanggal = document.getElementById('filter-tanggal');
+
+  let semuaTransaksi = [];
+  let activeId = null;
+  let mode = 'lihat'; // 'lihat' atau 'edit'
+  let trxAktif = null;
+
+  function formatTanggal(iso){
+    // Ambil hanya bagian tanggal (YYYY-MM-DD) sebelum dikonversi, hindari geser hari karena zona waktu
+    const tgl = iso.split('T')[0];
+    const [y, m, d] = tgl.split('-');
+    const dateObj = new Date(y, m - 1, d);
+    return dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function formatWaktu(iso){
+    const dateObj = new Date(iso);
+    return dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderList(){
+    const kataKunci = cariRuangan.value.trim().toLowerCase();
+    const tanggalFilter = filterTanggal.value;
+
+    const hasil = semuaTransaksi.filter(trx => {
+      const cocokRuangan = trx.ruangan.toLowerCase().includes(kataKunci);
+      const cocokTanggal = !tanggalFilter || trx.tanggal.split('T')[0] === tanggalFilter;
+      return cocokRuangan && cocokTanggal;
+    });
+
+    if(hasil.length === 0){
+      listScroll.innerHTML = '<div class="empty-state">Tidak ada transaksi yang cocok.</div>';
+      return;
+    }
+
+    listScroll.innerHTML = '';
+    hasil.forEach(trx => {
+      const btn = document.createElement('button');
+      btn.className = 'trx-item' + (trx.id === activeId ? ' active' : '');
+      btn.innerHTML = `
+        <div class="ruangan">${trx.ruangan}</div>
+        <div class="meta">${formatTanggal(trx.tanggal)} · dicatat ${formatWaktu(trx.created_at)}</div>
+      `;
+      btn.addEventListener('click', () => muatDetail(trx.id));
+      listScroll.appendChild(btn);
+    });
+  }
+
+  async function muatDaftar(){
+    try{
+      const res = await fetch('/api/serah-terima');
+      if(!res.ok) throw new Error('Gagal memuat');
+      semuaTransaksi = await res.json();
+      renderList();
+    }catch(err){
+      listScroll.innerHTML = '<div class="empty-state">Gagal memuat riwayat. Coba muat ulang halaman.</div>';
+    }
+  }
+
+  async function muatDetail(id){
+    activeId = id;
+    mode = 'lihat';
+    renderList();
+
+    detailPanel.innerHTML = '<div class="detail-placeholder">Memuat rincian…</div>';
+
+    try{
+      const res = await fetch(`/api/serah-terima/${id}`);
+      if(!res.ok) throw new Error('Gagal memuat detail');
+      trxAktif = await res.json();
+      renderDetail();
+    }catch(err){
+      detailPanel.innerHTML = '<div class="detail-placeholder">Gagal memuat rincian transaksi ini.</div>';
+    }
+  }
+
+  function renderDetail(){
+    if(mode === 'edit'){
+      renderDetailEdit();
+    }else{
+      renderDetailLihat();
+    }
+  }
+
+  function renderDetailLihat(){
+    const trx = trxAktif;
+    let totalKotor = 0, totalBersih = 0;
+    const baris = trx.detail.map(item => {
+      totalKotor += item.jumlah_kotor;
+      totalBersih += item.jumlah_bersih;
+      return `
+        <tr>
+          <td>${item.jenis_linen_nama}</td>
+          <td class="col-kotor">${item.jumlah_kotor}</td>
+          <td class="col-bersih">${item.jumlah_bersih}</td>
+          <td class="col-ket">${item.keterangan || '—'}</td>
+        </tr>
+      `;
+    }).join('');
+
+    detailPanel.innerHTML = `
+      <div class="detail-head">
+        <div>
+          <h2>${trx.ruangan}</h2>
+          <div class="tanggal-lengkap">${formatTanggal(trx.tanggal)}</div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn" id="btn-edit">Edit</button>
+          <button class="btn btn-danger" id="btn-hapus">Hapus</button>
+        </div>
+      </div>
+      <div class="detail-head" style="border-top:1px solid var(--line-soft); border-bottom:none;">
+        <div class="detail-totals">
+          <span><span class="dot-kotor">●</span> Kotor <strong>${totalKotor}</strong></span>
+          <span><span class="dot-bersih">●</span> Bersih <strong>${totalBersih}</strong></span>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Jenis Linen</th>
+            <th class="col-kotor hdr-kotor">Kotor</th>
+            <th class="col-bersih hdr-bersih">Bersih</th>
+            <th class="col-ket">Keterangan</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${baris || '<tr class="empty-detail"><td colspan="4">Tidak ada rincian linen.</td></tr>'}
+        </tbody>
+      </table>
+    `;
+
+    document.getElementById('btn-edit').addEventListener('click', () => {
+      mode = 'edit';
+      renderDetail();
+    });
+    document.getElementById('btn-hapus').addEventListener('click', hapusTransaksi);
+  }
+
+  function renderDetailEdit(){
+    const trx = trxAktif;
+    const tglValue = trx.tanggal.split('T')[0];
+
+    const baris = trx.detail.map((item, idx) => `
+      <tr>
+        <td>${item.jenis_linen_nama}</td>
+        <td class="col-kotor">
+          <input type="number" min="0" class="qty-edit" data-idx="${idx}" data-field="kotor" value="${item.jumlah_kotor}">
+        </td>
+        <td class="col-bersih">
+          <input type="number" min="0" class="qty-edit" data-idx="${idx}" data-field="bersih" value="${item.jumlah_bersih}">
+        </td>
+        <td class="col-ket">
+          <input type="text" class="ket-edit" data-idx="${idx}" data-field="ket" value="${item.keterangan || ''}">
+        </td>
+      </tr>
+    `).join('');
+
+    detailPanel.innerHTML = `
+      <div class="detail-head">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <input type="text" class="edit-field" id="edit-ruangan" value="${trx.ruangan}">
+          <input type="date" class="edit-field" id="edit-tanggal" value="${tglValue}">
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-primary" id="btn-simpan">Simpan</button>
+          <button class="btn" id="btn-batal">Batal</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Jenis Linen</th>
+            <th class="col-kotor hdr-kotor">Kotor</th>
+            <th class="col-bersih hdr-bersih">Bersih</th>
+            <th class="col-ket">Keterangan</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${baris || '<tr class="empty-detail"><td colspan="4">Tidak ada rincian linen untuk diedit.</td></tr>'}
+        </tbody>
+      </table>
+    `;
+
+    document.getElementById('btn-batal').addEventListener('click', () => {
+      mode = 'lihat';
+      renderDetail();
+    });
+    document.getElementById('btn-simpan').addEventListener('click', simpanEdit);
+  }
+
+  async function simpanEdit(){
+    const btnSimpan = document.getElementById('btn-simpan');
+    const ruangan = document.getElementById('edit-ruangan').value.trim();
+    const tanggal = document.getElementById('edit-tanggal').value;
+
+    if(!ruangan || !tanggal){
+      alert('Ruangan dan tanggal wajib diisi.');
+      return;
+    }
+
+    const detail = trxAktif.detail.map((item, idx) => {
+      const kotorInput = document.querySelector(`.qty-edit[data-idx="${idx}"][data-field="kotor"]`);
+      const bersihInput = document.querySelector(`.qty-edit[data-idx="${idx}"][data-field="bersih"]`);
+      const ketInput = document.querySelector(`.ket-edit[data-idx="${idx}"]`);
+      return {
+        jenis_linen_id: item.jenis_linen_id,
+        jumlah_kotor: Number(kotorInput.value) || 0,
+        jumlah_bersih: Number(bersihInput.value) || 0,
+        keterangan: ketInput.value.trim() || null
+      };
+    });
+
+    btnSimpan.disabled = true;
+    btnSimpan.textContent = 'Menyimpan…';
+
+    try{
+      const res = await fetch(`/api/serah-terima/${trxAktif.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ruangan, tanggal, detail })
+      });
+      const result = await res.json();
+      if(!res.ok) throw new Error(result.error || 'Gagal menyimpan perubahan');
+
+      mode = 'lihat';
+      await muatDaftar();
+      await muatDetail(trxAktif.id);
+    }catch(err){
+      alert(err.message || 'Terjadi kesalahan saat menyimpan perubahan.');
+      btnSimpan.disabled = false;
+      btnSimpan.textContent = 'Simpan';
+    }
+  }
+
+  async function hapusTransaksi(){
+    const konfirmasi = confirm(`Hapus transaksi "${trxAktif.ruangan}" tanggal ${formatTanggal(trxAktif.tanggal)}? Tindakan ini tidak bisa dibatalkan.`);
+    if(!konfirmasi) return;
+
+    try{
+      const res = await fetch(`/api/serah-terima/${trxAktif.id}`, { method: 'DELETE' });
+      const result = await res.json();
+      if(!res.ok) throw new Error(result.error || 'Gagal menghapus transaksi');
+
+      activeId = null;
+      trxAktif = null;
+      detailPanel.innerHTML = '<div class="detail-placeholder">Pilih salah satu transaksi di sebelah kiri untuk melihat rinciannya.</div>';
+      await muatDaftar();
+    }catch(err){
+      alert(err.message || 'Terjadi kesalahan saat menghapus transaksi.');
+    }
+  }
+
+  cariRuangan.addEventListener('input', renderList);
+  filterTanggal.addEventListener('input', renderList);
+
+  muatDaftar();
+</script>
+
+</body>
+</html>

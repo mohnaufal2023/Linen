@@ -10,9 +10,5 @@ app.use('/api/jenis-linen', jenisLinenRoutes);
 const serahTerimaRoutes = require('./routes/serahTerima');
 app.use('/api/serah-terima', serahTerimaRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Web Linen jalan!');
-});
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server jalan di http://localhost:${PORT}`));

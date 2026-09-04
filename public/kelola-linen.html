@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Jenis Linen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+    --line-soft: #EAEFED;
+    --teal: #2E7D6B;
+    --teal-deep: #1F5E51;
+    --teal-tint: #E7F2EE;
+    --amber: #B8722E;
+    --amber-tint: #FBF0E3;
+    --danger: #B34A3E;
+    --radius: 10px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+
+  .wrap{
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  header{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand{ display: flex; flex-direction: column; gap: 2px; }
+  .brand .unit{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    letter-spacing: 0.02em;
+  }
+  h1{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 26px;
+    margin: 2px 0 0;
+  }
+
+  a.nav-link{
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    text-decoration: none;
+    padding: 9px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  a.nav-link:hover{ background: var(--teal-tint); border-color: #BFDED4; }
+
+  /* ---------- Form tambah ---------- */
+  .add-form{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .add-form input{
+    font-family: inherit;
+    font-size: 15px;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .add-form input#tambah-nama{ flex: 1; }
+  .add-form input#tambah-urutan{ width: 90px; }
+  .add-form input:focus-visible{
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+    border-color: var(--teal);
+  }
+
+  .btn{
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover{ background: #FAFBFA; }
+  .btn.btn-primary{ background: var(--teal); border-color: var(--teal); color: #fff; }
+  .btn.btn-primary:hover{ background: var(--teal-deep); }
+  .btn.btn-primary:disabled{ background: #A9B6B2; border-color: #A9B6B2; cursor: not-allowed; }
+  .btn.btn-danger{ color: var(--danger); border-color: #EFC7C0; }
+  .btn.btn-danger:hover{ background: #FBEAE7; }
+  .btn.btn-sm{ padding: 6px 12px; font-size: 13px; }
+
+  /* ---------- Banner ---------- */
+  .banner{
+    display: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .banner.show{ display: block; }
+  .banner.success{ background: var(--teal-tint); color: var(--teal-deep); border: 1px solid #BFDED4; }
+  .banner.error{ background: #FBEAE7; color: var(--danger); border: 1px solid #EFC7C0; }
+
+  /* ---------- List ---------- */
+  .list-panel{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .linen-row{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .linen-row:last-child{ border-bottom: none; }
+  .linen-row:hover{ background: #FAFBFA; }
+
+  .linen-row .urutan-badge{
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  .linen-row .nama{
+    flex: 1;
+    font-weight: 500;
+    font-size: 14.5px;
+  }
+
+  .linen-row .aksi{
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Mode edit inline */
+  .linen-row.editing .edit-field{
+    font-family: inherit;
+    font-size: 14px;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .linen-row.editing input#edit-inline-nama{ flex: 1; }
+  .linen-row.editing input#edit-inline-urutan{ width: 60px; }
+
+  .empty-state{
+    padding: 30px 16px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  @media (max-width: 560px){
+    header{ flex-direction: column; align-items: flex-start; gap: 10px; }
+    .add-form{ flex-wrap: wrap; }
+    .add-form input#tambah-nama{ flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="unit">Instalasi Loundry</span>
+      <h1>Kelola Jenis Linen</h1>
+    </div>
+    <a class="nav-link" href="/">← Kembali</a>
+  </header>
+
+  <form class="add-form" id="form-tambah">
+    <input type="text" id="tambah-nama" placeholder="Nama jenis linen baru…" required>
+    <input type="number" id="tambah-urutan" placeholder="Urutan" min="0">
+    <button type="submit" class="btn btn-primary" id="btn-tambah">Tambah</button>
+  </form>
+
+  <div class="banner" id="banner"></div>
+
+  <div class="list-panel" id="list-panel">
+    <div class="empty-state">Memuat daftar jenis linen…</div>
+  </div>
+
+</div>
+
+<script>
+  const formTambah = document.getElementById('form-tambah');
+  const tambahNama = document.getElementById('tambah-nama');
+  const tambahUrutan = document.getElementById('tambah-urutan');
+  const btnTambah = document.getElementById('btn-tambah');
+  const listPanel = document.getElementById('list-panel');
+  const banner = document.getElementById('banner');
+
+  let daftarLinen = [];
+  let editingId = null;
+
+  function showBanner(type, message){
+    banner.textContent = message;
+    banner.className = 'banner show ' + type;
+    if(type === 'success'){
+      setTimeout(() => { banner.className = 'banner'; }, 3000);
+    }
+  }
+
+  async function muatDaftar(){
+    try{
+      const res = await fetch('/api/jenis-linen');
+      if(!res.ok) throw new Error('Gagal memuat');
+      daftarLinen = await res.json();
+      renderList();
+    }catch(err){
+      listPanel.innerHTML = '<div class="empty-state">Gagal memuat daftar jenis linen. Coba muat ulang halaman.</div>';
+    }
+  }
+
+  function renderList(){
+    if(daftarLinen.length === 0){
+      listPanel.innerHTML = '<div class="empty-state">Belum ada jenis linen. Tambahkan lewat form di atas.</div>';
+      return;
+    }
+
+    listPanel.innerHTML = '';
+    daftarLinen.forEach(item => {
+      const row = document.createElement('div');
+
+      if(item.id === editingId){
+        row.className = 'linen-row editing';
+        row.innerHTML = `
+          <input type="text" class="edit-field" id="edit-inline-nama" value="${item.nama}">
+          <input type="number" class="edit-field" id="edit-inline-urutan" value="${item.urutan}" min="0">
+          <div class="aksi">
+            <button class="btn btn-primary btn-sm" data-aksi="simpan" data-id="${item.id}">Simpan</button>
+            <button class="btn btn-sm" data-aksi="batal">Batal</button>
+          </div>
+        `;
+      }else{
+        row.className = 'linen-row';
+        row.innerHTML = `
+          <div class="urutan-badge">${item.urutan}</div>
+          <div class="nama">${item.nama}</div>
+          <div class="aksi">
+            <button class="btn btn-sm" data-aksi="edit" data-id="${item.id}">Edit</button>
+            <button class="btn btn-danger btn-sm" data-aksi="hapus" data-id="${item.id}" data-nama="${item.nama}">Hapus</button>
+          </div>
+        `;
+      }
+
+      listPanel.appendChild(row);
+    });
+
+    listPanel.querySelectorAll('[data-aksi="edit"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editingId = Number(btn.dataset.id);
+        renderList();
+      });
+    });
+
+    listPanel.querySelectorAll('[data-aksi="batal"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        editingId = null;
+        renderList();
+      });
+    });
+
+    listPanel.querySelectorAll('[data-aksi="simpan"]').forEach(btn => {
+      btn.addEventListener('click', () => simpanEdit(Number(btn.dataset.id)));
+    });
+
+    listPanel.querySelectorAll('[data-aksi="hapus"]').forEach(btn => {
+      btn.addEventListener('click', () => hapusLinen(Number(btn.dataset.id), btn.dataset.nama));
+    });
+  }
+
+  async function simpanEdit(id){
+    const nama = document.getElementById('edit-inline-nama').value.trim();
+    const urutan = document.getElementById('edit-inline-urutan').value;
+
+    if(!nama){
+      showBanner('error', 'Nama jenis linen tidak boleh kosong.');
+      return;
+    }
+
+    try{
+      const res = await fetch(`/api/jenis-linen/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nama, urutan: Number(urutan) || 0 })
+      });
+      const result = await res.json();
+      if(!res.ok) throw new Error(result.error || 'Gagal menyimpan perubahan');
+
+      editingId = null;
+      showBanner('success', `"${nama}" berhasil diperbarui.`);
+      await muatDaftar();
+    }catch(err){
+      showBanner('error', err.message || 'Terjadi kesalahan saat menyimpan.');
+    }
+  }
+
+  async function hapusLinen(id, nama){
+    const konfirmasi = confirm(`Hapus jenis linen "${nama}"? Tindakan ini tidak bisa dibatalkan.`);
+    if(!konfirmasi) return;
+
+    try{
+      const res = await fetch(`/api/jenis-linen/${id}`, { method: 'DELETE' });
+      const result = await res.json();
+      if(!res.ok) throw new Error(result.error || 'Gagal menghapus jenis linen');
+
+      showBanner('success', `"${nama}" berhasil dihapus.`);
+      await muatDaftar();
+    }catch(err){
+      showBanner('error', err.message || 'Terjadi kesalahan saat menghapus.');
+    }
+  }
+
+  formTambah.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const nama = tambahNama.value.trim();
+    const urutan = tambahUrutan.value;
+
+    if(!nama){
+      showBanner('error', 'Nama jenis linen wajib diisi.');
+      return;
+    }
+
+    btnTambah.disabled = true;
+    btnTambah.textContent = 'Menyimpan…';
+
+    try{
+      const res = await fetch('/api/jenis-linen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nama, urutan: urutan ? Number(urutan) : undefined })
+      });
+      const result = await res.json();
+      if(!res.ok) throw new Error(result.error || 'Gagal menambahkan jenis linen');
+
+      showBanner('success', `"${nama}" berhasil ditambahkan.`);
+      tambahNama.value = '';
+      tambahUrutan.value = '';
+      await muatDaftar();
+    }catch(err){
+      showBanner('error', err.message || 'Terjadi kesalahan saat menambahkan.');
+    }finally{
+      btnTambah.disabled = false;
+      btnTambah.textContent = 'Tambah';
+    }
+  });
+
+  muatDaftar();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Linen — Instalasi Loundry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+    --teal: #2E7D6B;
+    --teal-deep: #1F5E51;
+    --teal-tint: #E7F2EE;
+    --amber: #B8722E;
+    --amber-tint: #FBF0E3;
+    --radius: 12px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .wrap{
+    max-width: 620px;
+    width: 100%;
+  }
+
+  .brand{
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .brand .unit{
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+
+  h1{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0;
+  }
+
+  .subtitle{
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  .menu{
+    display: grid;
+    gap: 14px;
+  }
+
+  .menu-card{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .menu-card:hover{
+    border-color: var(--teal);
+    transform: translateY(-1px);
+  }
+
+  .menu-icon{
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .menu-card.baru .menu-icon{ background: var(--teal-tint); color: var(--teal-deep); }
+  .menu-card.riwayat .menu-icon{ background: var(--amber-tint); color: var(--amber); }
+  .menu-card.kelola .menu-icon{ background: #EAEAF5; color: #4B4B8F; }
+
+  .menu-text h2{
+    font-size: 16.5px;
+    font-weight: 700;
+    margin: 0 0 3px;
+  }
+
+  .menu-text p{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .menu-arrow{
+    margin-left: auto;
+    color: var(--ink-soft);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="brand">
+    <span class="unit">Instalasi Loundry</span>
+    <h1>Serah Terima Pencucian Linen</h1>
+    <p class="subtitle">Pilih menu di bawah untuk mulai</p>
+  </div>
+
+  <div class="menu">
+    <a class="menu-card baru" href="/form.html">
+      <div class="menu-icon">＋</div>
+      <div class="menu-text">
+        <h2>Serah Terima Baru</h2>
+        <p>Catat linen kotor &amp; bersih untuk sebuah ruangan</p>
+      </div>
+      <div class="menu-arrow">›</div>
+    </a>
+
+    <a class="menu-card riwayat" href="/riwayat.html">
+      <div class="menu-icon">📋</div>
+      <div class="menu-text">
+        <h2>Riwayat Serah Terima</h2>
+        <p>Lihat dan cari semua transaksi yang pernah dicatat</p>
+      </div>
+      <div class="menu-arrow">›</div>
+    </a>
+
+    <a class="menu-card kelola" href="/kelola-linen.html">
+      <div class="menu-icon">🗂️</div>
+      <div class="menu-text">
+        <h2>Kelola Jenis Linen</h2>
+        <p>Tambah, ubah, atau hapus daftar jenis linen</p>
+      </div>
+      <div class="menu-arrow">›</div>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>
