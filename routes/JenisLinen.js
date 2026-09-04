@@ -6,7 +6,7 @@ const db = require('../config/db');
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.query(
-      'SELECT id, nama, urutan FROM jenis_linen ORDER BY urutan ASC'
+      'SELECT id, nama, urutan, jumlah_stok FROM jenis_linen ORDER BY urutan ASC'
     );
     res.json(rows);
   } catch (err) {
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
     }
 
     const [result] = await db.query(
-      'INSERT INTO jenis_linen (nama, urutan) VALUES (?, ?)',
+      'INSERT INTO jenis_linen (nama, urutan, jumlah_stok) VALUES (?, ?, 0)',
       [nama.trim(), urutanFinal]
     );
 
@@ -43,10 +43,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT update jenis linen (nama dan/atau urutan)
+// PUT update jenis linen (nama, urutan, dan/atau jumlah stok)
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { nama, urutan } = req.body;
+  const { nama, urutan, jumlah_stok } = req.body;
 
   if (!nama || !nama.trim()) {
     return res.status(400).json({ error: 'Nama jenis linen wajib diisi' });
@@ -54,8 +54,8 @@ router.put('/:id', async (req, res) => {
 
   try {
     const [result] = await db.query(
-      'UPDATE jenis_linen SET nama = ?, urutan = ? WHERE id = ?',
-      [nama.trim(), urutan || 0, id]
+      'UPDATE jenis_linen SET nama = ?, urutan = ?, jumlah_stok = ? WHERE id = ?',
+      [nama.trim(), urutan || 0, jumlah_stok || 0, id]
     );
 
     if (result.affectedRows === 0) {

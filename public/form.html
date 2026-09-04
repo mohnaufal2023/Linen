@@ -347,8 +347,8 @@
             <tr>
               <th class="col-no">No</th>
               <th>Jenis Linen</th>
-              <th class="col-kotor hdr-kotor">Kotor</th>
-              <th class="col-bersih hdr-bersih">Bersih</th>
+              <th class="col-kotor hdr-kotor">Diantar</th>
+              <th class="col-bersih hdr-bersih">Diambil</th>
               <th class="col-ket">Keterangan</th>
             </tr>
           </thead>
@@ -360,8 +360,8 @@
 
       <div class="footer-bar">
         <div class="totals">
-          <span><span class="dot-kotor">●</span> Total kotor <strong id="total-kotor">0</strong></span>
-          <span><span class="dot-bersih">●</span> Total bersih <strong id="total-bersih">0</strong></span>
+          <span><span class="dot-kotor">●</span> Total diantar <strong id="total-kotor">0</strong></span>
+          <span><span class="dot-bersih">●</span> Total diambil <strong id="total-bersih">0</strong></span>
         </div>
         <button type="submit" id="submit-btn">Simpan serah terima</button>
       </div>
@@ -458,7 +458,7 @@
     });
 
     if(detail.length === 0){
-      showBanner('error', 'Isi minimal satu jumlah linen (kotor atau bersih) sebelum menyimpan.');
+      showBanner('error', 'Isi minimal satu jumlah linen (diantar atau diambil) sebelum menyimpan.');
       return;
     }
 

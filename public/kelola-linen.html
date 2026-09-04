@@ -178,6 +178,32 @@
     font-size: 14.5px;
   }
 
+  .stok-group{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .stok-group label{
+    font-size: 12px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .stok-input{
+    width: 64px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    padding: 6px 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--teal-tint);
+    color: var(--teal-deep);
+  }
+  .stok-input:focus-visible{ outline: 2px solid var(--teal); background: #fff; }
+
   .linen-row .aksi{
     display: flex;
     gap: 6px;
@@ -204,10 +230,15 @@
     font-size: 14px;
   }
 
-  @media (max-width: 560px){
+  @media (max-width: 620px){
     header{ flex-direction: column; align-items: flex-start; gap: 10px; }
     .add-form{ flex-wrap: wrap; }
     .add-form input#tambah-nama{ flex-basis: 100%; }
+    .linen-row{ flex-wrap: wrap; }
+    .linen-row .nama{ flex-basis: 100%; order: 1; }
+    .linen-row .urutan-badge{ order: 0; }
+    .stok-group{ order: 2; }
+    .linen-row .aksi{ order: 3; margin-left: auto; }
   }
 </style>
 </head>
@@ -225,7 +256,6 @@
 
   <form class="add-form" id="form-tambah">
     <input type="text" id="tambah-nama" placeholder="Nama jenis linen baru…" required>
-    <input type="number" id="tambah-urutan" placeholder="Urutan" min="0">
     <button type="submit" class="btn btn-primary" id="btn-tambah">Tambah</button>
   </form>
 
@@ -240,7 +270,6 @@
 <script>
   const formTambah = document.getElementById('form-tambah');
   const tambahNama = document.getElementById('tambah-nama');
-  const tambahUrutan = document.getElementById('tambah-urutan');
   const btnTambah = document.getElementById('btn-tambah');
   const listPanel = document.getElementById('list-panel');
   const banner = document.getElementById('banner');
@@ -292,6 +321,11 @@
         row.innerHTML = `
           <div class="urutan-badge">${item.urutan}</div>
           <div class="nama">${item.nama}</div>
+          <div class="stok-group">
+            <label>Stok</label>
+            <input type="number" min="0" class="stok-input" id="stok-${item.id}" value="${item.jumlah_stok || 0}">
+            <button class="btn btn-sm" data-aksi="simpan-stok" data-id="${item.id}">Simpan</button>
+          </div>
           <div class="aksi">
             <button class="btn btn-sm" data-aksi="edit" data-id="${item.id}">Edit</button>
             <button class="btn btn-danger btn-sm" data-aksi="hapus" data-id="${item.id}" data-nama="${item.nama}">Hapus</button>
@@ -323,6 +357,31 @@
     listPanel.querySelectorAll('[data-aksi="hapus"]').forEach(btn => {
       btn.addEventListener('click', () => hapusLinen(Number(btn.dataset.id), btn.dataset.nama));
     });
+
+    listPanel.querySelectorAll('[data-aksi="simpan-stok"]').forEach(btn => {
+      btn.addEventListener('click', () => simpanStok(Number(btn.dataset.id)));
+    });
+  }
+
+  async function simpanStok(id){
+    const item = daftarLinen.find(x => x.id === id);
+    const stokInput = document.getElementById(`stok-${id}`);
+    const jumlah_stok = Number(stokInput.value) || 0;
+
+    try{
+      const res = await fetch(`/api/jenis-linen/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nama: item.nama, urutan: item.urutan, jumlah_stok })
+      });
+      const result = await res.json();
+      if(!res.ok) throw new Error(result.error || 'Gagal menyimpan stok');
+
+      showBanner('success', `Stok "${item.nama}" diperbarui jadi ${jumlah_stok}.`);
+      await muatDaftar();
+    }catch(err){
+      showBanner('error', err.message || 'Terjadi kesalahan saat menyimpan stok.');
+    }
   }
 
   async function simpanEdit(id){
@@ -371,7 +430,6 @@
     e.preventDefault();
 
     const nama = tambahNama.value.trim();
-    const urutan = tambahUrutan.value;
 
     if(!nama){
       showBanner('error', 'Nama jenis linen wajib diisi.');
@@ -385,14 +443,13 @@
       const res = await fetch('/api/jenis-linen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nama, urutan: urutan ? Number(urutan) : undefined })
+        body: JSON.stringify({ nama })
       });
       const result = await res.json();
       if(!res.ok) throw new Error(result.error || 'Gagal menambahkan jenis linen');
 
       showBanner('success', `"${nama}" berhasil ditambahkan.`);
       tambahNama.value = '';
-      tambahUrutan.value = '';
       await muatDaftar();
     }catch(err){
       showBanner('error', err.message || 'Terjadi kesalahan saat menambahkan.');
