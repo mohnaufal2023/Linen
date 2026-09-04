@@ -3,12 +3,18 @@ const router = express.Router();
 const db = require('../config/db');
 
 // GET daftar semua transaksi serah terima, terbaru duluan
+// Sekalian dihitung total kotor & bersih per transaksi lewat LEFT JOIN + SUM
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT id, ruangan, tanggal, created_at
-       FROM serah_terima
-       ORDER BY created_at DESC`
+      `SELECT
+         st.id, st.ruangan, st.tanggal, st.created_at,
+         COALESCE(SUM(d.jumlah_kotor), 0) AS total_kotor,
+         COALESCE(SUM(d.jumlah_bersih), 0) AS total_bersih
+       FROM serah_terima st
+       LEFT JOIN serah_terima_detail d ON d.serah_terima_id = st.id
+       GROUP BY st.id, st.ruangan, st.tanggal, st.created_at
+       ORDER BY st.created_at DESC`
     );
     res.json(rows);
   } catch (err) {

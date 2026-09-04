@@ -83,6 +83,26 @@
     text-align: right;
   }
 
+  .header-right{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  a.nav-link{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    text-decoration: none;
+    padding: 7px 13px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  a.nav-link:hover{ background: var(--teal-tint); border-color: #BFDED4; }
+
   /* ---------- Info fields ---------- */
   .info-row{
     display: grid;
@@ -303,6 +323,10 @@
     </div>
     <div class="tanggal-hariini" id="tanggal-hariini"></div>
   </header>
+
+  <div style="display:flex; justify-content:flex-end; margin:-16px 0 24px;">
+    <a class="nav-link" href="/">← Kembali</a>
+  </div>
 
   <form id="form-linen">
     <div class="info-row">

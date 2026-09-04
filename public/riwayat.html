@@ -159,6 +159,29 @@
     font-size: 14px;
   }
 
+  /* ---------- Total bar ---------- */
+  .total-bar{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .total-bar .jumlah-trx{
+    padding-right: 20px;
+    border-right: 1px solid var(--line);
+  }
+  .total-bar strong{
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+    color: var(--ink);
+  }
+
   /* ---------- Detail panel ---------- */
   .detail-panel{
     background: var(--surface);
@@ -329,9 +352,19 @@
     <a class="nav-link" href="/form.html">+ Serah terima baru</a>
   </header>
 
+  <div style="display:flex; justify-content:flex-end; margin:-16px 0 18px;">
+    <a class="nav-link" href="/">← Kembali</a>
+  </div>
+
   <div class="filter-row">
     <input type="text" id="cari-ruangan" placeholder="Cari ruangan…">
     <input type="date" id="filter-tanggal">
+  </div>
+
+  <div class="total-bar" id="total-bar">
+    <span class="jumlah-trx"><strong id="jumlah-trx">0</strong> transaksi</span>
+    <span><span class="dot-kotor">●</span> Total kotor <strong id="grand-total-kotor">0</strong></span>
+    <span><span class="dot-bersih">●</span> Total bersih <strong id="grand-total-bersih">0</strong></span>
   </div>
 
   <div class="layout">
@@ -381,6 +414,16 @@
       const cocokTanggal = !tanggalFilter || trx.tanggal.split('T')[0] === tanggalFilter;
       return cocokRuangan && cocokTanggal;
     });
+
+    // Hitung & tampilkan total gabungan dari transaksi yang lagi ditampilkan
+    let grandKotor = 0, grandBersih = 0;
+    hasil.forEach(trx => {
+      grandKotor += Number(trx.total_kotor) || 0;
+      grandBersih += Number(trx.total_bersih) || 0;
+    });
+    document.getElementById('jumlah-trx').textContent = hasil.length;
+    document.getElementById('grand-total-kotor').textContent = grandKotor;
+    document.getElementById('grand-total-bersih').textContent = grandBersih;
 
     if(hasil.length === 0){
       listScroll.innerHTML = '<div class="empty-state">Tidak ada transaksi yang cocok.</div>';
