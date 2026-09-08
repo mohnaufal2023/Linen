@@ -3,14 +3,14 @@ const router = express.Router();
 const db = require('../config/db');
 
 // GET daftar semua transaksi serah terima, terbaru duluan
-// Sekalian dihitung total kotor & bersih per transaksi lewat LEFT JOIN + SUM
+// Sekalian dihitung total diantar & total diambil (infeksius + non-infeksius) per transaksi
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT
          st.id, st.ruangan, st.tanggal, st.created_at,
          COALESCE(SUM(d.jumlah_kotor), 0) AS total_kotor,
-         COALESCE(SUM(d.jumlah_bersih), 0) AS total_bersih
+         COALESCE(SUM(d.jumlah_diambil_infeksius + d.jumlah_diambil_non_infeksius), 0) AS total_bersih
        FROM serah_terima st
        LEFT JOIN serah_terima_detail d ON d.serah_terima_id = st.id
        GROUP BY st.id, st.ruangan, st.tanggal, st.created_at
@@ -28,7 +28,6 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Ambil header transaksi
     const [headerRows] = await db.query(
       'SELECT id, ruangan, tanggal, created_at FROM serah_terima WHERE id = ?',
       [id]
@@ -38,10 +37,11 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Transaksi tidak ditemukan' });
     }
 
-    // Ambil detail linen, join ke jenis_linen supaya dapat namanya juga
     const [detailRows] = await db.query(
       `SELECT d.id, d.jenis_linen_id, l.nama AS jenis_linen_nama,
-              d.jumlah_kotor, d.jumlah_bersih, d.keterangan
+              d.jumlah_kotor,
+              d.jumlah_diambil_infeksius, d.jumlah_diambil_non_infeksius,
+              d.keterangan
        FROM serah_terima_detail d
        JOIN jenis_linen l ON l.id = d.jenis_linen_id
        WHERE d.serah_terima_id = ?
@@ -60,8 +60,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // PUT update satu transaksi (ganti header + seluruh detail linennya)
-// Body yang diharapkan sama seperti POST:
-// { "ruangan": "...", "tanggal": "...", "detail": [ { jenis_linen_id, jumlah_kotor, jumlah_bersih, keterangan }, ... ] }
+// Body: { ruangan, tanggal, detail: [{ jenis_linen_id, jumlah_kotor, jumlah_diambil_infeksius, jumlah_diambil_non_infeksius, keterangan }] }
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { ruangan, tanggal, detail } = req.body;
@@ -77,7 +76,6 @@ router.put('/:id', async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    // 1. Pastikan transaksinya ada, sekaligus update header
     const [updateResult] = await connection.query(
       'UPDATE serah_terima SET ruangan = ?, tanggal = ? WHERE id = ?',
       [ruangan, tanggal, id]
@@ -88,8 +86,6 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Transaksi tidak ditemukan' });
     }
 
-    // 2. Hapus semua detail lama, lalu masukkan ulang yang baru
-    //    (lebih sederhana & aman daripada mencocokkan baris satu-satu)
     await connection.query(
       'DELETE FROM serah_terima_detail WHERE serah_terima_id = ?',
       [id]
@@ -97,15 +93,16 @@ router.put('/:id', async (req, res) => {
 
     for (const item of detail) {
       const jumlahKotor = item.jumlah_kotor || 0;
-      const jumlahBersih = item.jumlah_bersih || 0;
+      const jumlahInfeksius = item.jumlah_diambil_infeksius || 0;
+      const jumlahNonInfeksius = item.jumlah_diambil_non_infeksius || 0;
 
-      if (jumlahKotor === 0 && jumlahBersih === 0) continue;
+      if (jumlahKotor === 0 && jumlahInfeksius === 0 && jumlahNonInfeksius === 0) continue;
 
       await connection.query(
         `INSERT INTO serah_terima_detail
-         (serah_terima_id, jenis_linen_id, jumlah_kotor, jumlah_bersih, keterangan)
-         VALUES (?, ?, ?, ?, ?)`,
-        [id, item.jenis_linen_id, jumlahKotor, jumlahBersih, item.keterangan || null]
+         (serah_terima_id, jenis_linen_id, jumlah_kotor, jumlah_diambil_infeksius, jumlah_diambil_non_infeksius, keterangan)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, item.jenis_linen_id, jumlahKotor, jumlahInfeksius, jumlahNonInfeksius, item.keterangan || null]
       );
     }
 
@@ -142,15 +139,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // POST simpan transaksi serah terima baru
-// Body yang diharapkan:
-// {
-//   "ruangan": "ICU",
-//   "tanggal": "2026-09-02",
-//   "detail": [
-//     { "jenis_linen_id": 1, "jumlah_kotor": 5, "jumlah_bersih": 3, "keterangan": "" },
-//     { "jenis_linen_id": 2, "jumlah_kotor": 0, "jumlah_bersih": 2, "keterangan": "" }
-//   ]
-// }
+// Body: { ruangan, tanggal, detail: [{ jenis_linen_id, jumlah_kotor, jumlah_diambil_infeksius, jumlah_diambil_non_infeksius, keterangan }] }
 router.post('/', async (req, res) => {
   const { ruangan, tanggal, detail } = req.body;
 
@@ -173,15 +162,16 @@ router.post('/', async (req, res) => {
 
     for (const item of detail) {
       const jumlahKotor = item.jumlah_kotor || 0;
-      const jumlahBersih = item.jumlah_bersih || 0;
+      const jumlahInfeksius = item.jumlah_diambil_infeksius || 0;
+      const jumlahNonInfeksius = item.jumlah_diambil_non_infeksius || 0;
 
-      if (jumlahKotor === 0 && jumlahBersih === 0) continue;
+      if (jumlahKotor === 0 && jumlahInfeksius === 0 && jumlahNonInfeksius === 0) continue;
 
       await connection.query(
         `INSERT INTO serah_terima_detail
-         (serah_terima_id, jenis_linen_id, jumlah_kotor, jumlah_bersih, keterangan)
-         VALUES (?, ?, ?, ?, ?)`,
-        [serahTerimaId, item.jenis_linen_id, jumlahKotor, jumlahBersih, item.keterangan || null]
+         (serah_terima_id, jenis_linen_id, jumlah_kotor, jumlah_diambil_infeksius, jumlah_diambil_non_infeksius, keterangan)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [serahTerimaId, item.jenis_linen_id, jumlahKotor, jumlahInfeksius, jumlahNonInfeksius, item.keterangan || null]
       );
     }
 

@@ -226,9 +226,7 @@
       </thead>
       <tbody id="tbody-stok"></tbody>
     </table>
-    <div class="keterangan-box">
-      Stok dihitung otomatis dari seluruh riwayat serah terima: total linen yang diantar laundry ke ruangan ini, dikurangi total yang sudah diambil kembali oleh laundry dari ruangan ini. Angka ini bisa meleset kalau ada transaksi lama yang datanya belum lengkap.
-    </div>
+    
   </div>
 
 </div>
@@ -290,6 +288,7 @@
 
       tbodyStok.innerHTML = '';
       data.forEach(item => {
+        const totalDiambil = Number(item.total_diambil_infeksius) + Number(item.total_diambil_non_infeksius);
         const stok = Number(item.stok);
         let kelas = 'stok-nol';
         if(stok > 0) kelas = 'stok-positif';
@@ -299,7 +298,7 @@
         tr.innerHTML = `
           <td>${item.jenis_linen_nama}</td>
           <td class="col-num col-diantar">${item.total_diantar}</td>
-          <td class="col-num col-diambil">${item.total_diambil}</td>
+          <td class="col-num col-diambil">${totalDiambil}</td>
           <td class="col-num stok-nilai ${kelas}">${stok}</td>
         `;
         tbodyStok.appendChild(tr);

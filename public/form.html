@@ -21,6 +21,9 @@
     --amber: #B8722E;
     --amber-tint: #FBF0E3;
     --danger: #B34A3E;
+    --danger-tint: #FBEAE7;
+    --green: #3B7A3F;
+    --green-tint: #EAF3EA;
     --radius: 10px;
   }
 
@@ -172,11 +175,12 @@
   }
 
   thead th.col-no{ width: 44px; text-align: center; }
-  thead th.col-kotor, thead th.col-bersih{ width: 104px; text-align: center; }
-  thead th.col-ket{ width: 160px; }
+  thead th.col-kotor, thead th.col-infeksius, thead th.col-noninfeksius{ width: 96px; text-align: center; }
+  thead th.col-ket{ width: 140px; }
 
   thead th.hdr-kotor{ color: var(--amber); }
-  thead th.hdr-bersih{ color: var(--teal-deep); }
+  thead th.hdr-infeksius{ color: var(--danger); }
+  thead th.hdr-noninfeksius{ color: var(--green); }
 
   tbody td{
     padding: 6px 12px;
@@ -213,8 +217,10 @@
 
   .qty-input.kotor{ background: var(--amber-tint); }
   .qty-input.kotor:focus-visible{ outline: 2px solid var(--amber); background: #fff; }
-  .qty-input.bersih{ background: var(--teal-tint); }
-  .qty-input.bersih:focus-visible{ outline: 2px solid var(--teal); background: #fff; }
+  .qty-input.infeksius{ background: var(--danger-tint); }
+  .qty-input.infeksius:focus-visible{ outline: 2px solid var(--danger); background: #fff; }
+  .qty-input.noninfeksius{ background: var(--green-tint); }
+  .qty-input.noninfeksius:focus-visible{ outline: 2px solid var(--green); background: #fff; }
 
   .qty-input::-webkit-outer-spin-button,
   .qty-input::-webkit-inner-spin-button{
@@ -262,7 +268,8 @@
   }
 
   .totals .dot-kotor{ color: var(--amber); }
-  .totals .dot-bersih{ color: var(--teal-deep); }
+  .totals .dot-infeksius{ color: var(--danger); }
+  .totals .dot-noninfeksius{ color: var(--green); }
 
   button#submit-btn{
     font-family: inherit;
@@ -301,13 +308,14 @@
     font-size: 14px;
   }
 
-  @media (max-width: 620px){
+  @media (max-width: 680px){
     .info-row{ grid-template-columns: 1fr; }
     header{ flex-direction: column; align-items: flex-start; gap: 6px; }
     .tanggal-hariini{ text-align: left; }
     thead th.col-ket, td.col-ket{ display: none; }
+    thead th.col-kotor, td.col-kotor{ display: none; }
     .footer-bar{ flex-direction: column; align-items: stretch; }
-    .totals{ justify-content: space-between; }
+    .totals{ justify-content: space-between; flex-wrap: wrap; row-gap: 6px; }
     button#submit-btn{ width: 100%; }
   }
 </style>
@@ -348,12 +356,13 @@
               <th class="col-no">No</th>
               <th>Jenis Linen</th>
               <th class="col-kotor hdr-kotor">Diantar</th>
-              <th class="col-bersih hdr-bersih">Diambil</th>
+              <th class="col-infeksius hdr-infeksius">Diambil Infeksius</th>
+              <th class="col-noninfeksius hdr-noninfeksius">Diambil Non-Infeksius</th>
               <th class="col-ket">Keterangan</th>
             </tr>
           </thead>
           <tbody id="tbody-linen">
-            <tr class="loading-row"><td colspan="5">Memuat daftar linen…</td></tr>
+            <tr class="loading-row"><td colspan="6">Memuat daftar linen…</td></tr>
           </tbody>
         </table>
       </div>
@@ -361,7 +370,8 @@
       <div class="footer-bar">
         <div class="totals">
           <span><span class="dot-kotor">●</span> Total diantar <strong id="total-kotor">0</strong></span>
-          <span><span class="dot-bersih">●</span> Total diambil <strong id="total-bersih">0</strong></span>
+          <span><span class="dot-infeksius">●</span> Diambil infeksius <strong id="total-infeksius">0</strong></span>
+          <span><span class="dot-noninfeksius">●</span> Diambil non-infeksius <strong id="total-noninfeksius">0</strong></span>
         </div>
         <button type="submit" id="submit-btn">Simpan serah terima</button>
       </div>
@@ -377,7 +387,8 @@
   const banner = document.getElementById('banner');
   const submitBtn = document.getElementById('submit-btn');
   const totalKotorEl = document.getElementById('total-kotor');
-  const totalBersihEl = document.getElementById('total-bersih');
+  const totalInfeksiusEl = document.getElementById('total-infeksius');
+  const totalNonInfeksiusEl = document.getElementById('total-noninfeksius');
   const tanggalInput = document.getElementById('tanggal');
   const tanggalHariIni = document.getElementById('tanggal-hariini');
 
@@ -393,11 +404,13 @@
   }
 
   function hitungTotal(){
-    let kotor = 0, bersih = 0;
+    let kotor = 0, infeksius = 0, nonInfeksius = 0;
     document.querySelectorAll('.qty-input.kotor').forEach(el => kotor += Number(el.value) || 0);
-    document.querySelectorAll('.qty-input.bersih').forEach(el => bersih += Number(el.value) || 0);
+    document.querySelectorAll('.qty-input.infeksius').forEach(el => infeksius += Number(el.value) || 0);
+    document.querySelectorAll('.qty-input.noninfeksius').forEach(el => nonInfeksius += Number(el.value) || 0);
     totalKotorEl.textContent = kotor;
-    totalBersihEl.textContent = bersih;
+    totalInfeksiusEl.textContent = infeksius;
+    totalNonInfeksiusEl.textContent = nonInfeksius;
   }
 
   async function muatJenisLinen(){
@@ -416,8 +429,12 @@
             <input type="number" min="0" inputmode="numeric" class="qty-input kotor"
                    data-id="${item.id}" value="0">
           </td>
-          <td class="col-bersih">
-            <input type="number" min="0" inputmode="numeric" class="qty-input bersih"
+          <td class="col-infeksius">
+            <input type="number" min="0" inputmode="numeric" class="qty-input infeksius"
+                   data-id="${item.id}" value="0">
+          </td>
+          <td class="col-noninfeksius">
+            <input type="number" min="0" inputmode="numeric" class="qty-input noninfeksius"
                    data-id="${item.id}" value="0">
           </td>
           <td class="col-ket">
@@ -429,7 +446,7 @@
 
       tbody.addEventListener('input', hitungTotal);
     }catch(err){
-      tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Gagal memuat daftar linen. Coba muat ulang halaman.</td></tr>';
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="6">Gagal memuat daftar linen. Coba muat ulang halaman.</td></tr>';
     }
   }
 
@@ -443,16 +460,19 @@
     const detail = [];
     document.querySelectorAll('#tbody-linen tr').forEach(tr => {
       const kotorInput = tr.querySelector('.qty-input.kotor');
-      const bersihInput = tr.querySelector('.qty-input.bersih');
+      const infeksiusInput = tr.querySelector('.qty-input.infeksius');
+      const nonInfeksiusInput = tr.querySelector('.qty-input.noninfeksius');
       const ketInput = tr.querySelector('.ket-input');
       if(!kotorInput) return;
       const kotor = Number(kotorInput.value) || 0;
-      const bersih = Number(bersihInput.value) || 0;
-      if(kotor === 0 && bersih === 0) return;
+      const infeksius = Number(infeksiusInput.value) || 0;
+      const nonInfeksius = Number(nonInfeksiusInput.value) || 0;
+      if(kotor === 0 && infeksius === 0 && nonInfeksius === 0) return;
       detail.push({
         jenis_linen_id: Number(kotorInput.dataset.id),
         jumlah_kotor: kotor,
-        jumlah_bersih: bersih,
+        jumlah_diambil_infeksius: infeksius,
+        jumlah_diambil_non_infeksius: nonInfeksius,
         keterangan: ketInput.value.trim() || null
       });
     });
