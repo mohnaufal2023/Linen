@@ -100,8 +100,19 @@
     background: var(--surface);
     color: var(--ink);
   }
+  .filter-row select{
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .filter-row select#filter-ruangan{ flex: 1; min-width: 180px; }
   .filter-row input#cari-ruangan{ flex: 1; min-width: 180px; }
-  .filter-row input:focus-visible{
+  .filter-row input:focus-visible, .filter-row select:focus-visible{
     outline: 2px solid var(--teal);
     outline-offset: 1px;
     border-color: var(--teal);
@@ -247,6 +258,30 @@
     gap: 8px;
   }
 
+  .penerima-info{
+    padding: 16px 22px;
+    border-top: 1px solid var(--line-soft);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .penerima-info .nama-label{
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .penerima-info .nama-label strong{
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .penerima-info img.ttd-img{
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    padding: 2px 8px;
+  }
+
   .btn{
     font-family: inherit;
     font-size: 13.5px;
@@ -382,14 +417,17 @@
   </div>
 
   <div class="filter-row">
-    <input type="text" id="cari-ruangan" placeholder="Cari ruangan…">
+    <select id="filter-ruangan">
+      <option value="">Semua ruangan</option>
+    </select>
     <input type="date" id="filter-tanggal">
   </div>
 
   <div class="total-bar" id="total-bar">
     <span class="jumlah-trx"><strong id="jumlah-trx">0</strong> transaksi</span>
     <span><span class="dot-kotor">●</span> Total diantar <strong id="grand-total-kotor">0</strong></span>
-    <span><span class="dot-bersih">●</span> Total diambil <strong id="grand-total-bersih">0</strong></span>
+    <span><span class="dot-infeksius">●</span> Total infeksius <strong id="grand-total-infeksius">0</strong></span>
+    <span><span class="dot-noninfeksius">●</span> Total non-infeksius <strong id="grand-total-noninfeksius">0</strong></span>
   </div>
 
   <div class="layout">
@@ -409,7 +447,7 @@
 <script>
   const listScroll = document.getElementById('list-scroll');
   const detailPanel = document.getElementById('detail-panel');
-  const cariRuangan = document.getElementById('cari-ruangan');
+  const filterRuangan = document.getElementById('filter-ruangan');
   const filterTanggal = document.getElementById('filter-tanggal');
 
   let semuaTransaksi = [];
@@ -431,24 +469,26 @@
   }
 
   function renderList(){
-    const kataKunci = cariRuangan.value.trim().toLowerCase();
+    const ruanganDipilih = filterRuangan.value;
     const tanggalFilter = filterTanggal.value;
 
     const hasil = semuaTransaksi.filter(trx => {
-      const cocokRuangan = trx.ruangan.toLowerCase().includes(kataKunci);
+      const cocokRuangan = !ruanganDipilih || trx.ruangan === ruanganDipilih;
       const cocokTanggal = !tanggalFilter || trx.tanggal.split('T')[0] === tanggalFilter;
       return cocokRuangan && cocokTanggal;
     });
 
     // Hitung & tampilkan total gabungan dari transaksi yang lagi ditampilkan
-    let grandKotor = 0, grandBersih = 0;
+    let grandKotor = 0, grandInfeksius = 0, grandNonInfeksius = 0;
     hasil.forEach(trx => {
       grandKotor += Number(trx.total_kotor) || 0;
-      grandBersih += Number(trx.total_bersih) || 0;
+      grandInfeksius += Number(trx.total_infeksius) || 0;
+      grandNonInfeksius += Number(trx.total_non_infeksius) || 0;
     });
     document.getElementById('jumlah-trx').textContent = hasil.length;
     document.getElementById('grand-total-kotor').textContent = grandKotor;
-    document.getElementById('grand-total-bersih').textContent = grandBersih;
+    document.getElementById('grand-total-infeksius').textContent = grandInfeksius;
+    document.getElementById('grand-total-noninfeksius').textContent = grandNonInfeksius;
 
     if(hasil.length === 0){
       listScroll.innerHTML = '<div class="empty-state">Tidak ada transaksi yang cocok.</div>';
@@ -473,9 +513,28 @@
       const res = await fetch('/api/serah-terima');
       if(!res.ok) throw new Error('Gagal memuat');
       semuaTransaksi = await res.json();
+      isiOpsiRuangan();
       renderList();
     }catch(err){
       listScroll.innerHTML = '<div class="empty-state">Gagal memuat riwayat. Coba muat ulang halaman.</div>';
+    }
+  }
+
+  function isiOpsiRuangan(){
+    const namaRuanganUnik = [...new Set(semuaTransaksi.map(trx => trx.ruangan))].sort();
+    const nilaiTerpilih = filterRuangan.value;
+
+    filterRuangan.innerHTML = '<option value="">Semua ruangan</option>';
+    namaRuanganUnik.forEach(nama => {
+      const opt = document.createElement('option');
+      opt.value = nama;
+      opt.textContent = nama;
+      filterRuangan.appendChild(opt);
+    });
+
+    // Pertahankan pilihan sebelumnya kalau masih ada di daftar
+    if(namaRuanganUnik.includes(nilaiTerpilih)){
+      filterRuangan.value = nilaiTerpilih;
     }
   }
 
@@ -565,6 +624,12 @@
           ${baris || '<tr class="empty-detail"><td colspan="6">Tidak ada rincian linen.</td></tr>'}
         </tbody>
       </table>
+      ${(trx.nama_penerima || trx.tanda_tangan) ? `
+        <div class="penerima-info">
+          <span class="nama-label">Diterima oleh: <strong>${trx.nama_penerima || '(nama tidak diisi)'}</strong></span>
+          ${trx.tanda_tangan ? `<img class="ttd-img" src="${trx.tanda_tangan}" alt="Tanda tangan penerima">` : ''}
+        </div>
+      ` : ''}
     `;
 
     document.getElementById('btn-edit').addEventListener('click', () => {
@@ -691,7 +756,13 @@
       const res = await fetch(`/api/serah-terima/${trxAktif.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ruangan, tanggal, detail })
+        body: JSON.stringify({
+          ruangan,
+          tanggal,
+          detail,
+          nama_penerima: trxAktif.nama_penerima || null,
+          tanda_tangan: trxAktif.tanda_tangan || null
+        })
       });
       const result = await res.json();
       if(!res.ok) throw new Error(result.error || 'Gagal menyimpan perubahan');
@@ -724,7 +795,7 @@
     }
   }
 
-  cariRuangan.addEventListener('input', renderList);
+  filterRuangan.addEventListener('change', renderList);
   filterTanggal.addEventListener('input', renderList);
 
   muatDaftar();

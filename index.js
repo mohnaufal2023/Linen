@@ -13,5 +13,8 @@ app.use('/api/serah-terima', serahTerimaRoutes);
 const stokRuanganRoutes = require('./routes/stokRuangan');
 app.use('/api/stok-ruangan', stokRuanganRoutes);
 
+const ruanganRoutes = require('./routes/ruangan');
+app.use('/api/ruangan', ruanganRoutes);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server jalan di http://localhost:${PORT}`));
