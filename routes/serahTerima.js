@@ -3,13 +3,15 @@ const router = express.Router();
 const db = require('../config/db');
 
 // GET daftar semua transaksi serah terima, terbaru duluan
-// Sekalian dihitung total diantar & total diambil (infeksius + non-infeksius) per transaksi
+// Sekalian dihitung total diantar, infeksius, dan non-infeksius per transaksi
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT
          st.id, st.ruangan, st.tanggal, st.created_at,
          COALESCE(SUM(d.jumlah_kotor), 0) AS total_kotor,
+         COALESCE(SUM(d.jumlah_diambil_infeksius), 0) AS total_infeksius,
+         COALESCE(SUM(d.jumlah_diambil_non_infeksius), 0) AS total_non_infeksius,
          COALESCE(SUM(d.jumlah_diambil_infeksius + d.jumlah_diambil_non_infeksius), 0) AS total_bersih
        FROM serah_terima st
        LEFT JOIN serah_terima_detail d ON d.serah_terima_id = st.id
@@ -29,7 +31,7 @@ router.get('/:id', async (req, res) => {
 
   try {
     const [headerRows] = await db.query(
-      'SELECT id, ruangan, tanggal, created_at FROM serah_terima WHERE id = ?',
+      'SELECT id, ruangan, tanggal, created_at, nama_penerima, tanda_tangan FROM serah_terima WHERE id = ?',
       [id]
     );
 
@@ -41,6 +43,7 @@ router.get('/:id', async (req, res) => {
       `SELECT d.id, d.jenis_linen_id, l.nama AS jenis_linen_nama,
               d.jumlah_kotor,
               d.jumlah_diambil_infeksius, d.jumlah_diambil_non_infeksius,
+              d.verifikasi_infeksius,
               d.keterangan
        FROM serah_terima_detail d
        JOIN jenis_linen l ON l.id = d.jenis_linen_id
@@ -59,11 +62,34 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// PUT ubah status verifikasi infeksius untuk satu baris detail linen
+// Body: { verifikasi_infeksius: 0 atau 1 }
+router.put('/detail/:detailId/verifikasi', async (req, res) => {
+  const { detailId } = req.params;
+  const { verifikasi_infeksius } = req.body;
+
+  try {
+    const [result] = await db.query(
+      'UPDATE serah_terima_detail SET verifikasi_infeksius = ? WHERE id = ?',
+      [verifikasi_infeksius ? 1 : 0, detailId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Baris detail tidak ditemukan' });
+    }
+
+    res.json({ message: 'Status verifikasi berhasil diperbarui' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Gagal memperbarui status verifikasi' });
+  }
+});
+
 // PUT update satu transaksi (ganti header + seluruh detail linennya)
 // Body: { ruangan, tanggal, detail: [{ jenis_linen_id, jumlah_kotor, jumlah_diambil_infeksius, jumlah_diambil_non_infeksius, keterangan }] }
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { ruangan, tanggal, detail } = req.body;
+  const { ruangan, tanggal, detail, nama_penerima, tanda_tangan } = req.body;
 
   if (!ruangan || !tanggal) {
     return res.status(400).json({ error: 'Ruangan dan tanggal wajib diisi' });
@@ -77,8 +103,8 @@ router.put('/:id', async (req, res) => {
     await connection.beginTransaction();
 
     const [updateResult] = await connection.query(
-      'UPDATE serah_terima SET ruangan = ?, tanggal = ? WHERE id = ?',
-      [ruangan, tanggal, id]
+      'UPDATE serah_terima SET ruangan = ?, tanggal = ?, nama_penerima = ?, tanda_tangan = ? WHERE id = ?',
+      [ruangan, tanggal, nama_penerima || null, tanda_tangan || null, id]
     );
 
     if (updateResult.affectedRows === 0) {
@@ -95,14 +121,15 @@ router.put('/:id', async (req, res) => {
       const jumlahKotor = item.jumlah_kotor || 0;
       const jumlahInfeksius = item.jumlah_diambil_infeksius || 0;
       const jumlahNonInfeksius = item.jumlah_diambil_non_infeksius || 0;
+      const verifikasi = item.verifikasi_infeksius ? 1 : 0;
 
       if (jumlahKotor === 0 && jumlahInfeksius === 0 && jumlahNonInfeksius === 0) continue;
 
       await connection.query(
         `INSERT INTO serah_terima_detail
-         (serah_terima_id, jenis_linen_id, jumlah_kotor, jumlah_diambil_infeksius, jumlah_diambil_non_infeksius, keterangan)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [id, item.jenis_linen_id, jumlahKotor, jumlahInfeksius, jumlahNonInfeksius, item.keterangan || null]
+         (serah_terima_id, jenis_linen_id, jumlah_kotor, jumlah_diambil_infeksius, jumlah_diambil_non_infeksius, verifikasi_infeksius, keterangan)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [id, item.jenis_linen_id, jumlahKotor, jumlahInfeksius, jumlahNonInfeksius, verifikasi, item.keterangan || null]
       );
     }
 
@@ -141,7 +168,7 @@ router.delete('/:id', async (req, res) => {
 // POST simpan transaksi serah terima baru
 // Body: { ruangan, tanggal, detail: [{ jenis_linen_id, jumlah_kotor, jumlah_diambil_infeksius, jumlah_diambil_non_infeksius, keterangan }] }
 router.post('/', async (req, res) => {
-  const { ruangan, tanggal, detail } = req.body;
+  const { ruangan, tanggal, detail, nama_penerima, tanda_tangan } = req.body;
 
   if (!ruangan || !tanggal) {
     return res.status(400).json({ error: 'Ruangan dan tanggal wajib diisi' });
@@ -155,8 +182,8 @@ router.post('/', async (req, res) => {
     await connection.beginTransaction();
 
     const [headerResult] = await connection.query(
-      'INSERT INTO serah_terima (ruangan, tanggal) VALUES (?, ?)',
-      [ruangan, tanggal]
+      'INSERT INTO serah_terima (ruangan, tanggal, nama_penerima, tanda_tangan) VALUES (?, ?, ?, ?)',
+      [ruangan, tanggal, nama_penerima || null, tanda_tangan || null]
     );
     const serahTerimaId = headerResult.insertId;
 

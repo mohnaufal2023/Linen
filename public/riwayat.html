@@ -334,6 +334,22 @@
     font-size: 13px;
   }
 
+  .badge-verif{
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .badge-verif.belum{ background: var(--danger-tint); color: var(--danger); }
+  .badge-verif.belum:hover{ background: #F6D9D5; }
+  .badge-verif.sudah{ background: var(--green-tint); color: var(--green); }
+  .badge-verif.sudah:hover{ background: #DCEEDD; }
+  .verif-kosong{ color: var(--ink-soft); font-size: 13px; }
+
   .loading-row td, .empty-detail td{
     text-align: center;
     color: var(--ink-soft);
@@ -345,6 +361,7 @@
     header{ flex-direction: column; align-items: flex-start; gap: 10px; }
     thead th.col-ket, td.col-ket{ display: none; }
     thead th.col-kotor, td.col-kotor{ display: none; }
+    .badge-verif{ font-size: 11px; padding: 4px 8px; }
   }
 </style>
 </head>
@@ -494,12 +511,22 @@
       totalKotor += item.jumlah_kotor;
       totalInfeksius += item.jumlah_diambil_infeksius;
       totalNonInfeksius += item.jumlah_diambil_non_infeksius;
+
+      let selVerif = '<span class="verif-kosong">—</span>';
+      if(item.jumlah_diambil_infeksius > 0){
+        const sudah = Number(item.verifikasi_infeksius) === 1;
+        selVerif = `<button class="badge-verif ${sudah ? 'sudah' : 'belum'}" data-detail-id="${item.id}" data-status="${sudah ? 1 : 0}">
+          ${sudah ? '✓ Sudah diverifikasi' : '⚠ Belum diverifikasi'}
+        </button>`;
+      }
+
       return `
         <tr>
           <td>${item.jenis_linen_nama}</td>
           <td class="col-kotor">${item.jumlah_kotor}</td>
           <td class="col-infeksius">${item.jumlah_diambil_infeksius}</td>
           <td class="col-noninfeksius">${item.jumlah_diambil_non_infeksius}</td>
+          <td class="col-verif" style="text-align:center;">${selVerif}</td>
           <td class="col-ket">${item.keterangan || '—'}</td>
         </tr>
       `;
@@ -530,11 +557,12 @@
             <th class="col-kotor hdr-kotor">Diantar</th>
             <th class="col-infeksius hdr-infeksius">Infeksius</th>
             <th class="col-noninfeksius hdr-noninfeksius">Non-Infeksius</th>
+            <th style="text-align:center;">Verifikasi</th>
             <th class="col-ket">Keterangan</th>
           </tr>
         </thead>
         <tbody>
-          ${baris || '<tr class="empty-detail"><td colspan="5">Tidak ada rincian linen.</td></tr>'}
+          ${baris || '<tr class="empty-detail"><td colspan="6">Tidak ada rincian linen.</td></tr>'}
         </tbody>
       </table>
     `;
@@ -544,6 +572,35 @@
       renderDetail();
     });
     document.getElementById('btn-hapus').addEventListener('click', hapusTransaksi);
+
+    detailPanel.querySelectorAll('.badge-verif').forEach(btn => {
+      btn.addEventListener('click', () => toggleVerifikasi(btn));
+    });
+  }
+
+  async function toggleVerifikasi(btn){
+    const detailId = btn.dataset.detailId;
+    const statusBaru = btn.dataset.status === '1' ? 0 : 1;
+
+    btn.disabled = true;
+
+    try{
+      const res = await fetch(`/api/serah-terima/detail/${detailId}/verifikasi`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ verifikasi_infeksius: statusBaru })
+      });
+      const result = await res.json();
+      if(!res.ok) throw new Error(result.error || 'Gagal memperbarui status');
+
+      // Update data lokal supaya tidak perlu fetch ulang seluruh transaksi
+      const item = trxAktif.detail.find(d => d.id === Number(detailId));
+      if(item) item.verifikasi_infeksius = statusBaru;
+      renderDetailLihat();
+    }catch(err){
+      alert(err.message || 'Terjadi kesalahan saat memperbarui status verifikasi.');
+      btn.disabled = false;
+    }
   }
 
   function renderDetailEdit(){
@@ -622,6 +679,7 @@
         jumlah_kotor: Number(kotorInput.value) || 0,
         jumlah_diambil_infeksius: Number(infeksiusInput.value) || 0,
         jumlah_diambil_non_infeksius: Number(nonInfeksiusInput.value) || 0,
+        verifikasi_infeksius: item.verifikasi_infeksius || 0,
         keterangan: ketInput.value.trim() || null
       };
     });
