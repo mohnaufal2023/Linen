@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masuk — Web Linen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+    --teal: #00b1b7;
+    --teal-deep: #00b1b7;
+    --teal-tint: #E7F2EE;
+    --teal-panel: #00b1b7;
+    --danger: #B34A3E;
+    --danger-tint: #FBEAE7;
+    --radius: 20px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+  }
+
+  .card{
+    max-width: 860px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    box-shadow: 0 24px 60px -20px rgba(28,43,51,0.18);
+  }
+
+  /* ---------- Panel ilustrasi ---------- */
+  .ilus-panel{
+    position: relative;
+    background: var(--teal-panel);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    min-height: 460px;
+  }
+
+  .ilus-pattern{
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding: 14px;
+    opacity: 0.10;
+    pointer-events: none;
+  }
+  .ilus-pattern span{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 26px;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+
+  .ilus-label{
+    position: absolute;
+    top: 22px;
+    left: 24px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.03em;
+  }
+
+  .ilus-panel img{
+    position: relative;
+    z-index: 1;
+    max-width: 72%;
+    height: auto;
+    margin-bottom: -6px;
+    filter: drop-shadow(0 18px 26px rgba(0,0,0,0.25));
+  }
+
+  /* ---------- Panel form ---------- */
+  .form-panel{
+    padding: 44px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .brand{
+    margin-bottom: 26px;
+  }
+
+  .brand .unit{
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-deep);
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+
+  h1{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 26px;
+    margin: 0 0 6px;
+  }
+
+  .form-panel .desc{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .field{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 20px;
+  }
+
+  .field label{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .field input{
+    font-family: inherit;
+    font-size: 15px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .field input:focus-visible{
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+    border-color: var(--teal);
+  }
+
+  button#login-btn{
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--teal);
+    border: none;
+    padding: 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 22px;
+  }
+  button#login-btn:hover{ background: var(--teal-deep); }
+  button#login-btn:disabled{ background: #A9B6B2; cursor: not-allowed; }
+
+  .banner{
+    display: none;
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-top: 18px;
+    background: var(--danger-tint);
+    color: var(--danger);
+    border: 1px solid #EFC7C0;
+  }
+  .banner.show{ display: block; }
+
+  @media (max-width: 720px){
+    .card{ grid-template-columns: 1fr; }
+    .ilus-panel{ min-height: 220px; }
+    .form-panel{ padding: 32px 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="ilus-panel">
+    
+    
+    <img src="/images/abe2.png" alt="Maskot Abe">
+  </div>
+
+  <div class="form-panel">
+    <div class="brand">
+      <span class="unit">LAUNDRY RS AWAL BROS</span>
+      <h1>Selamat datang</h1>
+      <p class="desc">Masuk untuk mencatat dan mengelola serah terima linen.</p>
+    </div>
+
+    <div class="banner" id="banner"></div>
+
+    <form id="form-login">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" id="login-btn">Masuk</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('form-login');
+  const banner = document.getElementById('banner');
+  const btn = document.getElementById('login-btn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    banner.className = 'banner';
+    btn.disabled = true;
+    btn.textContent = 'Memeriksa…';
+
+    try{
+      const res = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value.trim(),
+          password: document.getElementById('password').value
+        })
+      });
+      const result = await res.json();
+
+      if(!res.ok) throw new Error(result.error || 'Gagal masuk');
+
+      window.location.href = '/';
+    }catch(err){
+      banner.textContent = err.message || 'Username atau password salah.';
+      banner.className = 'banner show';
+      btn.disabled = false;
+      btn.textContent = 'Masuk';
+    }
+  });
+</script>
+
+</body>
+</html>

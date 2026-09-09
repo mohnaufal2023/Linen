@@ -14,8 +14,8 @@
     --ink: #1C2B33;
     --ink-soft: #5B6B70;
     --line: #DCE3E1;
-    --teal: #2E7D6B;
-    --teal-deep: #1F5E51;
+    --teal: #00b1b7;
+    --teal-deep: #00b1b7;
     --teal-tint: #E7F2EE;
     --amber: #B8722E;
     --amber-tint: #FBF0E3;
@@ -23,6 +23,21 @@
   }
 
   *{ box-sizing: border-box; }
+
+  a.logout-link{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+  a.logout-link:hover{ background: #FBEAE7; color: #B34A3E; border-color: #EFC7C0; }
 
   html, body{
     margin: 0;
@@ -110,6 +125,7 @@
   .menu-card.baru .menu-icon{ background: var(--teal-tint); color: var(--teal-deep); }
   .menu-card.riwayat .menu-icon{ background: var(--amber-tint); color: var(--amber); }
   .menu-card.kelola .menu-icon{ background: #EAEAF5; color: #4B4B8F; }
+  .menu-card.kelola-ruangan .menu-icon{ background: #E3F2ED; color: #1F5E51; }
   .menu-card.stok .menu-icon{ background: #FDEBEE; color: #B34A6B; }
 
   .menu-text h2{
@@ -133,6 +149,8 @@
 </style>
 </head>
 <body>
+
+<a class="logout-link" href="/logout">Keluar</a>
 
 <div class="wrap">
   <div class="brand">
@@ -165,6 +183,15 @@
       <div class="menu-text">
         <h2>Kelola Jenis Linen</h2>
         <p>Tambah, ubah, atau hapus daftar jenis linen</p>
+      </div>
+      <div class="menu-arrow">›</div>
+    </a>
+
+    <a class="menu-card kelola-ruangan" href="/kelola-ruangan.html">
+      <div class="menu-icon">🏥</div>
+      <div class="menu-text">
+        <h2>Kelola Ruangan</h2>
+        <p>Tambah, ubah, atau hapus daftar ruangan</p>
       </div>
       <div class="menu-arrow">›</div>
     </a>

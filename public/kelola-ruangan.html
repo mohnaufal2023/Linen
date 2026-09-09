@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kelola Jenis Linen</title>
+<title>Kelola Ruangan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
@@ -99,7 +99,6 @@
     color: var(--ink);
   }
   .add-form input#tambah-nama{ flex: 1; }
-  .add-form input#tambah-urutan{ width: 90px; }
   .add-form input:focus-visible{
     outline: 2px solid var(--teal);
     outline-offset: 1px;
@@ -147,17 +146,17 @@
     overflow: hidden;
   }
 
-  .linen-row{
+  .ruangan-row{
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
     border-bottom: 1px solid var(--line-soft);
   }
-  .linen-row:last-child{ border-bottom: none; }
-  .linen-row:hover{ background: #FAFBFA; }
+  .ruangan-row:last-child{ border-bottom: none; }
+  .ruangan-row:hover{ background: #FAFBFA; }
 
-  .linen-row .urutan-badge{
+  .ruangan-row .urutan-badge{
     flex-shrink: 0;
     width: 28px;
     height: 28px;
@@ -172,46 +171,20 @@
     font-weight: 600;
   }
 
-  .linen-row .nama{
+  .ruangan-row .nama{
     flex: 1;
     font-weight: 500;
     font-size: 14.5px;
   }
 
-  .stok-group{
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-
-  .stok-group label{
-    font-size: 12px;
-    color: var(--ink-soft);
-    white-space: nowrap;
-  }
-
-  .stok-input{
-    width: 64px;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    font-weight: 600;
-    padding: 6px 4px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--teal-tint);
-    color: var(--teal-deep);
-  }
-  .stok-input:focus-visible{ outline: 2px solid var(--teal); background: #fff; }
-
-  .linen-row .aksi{
+  .ruangan-row .aksi{
     display: flex;
     gap: 6px;
     flex-shrink: 0;
   }
 
   /* Mode edit inline */
-  .linen-row.editing .edit-field{
+  .ruangan-row.editing .edit-field{
     font-family: inherit;
     font-size: 14px;
     padding: 6px 8px;
@@ -220,8 +193,8 @@
     background: var(--bg);
     color: var(--ink);
   }
-  .linen-row.editing input#edit-inline-nama{ flex: 1; }
-  .linen-row.editing input#edit-inline-urutan{ width: 60px; }
+  .ruangan-row.editing input#edit-inline-nama{ flex: 1; }
+  .ruangan-row.editing input#edit-inline-urutan{ width: 60px; }
 
   .empty-state{
     padding: 30px 16px;
@@ -230,15 +203,10 @@
     font-size: 14px;
   }
 
-  @media (max-width: 620px){
+  @media (max-width: 560px){
     header{ flex-direction: column; align-items: flex-start; gap: 10px; }
     .add-form{ flex-wrap: wrap; }
     .add-form input#tambah-nama{ flex-basis: 100%; }
-    .linen-row{ flex-wrap: wrap; }
-    .linen-row .nama{ flex-basis: 100%; order: 1; }
-    .linen-row .urutan-badge{ order: 0; }
-    .stok-group{ order: 2; }
-    .linen-row .aksi{ order: 3; margin-left: auto; }
   }
 </style>
 </head>
@@ -249,20 +217,20 @@
   <header>
     <div class="brand">
       <span class="unit">Instalasi Loundry</span>
-      <h1>Kelola Jenis Linen</h1>
+      <h1>Kelola Ruangan</h1>
     </div>
     <a class="nav-link" href="/">← Kembali</a>
   </header>
 
   <form class="add-form" id="form-tambah">
-    <input type="text" id="tambah-nama" placeholder="Nama jenis linen baru…" required>
+    <input type="text" id="tambah-nama" placeholder="Nama ruangan baru…" required>
     <button type="submit" class="btn btn-primary" id="btn-tambah">Tambah</button>
   </form>
 
   <div class="banner" id="banner"></div>
 
   <div class="list-panel" id="list-panel">
-    <div class="empty-state">Memuat daftar jenis linen…</div>
+    <div class="empty-state">Memuat daftar ruangan…</div>
   </div>
 
 </div>
@@ -274,7 +242,7 @@
   const listPanel = document.getElementById('list-panel');
   const banner = document.getElementById('banner');
 
-  let daftarLinen = [];
+  let daftarRuangan = [];
   let editingId = null;
 
   function showBanner(type, message){
@@ -287,27 +255,27 @@
 
   async function muatDaftar(){
     try{
-      const res = await fetch('/api/jenis-linen');
+      const res = await fetch('/api/ruangan');
       if(!res.ok) throw new Error('Gagal memuat');
-      daftarLinen = await res.json();
+      daftarRuangan = await res.json();
       renderList();
     }catch(err){
-      listPanel.innerHTML = '<div class="empty-state">Gagal memuat daftar jenis linen. Coba muat ulang halaman.</div>';
+      listPanel.innerHTML = '<div class="empty-state">Gagal memuat daftar ruangan. Coba muat ulang halaman.</div>';
     }
   }
 
   function renderList(){
-    if(daftarLinen.length === 0){
-      listPanel.innerHTML = '<div class="empty-state">Belum ada jenis linen. Tambahkan lewat form di atas.</div>';
+    if(daftarRuangan.length === 0){
+      listPanel.innerHTML = '<div class="empty-state">Belum ada ruangan. Tambahkan lewat form di atas.</div>';
       return;
     }
 
     listPanel.innerHTML = '';
-    daftarLinen.forEach(item => {
+    daftarRuangan.forEach(item => {
       const row = document.createElement('div');
 
       if(item.id === editingId){
-        row.className = 'linen-row editing';
+        row.className = 'ruangan-row editing';
         row.innerHTML = `
           <input type="text" class="edit-field" id="edit-inline-nama" value="${item.nama}">
           <input type="number" class="edit-field" id="edit-inline-urutan" value="${item.urutan}" min="0">
@@ -317,15 +285,10 @@
           </div>
         `;
       }else{
-        row.className = 'linen-row';
+        row.className = 'ruangan-row';
         row.innerHTML = `
           <div class="urutan-badge">${item.urutan}</div>
           <div class="nama">${item.nama}</div>
-          <div class="stok-group">
-            <label>Stok</label>
-            <input type="number" min="0" class="stok-input" id="stok-${item.id}" value="${item.jumlah_stok || 0}">
-            <button class="btn btn-sm" data-aksi="simpan-stok" data-id="${item.id}">Simpan</button>
-          </div>
           <div class="aksi">
             <button class="btn btn-sm" data-aksi="edit" data-id="${item.id}">Edit</button>
             <button class="btn btn-danger btn-sm" data-aksi="hapus" data-id="${item.id}" data-nama="${item.nama}">Hapus</button>
@@ -355,33 +318,8 @@
     });
 
     listPanel.querySelectorAll('[data-aksi="hapus"]').forEach(btn => {
-      btn.addEventListener('click', () => hapusLinen(Number(btn.dataset.id), btn.dataset.nama));
+      btn.addEventListener('click', () => hapusRuangan(Number(btn.dataset.id), btn.dataset.nama));
     });
-
-    listPanel.querySelectorAll('[data-aksi="simpan-stok"]').forEach(btn => {
-      btn.addEventListener('click', () => simpanStok(Number(btn.dataset.id)));
-    });
-  }
-
-  async function simpanStok(id){
-    const item = daftarLinen.find(x => x.id === id);
-    const stokInput = document.getElementById(`stok-${id}`);
-    const jumlah_stok = Number(stokInput.value) || 0;
-
-    try{
-      const res = await fetch(`/api/jenis-linen/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nama: item.nama, urutan: item.urutan, jumlah_stok })
-      });
-      const result = await res.json();
-      if(!res.ok) throw new Error(result.error || 'Gagal menyimpan stok');
-
-      showBanner('success', `Stok "${item.nama}" diperbarui jadi ${jumlah_stok}.`);
-      await muatDaftar();
-    }catch(err){
-      showBanner('error', err.message || 'Terjadi kesalahan saat menyimpan stok.');
-    }
   }
 
   async function simpanEdit(id){
@@ -389,12 +327,12 @@
     const urutan = document.getElementById('edit-inline-urutan').value;
 
     if(!nama){
-      showBanner('error', 'Nama jenis linen tidak boleh kosong.');
+      showBanner('error', 'Nama ruangan tidak boleh kosong.');
       return;
     }
 
     try{
-      const res = await fetch(`/api/jenis-linen/${id}`, {
+      const res = await fetch(`/api/ruangan/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nama, urutan: Number(urutan) || 0 })
@@ -410,14 +348,14 @@
     }
   }
 
-  async function hapusLinen(id, nama){
-    const konfirmasi = confirm(`Hapus jenis linen "${nama}"? Tindakan ini tidak bisa dibatalkan.`);
+  async function hapusRuangan(id, nama){
+    const konfirmasi = confirm(`Hapus ruangan "${nama}"? Tindakan ini tidak bisa dibatalkan.`);
     if(!konfirmasi) return;
 
     try{
-      const res = await fetch(`/api/jenis-linen/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/ruangan/${id}`, { method: 'DELETE' });
       const result = await res.json();
-      if(!res.ok) throw new Error(result.error || 'Gagal menghapus jenis linen');
+      if(!res.ok) throw new Error(result.error || 'Gagal menghapus ruangan');
 
       showBanner('success', `"${nama}" berhasil dihapus.`);
       await muatDaftar();
@@ -432,7 +370,7 @@
     const nama = tambahNama.value.trim();
 
     if(!nama){
-      showBanner('error', 'Nama jenis linen wajib diisi.');
+      showBanner('error', 'Nama ruangan wajib diisi.');
       return;
     }
 
@@ -440,13 +378,13 @@
     btnTambah.textContent = 'Menyimpan…';
 
     try{
-      const res = await fetch('/api/jenis-linen', {
+      const res = await fetch('/api/ruangan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nama })
       });
       const result = await res.json();
-      if(!res.ok) throw new Error(result.error || 'Gagal menambahkan jenis linen');
+      if(!res.ok) throw new Error(result.error || 'Gagal menambahkan ruangan');
 
       showBanner('success', `"${nama}" berhasil ditambahkan.`);
       tambahNama.value = '';
