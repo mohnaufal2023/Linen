@@ -257,7 +257,7 @@
 
       if(!res.ok) throw new Error(result.error || 'Gagal masuk');
 
-      window.location.href = '/';
+      window.location.href = result.redirect || '/';
     }catch(err){
       banner.textContent = err.message || 'Username atau password salah.';
       banner.className = 'banner show';
