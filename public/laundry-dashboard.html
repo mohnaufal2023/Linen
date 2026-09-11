@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard Laundry — Web Linen</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+    --teal: #00b1b7;
+    --teal-tint: #E7F2EE;
+    --amber: #B8722E;
+    --amber-tint: #FBF0E3;
+    --purple: #4B4B8F;
+    --purple-tint: #EAEAF5;
+    --radius: 12px;
+  }
+
+  *{
+    box-sizing: border-box;
+  }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .wrap{
+    max-width: 620px;
+    width: 100%;
+  }
+
+  .logout-link{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .logout-link:hover{
+    background: #FBEAE7;
+    color: #B34A3E;
+    border-color: #EFC7C0;
+  }
+
+  .brand{
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .brand .unit{
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+
+  h1{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0;
+  }
+
+  .subtitle{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  .user-info{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 18px;
+  }
+
+  .user-info-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .user-info-row + .user-info-row{
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+
+  .user-label{
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .user-value{
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .menu{
+    display: grid;
+    gap: 14px;
+  }
+
+  .menu-card{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+
+  .menu-card:hover{
+    transform: translateY(-1px);
+  }
+
+  .menu-card.baru:hover{
+    border-color: var(--teal);
+  }
+
+  .menu-card.riwayat:hover{
+    border-color: var(--amber);
+  }
+
+  .menu-icon{
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .menu-card.baru .menu-icon{
+    background: var(--teal-tint);
+    color: var(--teal);
+  }
+
+  .menu-card.riwayat .menu-icon{
+    background: var(--amber-tint);
+    color: var(--amber);
+  }
+
+  .menu-card.verifikasi .menu-icon{
+    background: var(--purple-tint);
+    color: var(--purple);
+  }
+
+  .menu-text h2{
+    font-size: 16.5px;
+    font-weight: 700;
+    margin: 0 0 3px;
+  }
+
+  .menu-text p{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .menu-arrow{
+    margin-left: auto;
+    color: var(--ink-soft);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 600px){
+    body{
+      padding: 32px 16px;
+    }
+
+    h1{
+      font-size: 27px;
+    }
+
+    .logout-link{
+      top: 12px;
+      right: 12px;
+    }
+
+    .user-info-row{
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 3px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<a class="logout-link" href="/logout">Keluar</a>
+
+<div class="wrap">
+
+  <div class="brand">
+    <span class="unit">Instalasi Laundry</span>
+
+    <h1>Dashboard Laundry</h1>
+
+    <p class="subtitle">
+      Sistem Serah Terima Pencucian Linen
+    </p>
+  </div>
+
+  <div class="user-info" id="user-info">
+    <div class="user-info-row">
+      <div class="user-label">Username</div>
+      <div class="user-value" id="username">Memuat...</div>
+    </div>
+
+    <div class="user-info-row">
+      <div class="user-label">Role</div>
+      <div class="user-value">Laundry</div>
+    </div>
+  </div>
+
+  <div class="menu">
+
+    <a class="menu-card baru" href="/form.html">
+      <div class="menu-icon">
+        ＋
+      </div>
+
+      <div class="menu-text">
+        <h2>Serah Terima Baru</h2>
+        <p>
+          Catat linen yang diantar dan diambil dari ruangan
+        </p>
+      </div>
+
+      <div class="menu-arrow">
+        ›
+      </div>
+    </a>
+
+    <a class="menu-card verifikasi" href="/riwayat.html">
+      <div class="menu-icon">
+        ✓
+      </div>
+
+      <div class="menu-text">
+        <h2>Verifikasi Pengambilan</h2>
+        <p>
+          Periksa dan verifikasi linen yang diambil
+        </p>
+      </div>
+
+      <div class="menu-arrow">
+        ›
+      </div>
+    </a>
+
+    <a class="menu-card riwayat" href="/riwayat.html">
+      <div class="menu-icon">
+        📋
+      </div>
+
+      <div class="menu-text">
+        <h2>Riwayat Serah Terima</h2>
+        <p>
+          Lihat seluruh transaksi serah terima
+        </p>
+      </div>
+
+      <div class="menu-arrow">
+        ›
+      </div>
+    </a>
+
+  </div>
+
+</div>
+
+<script>
+  async function muatInformasiLaundry(){
+
+    try{
+      const res = await fetch('/api/me');
+
+      if(!res.ok){
+        throw new Error('Gagal mengambil informasi akun');
+      }
+
+      const result = await res.json();
+
+      if(result.user.role !== 'laundry'){
+        window.location.href = '/';
+        return;
+      }
+
+      document.getElementById('username').textContent =
+        result.user.username;
+
+    }catch(err){
+
+      console.error(err);
+
+      document.getElementById('username').textContent = '-';
+    }
+  }
+
+  muatInformasiLaundry();
+</script>
+
+</body>
+</html>

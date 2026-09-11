@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
+const path = require('path');
+
 require('dotenv').config();
+
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 
@@ -29,17 +32,31 @@ app.use(express.json());
 function requireLogin(req, res, next) {
   const isLoggedIn = req.session && req.session.loggedIn;
 
-  // Kalau sudah login dan membuka login.html
-  // arahkan ke dashboard sesuai role
+  // ==================================
+  // SUDAH LOGIN TAPI BUKA LOGIN.HTML
+  // ==================================
   if (req.path === '/login.html' && isLoggedIn) {
-    if (req.session.user && req.session.user.role === 'user') {
+
+    const role = req.session.user?.role;
+
+    if (role === 'admin') {
+      return res.redirect('/');
+    }
+
+    if (role === 'laundry') {
+      return res.redirect('/laundry-dashboard.html');
+    }
+
+    if (role === 'user') {
       return res.redirect('/user-dashboard.html');
     }
 
-    return res.redirect('/');
+    return res.redirect('/login.html');
   }
 
-  // Halaman yang boleh diakses tanpa login
+  // ==================================
+  // HALAMAN TANPA LOGIN
+  // ==================================
   const publicPaths = [
     '/login.html',
     '/login'
@@ -49,29 +66,39 @@ function requireLogin(req, res, next) {
     return next();
   }
 
-  // Logout tetap boleh diakses
+  // ==================================
+  // LOGOUT
+  // ==================================
   if (req.path === '/logout') {
     return next();
   }
 
-  // Gambar boleh diakses tanpa login
+  // ==================================
+  // GAMBAR
+  // ==================================
   if (req.path.startsWith('/images/')) {
     return next();
   }
 
-  // Kalau sudah login
+  // ==================================
+  // SUDAH LOGIN
+  // ==================================
   if (isLoggedIn) {
     return next();
   }
 
-  // Kalau API dan belum login
+  // ==================================
+  // API BELUM LOGIN
+  // ==================================
   if (req.path.startsWith('/api/')) {
     return res.status(401).json({
       error: 'Silakan login terlebih dahulu'
     });
   }
 
-  // Halaman biasa dan belum login
+  // ==================================
+  // HALAMAN BELUM LOGIN
+  // ==================================
   return res.redirect('/login.html');
 }
 
@@ -80,31 +107,157 @@ app.use(requireLogin);
 // ==============================
 // STATIC FILE
 // ==============================
-app.use(express.static('public'));
+app.use(
+  express.static(
+    path.join(__dirname, 'public')
+  )
+);
+
+// ==============================
+// INFO USER YANG SEDANG LOGIN
+// ==============================
+app.get('/api/me', async (req, res) => {
+
+  if (
+    !req.session ||
+    !req.session.loggedIn ||
+    !req.session.user
+  ) {
+    return res.status(401).json({
+      error: 'Silakan login terlebih dahulu'
+    });
+  }
+
+  try {
+
+    const userSession = req.session.user;
+
+    // ==================================
+    // ADMIN
+    // ==================================
+    if (userSession.role === 'admin') {
+
+      return res.json({
+        user: {
+          id: null,
+          username: userSession.username,
+          role: 'admin',
+          ruangan_id: null,
+          ruangan_nama: null
+        }
+      });
+    }
+
+    // ==================================
+    // LAUNDRY
+    // ==================================
+    if (userSession.role === 'laundry') {
+
+      return res.json({
+        user: {
+          id: userSession.id,
+          username: userSession.username,
+          role: 'laundry',
+          ruangan_id: null,
+          ruangan_nama: null
+        }
+      });
+    }
+
+    // ==================================
+    // USER RUANGAN
+    // ==================================
+    if (userSession.role === 'user') {
+
+      const [rows] = await db.query(
+        `SELECT
+          u.id,
+          u.username,
+          u.role,
+          u.ruangan_id,
+          r.nama AS ruangan_nama
+         FROM users u
+         LEFT JOIN ruangan r
+           ON r.id = u.ruangan_id
+         WHERE u.id = ?
+         LIMIT 1`,
+        [userSession.id]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({
+          error: 'Data user tidak ditemukan'
+        });
+      }
+
+      return res.json({
+        user: rows[0]
+      });
+    }
+
+    return res.status(403).json({
+      error: 'Role akun tidak dikenali'
+    });
+
+  } catch (err) {
+
+    console.error('Error /api/me:', err);
+
+    return res.status(500).json({
+      error: 'Gagal mengambil informasi akun'
+    });
+  }
+});
 
 // ==============================
 // ROUTES
 // ==============================
 
-const jenisLinenRoutes = require('./routes/JenisLinen');
-app.use('/api/jenis-linen', jenisLinenRoutes);
+const jenisLinenRoutes =
+  require('./routes/JenisLinen');
 
-const serahTerimaRoutes = require('./routes/serahTerima');
-app.use('/api/serah-terima', serahTerimaRoutes);
+app.use(
+  '/api/jenis-linen',
+  jenisLinenRoutes
+);
 
-const stokRuanganRoutes = require('./routes/stokRuangan');
-app.use('/api/stok-ruangan', stokRuanganRoutes);
+const serahTerimaRoutes =
+  require('./routes/serahTerima');
 
-const ruanganRoutes = require('./routes/ruangan');
-app.use('/api/ruangan', ruanganRoutes);
+app.use(
+  '/api/serah-terima',
+  serahTerimaRoutes
+);
+
+const stokRuanganRoutes =
+  require('./routes/stokRuangan');
+
+app.use(
+  '/api/stok-ruangan',
+  stokRuanganRoutes
+);
+
+const ruanganRoutes =
+  require('./routes/ruangan');
+
+app.use(
+  '/api/ruangan',
+  ruanganRoutes
+);
 
 // ==============================
 // LOGIN
 // ==============================
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
 
-  // Validasi
+  const {
+    username,
+    password
+  } = req.body;
+
+  // ==================================
+  // VALIDASI
+  // ==================================
   if (!username || !password) {
     return res.status(400).json({
       error: 'Username dan password wajib diisi'
@@ -125,7 +278,7 @@ app.post('/login', async (req, res) => {
 
       req.session.user = {
         id: null,
-        username: username,
+        username,
         role: 'admin',
         ruangan_id: null
       };
@@ -138,7 +291,7 @@ app.post('/login', async (req, res) => {
     }
 
     // ==================================
-    // 2. CEK USER DARI DATABASE
+    // 2. CEK USER DATABASE
     // ==================================
     const [rows] = await db.query(
       `
@@ -155,8 +308,11 @@ app.post('/login', async (req, res) => {
       [username]
     );
 
-    // Username tidak ditemukan
+    // ==================================
+    // USER TIDAK DITEMUKAN
+    // ==================================
     if (rows.length === 0) {
+
       return res.status(401).json({
         error: 'Username atau password salah'
       });
@@ -167,21 +323,27 @@ app.post('/login', async (req, res) => {
     // ==================================
     // 3. CEK PASSWORD BCRYPT
     // ==================================
-    const passwordCocok = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const passwordCocok =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
 
     if (!passwordCocok) {
+
       return res.status(401).json({
         error: 'Username atau password salah'
       });
     }
 
     // ==================================
-    // 4. USER HARUS PUNYA RUANGAN
+    // 4. USER RUANGAN WAJIB PUNYA RUANGAN
     // ==================================
-    if (user.role === 'user' && !user.ruangan_id) {
+    if (
+      user.role === 'user' &&
+      !user.ruangan_id
+    ) {
+
       return res.status(403).json({
         error: 'Akun user belum terhubung dengan ruangan'
       });
@@ -200,9 +362,10 @@ app.post('/login', async (req, res) => {
     };
 
     // ==================================
-    // 6. REDIRECT SESUAI ROLE
+    // 6. REDIRECT ADMIN
     // ==================================
     if (user.role === 'admin') {
+
       return res.json({
         message: 'Login admin berhasil',
         role: 'admin',
@@ -210,14 +373,37 @@ app.post('/login', async (req, res) => {
       });
     }
 
-    return res.json({
-      message: 'Login user berhasil',
-      role: 'user',
-      ruangan_id: user.ruangan_id,
-      redirect: '/user-dashboard.html'
+    // ==================================
+    // 7. REDIRECT LAUNDRY
+    // ==================================
+    if (user.role === 'laundry') {
+
+      return res.json({
+        message: 'Login laundry berhasil',
+        role: 'laundry',
+        redirect: '/laundry-dashboard.html'
+      });
+    }
+
+    // ==================================
+    // 8. REDIRECT USER RUANGAN
+    // ==================================
+    if (user.role === 'user') {
+
+      return res.json({
+        message: 'Login user berhasil',
+        role: 'user',
+        ruangan_id: user.ruangan_id,
+        redirect: '/user-dashboard.html'
+      });
+    }
+
+    return res.status(403).json({
+      error: 'Role akun tidak dikenali'
     });
 
   } catch (err) {
+
     console.error('Error login:', err);
 
     return res.status(500).json({
@@ -230,12 +416,19 @@ app.post('/login', async (req, res) => {
 // LOGOUT
 // ==============================
 app.get('/logout', (req, res) => {
+
   req.session.destroy((err) => {
 
     if (err) {
-      console.error('Gagal logout:', err);
 
-      return res.status(500).send('Gagal logout');
+      console.error(
+        'Gagal logout:',
+        err
+      );
+
+      return res.status(500).send(
+        'Gagal logout'
+      );
     }
 
     res.redirect('/login.html');
@@ -245,8 +438,12 @@ app.get('/logout', (req, res) => {
 // ==============================
 // SERVER
 // ==============================
-const PORT = process.env.PORT || 3000;
+const PORT =
+  process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server jalan di http://localhost:${PORT}`);
+
+  console.log(
+    `Server jalan di http://localhost:${PORT}`
+  );
 });

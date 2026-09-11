@@ -3,10 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Riwayat Serah Terima Linen</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap"
+  rel="stylesheet"
+>
+
 <style>
   :root{
     --bg: #F5F7F6;
@@ -15,19 +22,29 @@
     --ink-soft: #5B6B70;
     --line: #DCE3E1;
     --line-soft: #EAEFED;
+
     --teal: #00b1b7;
     --teal-deep: #00b1b7;
     --teal-tint: #E7F2EE;
+
     --amber: #B8722E;
     --amber-tint: #FBF0E3;
+
     --danger: #B34A3E;
     --danger-tint: #FBEAE7;
+
     --green: #3B7A3F;
     --green-tint: #EAF3EA;
+
+    --purple: #4B4B8F;
+    --purple-tint: #EAEAF5;
+
     --radius: 10px;
   }
 
-  *{ box-sizing: border-box; }
+  *{
+    box-sizing: border-box;
+  }
 
   html, body{
     margin: 0;
@@ -48,6 +65,10 @@
     margin: 0 auto;
   }
 
+  /* ==========================
+     HEADER
+  ========================== */
+
   header{
     display: flex;
     align-items: baseline;
@@ -58,13 +79,19 @@
     border-bottom: 1px solid var(--line);
   }
 
-  .brand{ display: flex; flex-direction: column; gap: 2px; }
+  .brand{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
   .brand .unit{
     font-size: 13px;
     font-weight: 600;
     color: var(--teal-deep);
     letter-spacing: 0.02em;
   }
+
   h1{
     font-family: 'Source Serif 4', Georgia, serif;
     font-weight: 600;
@@ -72,7 +99,13 @@
     margin: 2px 0 0;
   }
 
-  a.nav-link{
+  .header-actions{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-link{
     font-size: 14px;
     font-weight: 600;
     color: var(--teal-deep);
@@ -82,8 +115,17 @@
     border-radius: 8px;
     background: var(--surface);
     white-space: nowrap;
+    cursor: pointer;
   }
-  a.nav-link:hover{ background: var(--teal-tint); border-color: #BFDED4; }
+
+  .nav-link:hover{
+    background: var(--teal-tint);
+    border-color: #BFDED4;
+  }
+
+  /* ==========================
+     FILTER
+  ========================== */
 
   .filter-row{
     display: flex;
@@ -91,15 +133,8 @@
     margin-bottom: 18px;
     flex-wrap: wrap;
   }
-  .filter-row input{
-    font-family: inherit;
-    font-size: 14px;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--ink);
-  }
+
+  .filter-row input,
   .filter-row select{
     font-family: inherit;
     font-size: 14px;
@@ -108,15 +143,82 @@
     border-radius: 8px;
     background: var(--surface);
     color: var(--ink);
+  }
+
+  .filter-row select{
+    flex: 1;
+    min-width: 180px;
     cursor: pointer;
   }
-  .filter-row select#filter-ruangan{ flex: 1; min-width: 180px; }
-  .filter-row input#cari-ruangan{ flex: 1; min-width: 180px; }
-  .filter-row input:focus-visible, .filter-row select:focus-visible{
+
+  .filter-row input{
+    min-width: 180px;
+  }
+
+  .filter-row input:focus-visible,
+  .filter-row select:focus-visible{
     outline: 2px solid var(--teal);
     outline-offset: 1px;
     border-color: var(--teal);
   }
+
+  .filter-row select:disabled{
+    cursor: default;
+    opacity: 0.9;
+  }
+
+  /* ==========================
+     TOTAL BAR
+  ========================== */
+
+  .total-bar{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    flex-wrap: wrap;
+  }
+
+  .total-bar .jumlah-trx{
+    padding-right: 20px;
+    border-right: 1px solid var(--line);
+  }
+
+  .total-bar strong{
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  /* ==========================
+     COLORS
+  ========================== */
+
+  .dot-kotor{
+    color: var(--amber);
+  }
+
+  .dot-infeksius{
+    color: var(--danger);
+  }
+
+  .dot-noninfeksius{
+    color: var(--green);
+  }
+
+  .dot-status{
+    color: var(--teal);
+  }
+
+  /* ==========================
+     LAYOUT
+  ========================== */
 
   .layout{
     display: grid;
@@ -125,7 +227,10 @@
     align-items: start;
   }
 
-  /* ---------- List panel ---------- */
+  /* ==========================
+     LIST PANEL
+  ========================== */
+
   .list-panel{
     background: var(--surface);
     border: 1px solid var(--line);
@@ -149,21 +254,52 @@
     cursor: pointer;
     font-family: inherit;
   }
-  .trx-item:last-child{ border-bottom: none; }
-  .trx-item:hover{ background: #FAFBFA; }
-  .trx-item.active{ background: var(--teal-tint); }
+
+  .trx-item:last-child{
+    border-bottom: none;
+  }
+
+  .trx-item:hover{
+    background: #FAFBFA;
+  }
+
+  .trx-item.active{
+    background: var(--teal-tint);
+  }
 
   .trx-item .ruangan{
     font-weight: 700;
     font-size: 15px;
     color: var(--ink);
   }
-  .trx-item.active .ruangan{ color: var(--teal-deep); }
+
+  .trx-item.active .ruangan{
+    color: var(--teal-deep);
+  }
 
   .trx-item .meta{
     font-size: 12.5px;
     color: var(--ink-soft);
     margin-top: 3px;
+  }
+
+  .trx-status{
+    display: inline-flex;
+    margin-top: 7px;
+    padding: 4px 7px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .trx-status.menunggu{
+    background: var(--amber-tint);
+    color: var(--amber);
+  }
+
+  .trx-status.selesai{
+    background: var(--green-tint);
+    color: var(--green);
   }
 
   .empty-state{
@@ -173,35 +309,16 @@
     font-size: 14px;
   }
 
-  /* ---------- Total bar ---------- */
-  .total-bar{
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    margin-bottom: 14px;
-    font-size: 13.5px;
-    color: var(--ink-soft);
-  }
-  .total-bar .jumlah-trx{
-    padding-right: 20px;
-    border-right: 1px solid var(--line);
-  }
-  .total-bar strong{
-    font-variant-numeric: tabular-nums;
-    font-size: 15px;
-    color: var(--ink);
-  }
+  /* ==========================
+     DETAIL PANEL
+  ========================== */
 
-  /* ---------- Detail panel ---------- */
   .detail-panel{
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     min-height: 300px;
+    overflow: hidden;
   }
 
   .detail-placeholder{
@@ -236,27 +353,60 @@
     color: var(--ink-soft);
   }
 
+  .detail-actions{
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  /* ==========================
+     STATUS
+  ========================== */
+
+  .status-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .status-badge.menunggu{
+    background: var(--amber-tint);
+    color: var(--amber);
+  }
+
+  .status-badge.selesai{
+    background: var(--green-tint);
+    color: var(--green);
+  }
+
+  /* ==========================
+     TOTAL DETAIL
+  ========================== */
+
   .detail-totals{
     display: flex;
     gap: 16px;
     font-size: 13px;
     color: var(--ink-soft);
     white-space: nowrap;
+    flex-wrap: wrap;
   }
+
   .detail-totals strong{
     font-variant-numeric: tabular-nums;
     font-size: 15px;
     color: var(--ink);
   }
-  .dot-kotor{ color: var(--amber); }
-  .dot-bersih{ color: var(--teal-deep); }
-  .dot-infeksius{ color: var(--danger); }
-  .dot-noninfeksius{ color: var(--green); }
 
-  .detail-actions{
-    display: flex;
-    gap: 8px;
-  }
+  /* ==========================
+     PENERIMA
+  ========================== */
 
   .penerima-info{
     padding: 16px 22px;
@@ -266,21 +416,35 @@
     gap: 18px;
     flex-wrap: wrap;
   }
+
   .penerima-info .nama-label{
     font-size: 13px;
     color: var(--ink-soft);
   }
+
   .penerima-info .nama-label strong{
     color: var(--ink);
     font-weight: 600;
   }
+
+  .penerima-info .diterima-waktu{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
   .penerima-info img.ttd-img{
-    height: 44px;
+    height: 50px;
+    max-width: 220px;
+    object-fit: contain;
     border: 1px solid var(--line);
     border-radius: 6px;
     background: var(--bg);
     padding: 2px 8px;
   }
+
+  /* ==========================
+     BUTTON
+  ========================== */
 
   .btn{
     font-family: inherit;
@@ -293,11 +457,147 @@
     color: var(--ink);
     cursor: pointer;
   }
-  .btn:hover{ background: #FAFBFA; }
-  .btn.btn-primary{ background: var(--teal); border-color: var(--teal); color: #fff; }
-  .btn.btn-primary:hover{ background: var(--teal-deep); }
-  .btn.btn-danger{ color: var(--danger); border-color: #EFC7C0; }
-  .btn.btn-danger:hover{ background: #FBEAE7; }
+
+  .btn:hover{
+    background: #FAFBFA;
+  }
+
+  .btn-primary{
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+  }
+
+  .btn-primary:hover{
+    background: var(--teal-deep);
+  }
+
+  .btn-danger{
+    color: var(--danger);
+    border-color: #EFC7C0;
+  }
+
+  .btn-danger:hover{
+    background: var(--danger-tint);
+  }
+
+  /* ==========================
+     TABLE
+  ========================== */
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+
+  thead th{
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  thead th.col-kotor,
+  thead th.col-infeksius,
+  thead th.col-noninfeksius{
+    width: 82px;
+    text-align: center;
+  }
+
+  thead th.hdr-kotor{
+    color: var(--amber);
+  }
+
+  thead th.hdr-infeksius{
+    color: var(--danger);
+  }
+
+  thead th.hdr-noninfeksius{
+    color: var(--green);
+  }
+
+  tbody td{
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  tbody tr:last-child td{
+    border-bottom: none;
+  }
+
+  td.col-kotor,
+  td.col-infeksius,
+  td.col-noninfeksius{
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  td.col-kotor{
+    color: var(--amber);
+  }
+
+  td.col-infeksius{
+    color: var(--danger);
+  }
+
+  td.col-noninfeksius{
+    color: var(--green);
+  }
+
+  td.col-ket{
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  /* ==========================
+     VERIFIKASI
+  ========================== */
+
+  .badge-verif{
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: none;
+    white-space: nowrap;
+  }
+
+  button.badge-verif{
+    cursor: pointer;
+  }
+
+  button.badge-verif:disabled{
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  .badge-verif.belum{
+    background: var(--danger-tint);
+    color: var(--danger);
+  }
+
+  .badge-verif.belum:hover{
+    background: #F6D9D5;
+  }
+
+  .badge-verif.sudah{
+    background: var(--green-tint);
+    color: var(--green);
+  }
+
+  .verif-kosong{
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  /* ==========================
+     EDIT
+  ========================== */
 
   .edit-field{
     font-family: inherit;
@@ -308,7 +608,11 @@
     background: var(--bg);
     color: var(--ink);
   }
-  .edit-field:focus-visible{ outline: 2px solid var(--teal); border-color: var(--teal); }
+
+  .edit-field:focus-visible{
+    outline: 2px solid var(--teal);
+    border-color: var(--teal);
+  }
 
   .qty-edit{
     width: 72px;
@@ -321,6 +625,7 @@
     background: var(--bg);
     color: var(--ink);
   }
+
   .ket-edit{
     width: 100%;
     font-size: 13.5px;
@@ -331,474 +636,1770 @@
     color: var(--ink);
   }
 
-  table{
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14.5px;
-  }
-  thead th{
-    text-align: left;
-    font-weight: 600;
-    color: var(--ink-soft);
-    font-size: 12.5px;
-    padding: 10px 22px;
-    border-bottom: 1px solid var(--line);
-  }
-  thead th.col-kotor, thead th.col-infeksius, thead th.col-noninfeksius{ width: 82px; text-align: center; }
-  thead th.hdr-kotor{ color: var(--amber); }
-  thead th.hdr-infeksius{ color: var(--danger); }
-  thead th.hdr-noninfeksius{ color: var(--green); }
+  /* ==========================
+     LOADING
+  ========================== */
 
-  tbody td{
-    padding: 10px 22px;
-    border-bottom: 1px solid var(--line-soft);
-  }
-  tbody tr:last-child td{ border-bottom: none; }
-
-  td.col-kotor, td.col-infeksius, td.col-noninfeksius{
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    font-weight: 600;
-  }
-  td.col-kotor{ color: var(--amber); }
-  td.col-infeksius{ color: var(--danger); }
-  td.col-noninfeksius{ color: var(--green); }
-
-  td.col-ket{
-    color: var(--ink-soft);
-    font-size: 13px;
-  }
-
-  .badge-verif{
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .badge-verif.belum{ background: var(--danger-tint); color: var(--danger); }
-  .badge-verif.belum:hover{ background: #F6D9D5; }
-  .badge-verif.sudah{ background: var(--green-tint); color: var(--green); }
-  .badge-verif.sudah:hover{ background: #DCEEDD; }
-  .verif-kosong{ color: var(--ink-soft); font-size: 13px; }
-
-  .loading-row td, .empty-detail td{
+  .loading-row td,
+  .empty-detail td{
     text-align: center;
     color: var(--ink-soft);
     padding: 26px 12px;
   }
 
+  /* ==========================
+     RESPONSIVE
+  ========================== */
+
   @media (max-width: 760px){
-    .layout{ grid-template-columns: 1fr; }
-    header{ flex-direction: column; align-items: flex-start; gap: 10px; }
-    thead th.col-ket, td.col-ket{ display: none; }
-    thead th.col-kotor, td.col-kotor{ display: none; }
-    .badge-verif{ font-size: 11px; padding: 4px 8px; }
+
+    .layout{
+      grid-template-columns: 1fr;
+    }
+
+    header{
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .header-actions{
+      width: 100%;
+    }
+
+    .nav-link{
+      width: 100%;
+      text-align: center;
+    }
+
+    .detail-head{
+      flex-direction: column;
+    }
+
+    .detail-actions{
+      width: 100%;
+      justify-content: flex-start;
+    }
+
+    thead th.col-ket,
+    td.col-ket{
+      display: none;
+    }
+
+    thead th.col-kotor,
+    td.col-kotor{
+      display: none;
+    }
+
+    .badge-verif{
+      font-size: 11px;
+      padding: 4px 8px;
+    }
   }
 </style>
 </head>
+
 <body>
 
 <div class="wrap">
 
   <header>
+
     <div class="brand">
       <span class="unit">Instalasi Loundry</span>
       <h1>Riwayat Serah Terima Linen</h1>
     </div>
-    <a class="nav-link" href="/form.html">+ Serah terima baru</a>
+
+    <div class="header-actions">
+
+      <a
+        class="nav-link"
+        href="/form.html"
+        id="btn-serah-baru"
+      >
+        + Serah terima baru
+      </a>
+
+      <a
+        class="nav-link"
+        href="/"
+        id="btn-kembali"
+      >
+        ← Kembali
+      </a>
+
+    </div>
+
   </header>
 
-  <div style="display:flex; justify-content:flex-end; margin:-16px 0 18px;">
-    <a class="nav-link" href="/">← Kembali</a>
-  </div>
-
   <div class="filter-row">
+
     <select id="filter-ruangan">
-      <option value="">Semua ruangan</option>
+      <option value="">
+        Memuat ruangan...
+      </option>
     </select>
-    <input type="date" id="filter-tanggal">
+
+    <input
+      type="date"
+      id="filter-tanggal"
+    >
+
   </div>
 
-  <div class="total-bar" id="total-bar">
-    <span class="jumlah-trx"><strong id="jumlah-trx">0</strong> transaksi</span>
-    <span><span class="dot-kotor">●</span> Total diantar <strong id="grand-total-kotor">0</strong></span>
-    <span><span class="dot-infeksius">●</span> Total infeksius <strong id="grand-total-infeksius">0</strong></span>
-    <span><span class="dot-noninfeksius">●</span> Total non-infeksius <strong id="grand-total-noninfeksius">0</strong></span>
+  <div
+    class="total-bar"
+    id="total-bar"
+  >
+
+    <span class="jumlah-trx">
+      <strong id="jumlah-trx">0</strong>
+      transaksi
+    </span>
+
+    <span>
+      <span class="dot-kotor">●</span>
+      Total diantar
+      <strong id="grand-total-kotor">0</strong>
+    </span>
+
+    <span>
+      <span class="dot-infeksius">●</span>
+      Total infeksius
+      <strong id="grand-total-infeksius">0</strong>
+    </span>
+
+    <span>
+      <span class="dot-noninfeksius">●</span>
+      Total non-infeksius
+      <strong id="grand-total-noninfeksius">0</strong>
+    </span>
+
   </div>
 
   <div class="layout">
+
     <div class="list-panel">
-      <div class="list-scroll" id="list-scroll">
-        <div class="empty-state">Memuat riwayat…</div>
+
+      <div
+        class="list-scroll"
+        id="list-scroll"
+      >
+        <div class="empty-state">
+          Memuat riwayat...
+        </div>
       </div>
+
     </div>
 
-    <div class="detail-panel" id="detail-panel">
-      <div class="detail-placeholder">Pilih salah satu transaksi di sebelah kiri untuk melihat rinciannya.</div>
+    <div
+      class="detail-panel"
+      id="detail-panel"
+    >
+
+      <div class="detail-placeholder">
+        Pilih salah satu transaksi di sebelah kiri
+        untuk melihat rinciannya.
+      </div>
+
     </div>
+
   </div>
 
 </div>
 
 <script>
-  const listScroll = document.getElementById('list-scroll');
-  const detailPanel = document.getElementById('detail-panel');
-  const filterRuangan = document.getElementById('filter-ruangan');
-  const filterTanggal = document.getElementById('filter-tanggal');
+
+  /* =========================================================
+     ELEMENT
+  ========================================================= */
+
+  const listScroll =
+    document.getElementById('list-scroll');
+
+  const detailPanel =
+    document.getElementById('detail-panel');
+
+  const filterRuangan =
+    document.getElementById('filter-ruangan');
+
+  const filterTanggal =
+    document.getElementById('filter-tanggal');
+
+  const btnSerahBaru =
+    document.getElementById('btn-serah-baru');
+
+  const btnKembali =
+    document.getElementById('btn-kembali');
+
+
+  /* =========================================================
+     STATE
+  ========================================================= */
 
   let semuaTransaksi = [];
+
   let activeId = null;
-  let mode = 'lihat'; // 'lihat' atau 'edit'
+
+  let mode = 'lihat';
+
   let trxAktif = null;
 
+  let userLogin = null;
+
+
+  /* =========================================================
+     FORMAT TANGGAL
+  ========================================================= */
+
   function formatTanggal(iso){
-    // Ambil hanya bagian tanggal (YYYY-MM-DD) sebelum dikonversi, hindari geser hari karena zona waktu
-    const tgl = iso.split('T')[0];
-    const [y, m, d] = tgl.split('-');
-    const dateObj = new Date(y, m - 1, d);
-    return dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    if(!iso){
+      return '-';
+    }
+
+    const tgl =
+      String(iso).split('T')[0];
+
+    const parts =
+      tgl.split('-');
+
+    if(parts.length !== 3){
+      return iso;
+    }
+
+    const [y, m, d] = parts;
+
+    const dateObj =
+      new Date(
+        Number(y),
+        Number(m) - 1,
+        Number(d)
+      );
+
+    return dateObj.toLocaleDateString(
+      'id-ID',
+      {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }
+    );
   }
+
+
+  /* =========================================================
+     FORMAT WAKTU
+  ========================================================= */
 
   function formatWaktu(iso){
-    const dateObj = new Date(iso);
-    return dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-  }
 
-  function renderList(){
-    const ruanganDipilih = filterRuangan.value;
-    const tanggalFilter = filterTanggal.value;
-
-    const hasil = semuaTransaksi.filter(trx => {
-      const cocokRuangan = !ruanganDipilih || trx.ruangan === ruanganDipilih;
-      const cocokTanggal = !tanggalFilter || trx.tanggal.split('T')[0] === tanggalFilter;
-      return cocokRuangan && cocokTanggal;
-    });
-
-    // Hitung & tampilkan total gabungan dari transaksi yang lagi ditampilkan
-    let grandKotor = 0, grandInfeksius = 0, grandNonInfeksius = 0;
-    hasil.forEach(trx => {
-      grandKotor += Number(trx.total_kotor) || 0;
-      grandInfeksius += Number(trx.total_infeksius) || 0;
-      grandNonInfeksius += Number(trx.total_non_infeksius) || 0;
-    });
-    document.getElementById('jumlah-trx').textContent = hasil.length;
-    document.getElementById('grand-total-kotor').textContent = grandKotor;
-    document.getElementById('grand-total-infeksius').textContent = grandInfeksius;
-    document.getElementById('grand-total-noninfeksius').textContent = grandNonInfeksius;
-
-    if(hasil.length === 0){
-      listScroll.innerHTML = '<div class="empty-state">Tidak ada transaksi yang cocok.</div>';
-      return;
+    if(!iso){
+      return '-';
     }
 
-    listScroll.innerHTML = '';
-    hasil.forEach(trx => {
-      const btn = document.createElement('button');
-      btn.className = 'trx-item' + (trx.id === activeId ? ' active' : '');
-      btn.innerHTML = `
-        <div class="ruangan">${trx.ruangan}</div>
-        <div class="meta">${formatTanggal(trx.tanggal)} · dicatat ${formatWaktu(trx.created_at)}</div>
-      `;
-      btn.addEventListener('click', () => muatDetail(trx.id));
-      listScroll.appendChild(btn);
-    });
-  }
+    const dateObj =
+      new Date(iso);
 
-  async function muatDaftar(){
-    try{
-      const res = await fetch('/api/serah-terima');
-      if(!res.ok) throw new Error('Gagal memuat');
-      semuaTransaksi = await res.json();
-      isiOpsiRuangan();
-      renderList();
-    }catch(err){
-      listScroll.innerHTML = '<div class="empty-state">Gagal memuat riwayat. Coba muat ulang halaman.</div>';
+    if(Number.isNaN(dateObj.getTime())){
+      return '-';
     }
+
+    return dateObj.toLocaleTimeString(
+      'id-ID',
+      {
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    );
   }
 
-  function isiOpsiRuangan(){
-    const namaRuanganUnik = [...new Set(semuaTransaksi.map(trx => trx.ruangan))].sort();
-    const nilaiTerpilih = filterRuangan.value;
 
-    filterRuangan.innerHTML = '<option value="">Semua ruangan</option>';
-    namaRuanganUnik.forEach(nama => {
-      const opt = document.createElement('option');
-      opt.value = nama;
-      opt.textContent = nama;
-      filterRuangan.appendChild(opt);
-    });
+  /* =========================================================
+     FORMAT TANGGAL + WAKTU
+  ========================================================= */
 
-    // Pertahankan pilihan sebelumnya kalau masih ada di daftar
-    if(namaRuanganUnik.includes(nilaiTerpilih)){
-      filterRuangan.value = nilaiTerpilih;
+  function formatTanggalWaktu(iso){
+
+    if(!iso){
+      return '-';
     }
+
+    const dateObj =
+      new Date(iso);
+
+    if(Number.isNaN(dateObj.getTime())){
+      return '-';
+    }
+
+    return dateObj.toLocaleString(
+      'id-ID',
+      {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    );
   }
 
-  async function muatDetail(id){
-    activeId = id;
-    mode = 'lihat';
-    renderList();
 
-    detailPanel.innerHTML = '<div class="detail-placeholder">Memuat rincian…</div>';
+  /* =========================================================
+     CEK LOGIN / ROLE
+  ========================================================= */
+
+  async function muatInformasiLogin(){
 
     try{
-      const res = await fetch(`/api/serah-terima/${id}`);
-      if(!res.ok) throw new Error('Gagal memuat detail');
-      trxAktif = await res.json();
-      renderDetail();
-    }catch(err){
-      detailPanel.innerHTML = '<div class="detail-placeholder">Gagal memuat rincian transaksi ini.</div>';
-    }
-  }
 
-  function renderDetail(){
-    if(mode === 'edit'){
-      renderDetailEdit();
-    }else{
-      renderDetailLihat();
-    }
-  }
+      const res =
+        await fetch('/api/me');
 
-  function renderDetailLihat(){
-    const trx = trxAktif;
-    let totalKotor = 0, totalInfeksius = 0, totalNonInfeksius = 0;
-    const baris = trx.detail.map(item => {
-      totalKotor += item.jumlah_kotor;
-      totalInfeksius += item.jumlah_diambil_infeksius;
-      totalNonInfeksius += item.jumlah_diambil_non_infeksius;
+      if(!res.ok){
 
-      let selVerif = '<span class="verif-kosong">—</span>';
-      if(item.jumlah_diambil_infeksius > 0){
-        const sudah = Number(item.verifikasi_infeksius) === 1;
-        selVerif = `<button class="badge-verif ${sudah ? 'sudah' : 'belum'}" data-detail-id="${item.id}" data-status="${sudah ? 1 : 0}">
-          ${sudah ? '✓ Sudah diverifikasi' : '⚠ Belum diverifikasi'}
-        </button>`;
+        window.location.href =
+          '/login.html';
+
+        return false;
       }
 
-      return `
-        <tr>
-          <td>${item.jenis_linen_nama}</td>
-          <td class="col-kotor">${item.jumlah_kotor}</td>
-          <td class="col-infeksius">${item.jumlah_diambil_infeksius}</td>
-          <td class="col-noninfeksius">${item.jumlah_diambil_non_infeksius}</td>
-          <td class="col-verif" style="text-align:center;">${selVerif}</td>
-          <td class="col-ket">${item.keterangan || '—'}</td>
-        </tr>
-      `;
-    }).join('');
+      const result =
+        await res.json();
 
-    detailPanel.innerHTML = `
-      <div class="detail-head">
-        <div>
-          <h2>${trx.ruangan}</h2>
-          <div class="tanggal-lengkap">${formatTanggal(trx.tanggal)}</div>
-        </div>
-        <div class="detail-actions">
-          <button class="btn" id="btn-edit">Edit</button>
-          <button class="btn btn-danger" id="btn-hapus">Hapus</button>
-        </div>
-      </div>
-      <div class="detail-head" style="border-top:1px solid var(--line-soft); border-bottom:none;">
-        <div class="detail-totals">
-          <span><span class="dot-kotor">●</span> Diantar <strong>${totalKotor}</strong></span>
-          <span><span class="dot-infeksius">●</span> Infeksius <strong>${totalInfeksius}</strong></span>
-          <span><span class="dot-noninfeksius">●</span> Non-infeksius <strong>${totalNonInfeksius}</strong></span>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Jenis Linen</th>
-            <th class="col-kotor hdr-kotor">Diantar</th>
-            <th class="col-infeksius hdr-infeksius">Infeksius</th>
-            <th class="col-noninfeksius hdr-noninfeksius">Non-Infeksius</th>
-            <th style="text-align:center;">Verifikasi</th>
-            <th class="col-ket">Keterangan</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${baris || '<tr class="empty-detail"><td colspan="6">Tidak ada rincian linen.</td></tr>'}
-        </tbody>
-      </table>
-      ${(trx.nama_penerima || trx.tanda_tangan) ? `
-        <div class="penerima-info">
-          <span class="nama-label">Diterima oleh: <strong>${trx.nama_penerima || '(nama tidak diisi)'}</strong></span>
-          ${trx.tanda_tangan ? `<img class="ttd-img" src="${trx.tanda_tangan}" alt="Tanda tangan penerima">` : ''}
-        </div>
-      ` : ''}
-    `;
+      userLogin =
+        result.user;
 
-    document.getElementById('btn-edit').addEventListener('click', () => {
-      mode = 'edit';
-      renderDetail();
-    });
-    document.getElementById('btn-hapus').addEventListener('click', hapusTransaksi);
+      return true;
 
-    detailPanel.querySelectorAll('.badge-verif').forEach(btn => {
-      btn.addEventListener('click', () => toggleVerifikasi(btn));
-    });
-  }
-
-  async function toggleVerifikasi(btn){
-    const detailId = btn.dataset.detailId;
-    const statusBaru = btn.dataset.status === '1' ? 0 : 1;
-
-    btn.disabled = true;
-
-    try{
-      const res = await fetch(`/api/serah-terima/detail/${detailId}/verifikasi`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ verifikasi_infeksius: statusBaru })
-      });
-      const result = await res.json();
-      if(!res.ok) throw new Error(result.error || 'Gagal memperbarui status');
-
-      // Update data lokal supaya tidak perlu fetch ulang seluruh transaksi
-      const item = trxAktif.detail.find(d => d.id === Number(detailId));
-      if(item) item.verifikasi_infeksius = statusBaru;
-      renderDetailLihat();
     }catch(err){
-      alert(err.message || 'Terjadi kesalahan saat memperbarui status verifikasi.');
-      btn.disabled = false;
+
+      console.error(
+        'Gagal mengambil informasi login:',
+        err
+      );
+
+      window.location.href =
+        '/login.html';
+
+      return false;
     }
   }
 
-  function renderDetailEdit(){
-    const trx = trxAktif;
-    const tglValue = trx.tanggal.split('T')[0];
 
-    const baris = trx.detail.map((item, idx) => `
-      <tr>
-        <td>${item.jenis_linen_nama}</td>
-        <td class="col-kotor">
-          <input type="number" min="0" class="qty-edit" data-idx="${idx}" data-field="kotor" value="${item.jumlah_kotor}">
-        </td>
-        <td class="col-infeksius">
-          <input type="number" min="0" class="qty-edit" data-idx="${idx}" data-field="infeksius" value="${item.jumlah_diambil_infeksius}">
-        </td>
-        <td class="col-noninfeksius">
-          <input type="number" min="0" class="qty-edit" data-idx="${idx}" data-field="noninfeksius" value="${item.jumlah_diambil_non_infeksius}">
-        </td>
-        <td class="col-ket">
-          <input type="text" class="ket-edit" data-idx="${idx}" data-field="ket" value="${item.keterangan || ''}">
-        </td>
-      </tr>
-    `).join('');
+  /* =========================================================
+     ATUR TAMPILAN BERDASARKAN ROLE
+  ========================================================= */
 
-    detailPanel.innerHTML = `
-      <div class="detail-head">
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <input type="text" class="edit-field" id="edit-ruangan" value="${trx.ruangan}">
-          <input type="date" class="edit-field" id="edit-tanggal" value="${tglValue}">
-        </div>
-        <div class="detail-actions">
-          <button class="btn btn-primary" id="btn-simpan">Simpan</button>
-          <button class="btn" id="btn-batal">Batal</button>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Jenis Linen</th>
-            <th class="col-kotor hdr-kotor">Diantar</th>
-            <th class="col-infeksius hdr-infeksius">Infeksius</th>
-            <th class="col-noninfeksius hdr-noninfeksius">Non-Infeksius</th>
-            <th class="col-ket">Keterangan</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${baris || '<tr class="empty-detail"><td colspan="5">Tidak ada rincian linen untuk diedit.</td></tr>'}
-        </tbody>
-      </table>
-    `;
+  function aturTampilanRole(){
 
-    document.getElementById('btn-batal').addEventListener('click', () => {
-      mode = 'lihat';
-      renderDetail();
-    });
-    document.getElementById('btn-simpan').addEventListener('click', simpanEdit);
-  }
-
-  async function simpanEdit(){
-    const btnSimpan = document.getElementById('btn-simpan');
-    const ruangan = document.getElementById('edit-ruangan').value.trim();
-    const tanggal = document.getElementById('edit-tanggal').value;
-
-    if(!ruangan || !tanggal){
-      alert('Ruangan dan tanggal wajib diisi.');
+    if(!userLogin){
       return;
     }
 
-    const detail = trxAktif.detail.map((item, idx) => {
-      const kotorInput = document.querySelector(`.qty-edit[data-idx="${idx}"][data-field="kotor"]`);
-      const infeksiusInput = document.querySelector(`.qty-edit[data-idx="${idx}"][data-field="infeksius"]`);
-      const nonInfeksiusInput = document.querySelector(`.qty-edit[data-idx="${idx}"][data-field="noninfeksius"]`);
-      const ketInput = document.querySelector(`.ket-edit[data-idx="${idx}"]`);
-      return {
-        jenis_linen_id: item.jenis_linen_id,
-        jumlah_kotor: Number(kotorInput.value) || 0,
-        jumlah_diambil_infeksius: Number(infeksiusInput.value) || 0,
-        jumlah_diambil_non_infeksius: Number(nonInfeksiusInput.value) || 0,
-        verifikasi_infeksius: item.verifikasi_infeksius || 0,
-        keterangan: ketInput.value.trim() || null
-      };
+    /* =============================
+       USER RUANGAN
+    ============================= */
+
+    if(userLogin.role === 'user'){
+
+      // Tidak boleh membuat transaksi
+      btnSerahBaru.style.display =
+        'none';
+
+      // Kembali ke dashboard user
+      btnKembali.href =
+        '/user-dashboard.html';
+
+      // User hanya melihat ruangannya sendiri
+      filterRuangan.innerHTML = '';
+
+      const option =
+        document.createElement('option');
+
+      option.value =
+        userLogin.ruangan_nama;
+
+      option.textContent =
+        userLogin.ruangan_nama;
+
+      filterRuangan.appendChild(
+        option
+      );
+
+      filterRuangan.value =
+        userLogin.ruangan_nama;
+
+      filterRuangan.disabled =
+        true;
+
+      return;
+    }
+
+
+    /* =============================
+       LAUNDRY
+    ============================= */
+
+    if(userLogin.role === 'laundry'){
+
+      btnSerahBaru.style.display =
+        '';
+
+      btnSerahBaru.href =
+        '/form.html';
+
+      btnKembali.href =
+        '/laundry-dashboard.html';
+
+      filterRuangan.disabled =
+        false;
+
+      return;
+    }
+
+
+    /* =============================
+       ADMIN
+    ============================= */
+
+    if(userLogin.role === 'admin'){
+
+      btnSerahBaru.style.display =
+        '';
+
+      btnSerahBaru.href =
+        '/form.html';
+
+      btnKembali.href =
+        '/';
+
+      filterRuangan.disabled =
+        false;
+
+      return;
+    }
+  }
+
+
+  /* =========================================================
+     ISI FILTER RUANGAN UNTUK ADMIN / LAUNDRY
+  ========================================================= */
+
+  function isiOpsiRuangan(){
+
+    if(
+      userLogin &&
+      userLogin.role === 'user'
+    ){
+      return;
+    }
+
+    const namaRuanganUnik = [
+      ...new Set(
+        semuaTransaksi.map(
+          trx => trx.ruangan
+        )
+      )
+    ].sort();
+
+    const nilaiTerpilih =
+      filterRuangan.value;
+
+    filterRuangan.innerHTML =
+      '<option value="">Semua ruangan</option>';
+
+    namaRuanganUnik.forEach(
+      nama => {
+
+        const opt =
+          document.createElement('option');
+
+        opt.value =
+          nama;
+
+        opt.textContent =
+          nama;
+
+        filterRuangan.appendChild(
+          opt
+        );
+      }
+    );
+
+    if(
+      namaRuanganUnik.includes(
+        nilaiTerpilih
+      )
+    ){
+      filterRuangan.value =
+        nilaiTerpilih;
+    }
+  }
+
+
+  /* =========================================================
+     RENDER LIST
+  ========================================================= */
+
+  function renderList(){
+
+    const ruanganDipilih =
+      filterRuangan.value;
+
+    const tanggalFilter =
+      filterTanggal.value;
+
+    const hasil =
+      semuaTransaksi.filter(
+        trx => {
+
+          const cocokRuangan =
+            !ruanganDipilih ||
+            trx.ruangan === ruanganDipilih;
+
+          const cocokTanggal =
+            !tanggalFilter ||
+            String(trx.tanggal)
+              .split('T')[0] ===
+            tanggalFilter;
+
+          return (
+            cocokRuangan &&
+            cocokTanggal
+          );
+        }
+      );
+
+
+    /* =============================
+       HITUNG TOTAL
+    ============================= */
+
+    let grandKotor = 0;
+
+    let grandInfeksius = 0;
+
+    let grandNonInfeksius = 0;
+
+
+    hasil.forEach(trx => {
+
+      grandKotor +=
+        Number(trx.total_kotor) || 0;
+
+      grandInfeksius +=
+        Number(trx.total_infeksius) || 0;
+
+      grandNonInfeksius +=
+        Number(
+          trx.total_non_infeksius
+        ) || 0;
     });
 
-    btnSimpan.disabled = true;
-    btnSimpan.textContent = 'Menyimpan…';
+
+    document.getElementById(
+      'jumlah-trx'
+    ).textContent =
+      hasil.length;
+
+    document.getElementById(
+      'grand-total-kotor'
+    ).textContent =
+      grandKotor;
+
+    document.getElementById(
+      'grand-total-infeksius'
+    ).textContent =
+      grandInfeksius;
+
+    document.getElementById(
+      'grand-total-noninfeksius'
+    ).textContent =
+      grandNonInfeksius;
+
+
+    /* =============================
+       KOSONG
+    ============================= */
+
+    if(hasil.length === 0){
+
+      listScroll.innerHTML = `
+        <div class="empty-state">
+          Tidak ada transaksi yang cocok.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    /* =============================
+       RENDER
+    ============================= */
+
+    listScroll.innerHTML = '';
+
+    hasil.forEach(trx => {
+
+      const btn =
+        document.createElement('button');
+
+      btn.className =
+        'trx-item' +
+        (
+          trx.id === activeId
+            ? ' active'
+            : ''
+        );
+
+      const status =
+        trx.status === 'selesai'
+          ? 'selesai'
+          : 'menunggu';
+
+      const statusText =
+        trx.status === 'selesai'
+          ? '✓ Selesai'
+          : '⚠ Menunggu Konfirmasi';
+
+      btn.innerHTML = `
+
+        <div class="ruangan">
+          ${trx.ruangan}
+        </div>
+
+        <div class="meta">
+          ${formatTanggal(trx.tanggal)}
+          · dicatat ${formatWaktu(trx.created_at)}
+        </div>
+
+        <div class="trx-status ${status}">
+          ${statusText}
+        </div>
+
+      `;
+
+      btn.addEventListener(
+        'click',
+        () => muatDetail(trx.id)
+      );
+
+      listScroll.appendChild(
+        btn
+      );
+
+    });
+  }
+
+
+  /* =========================================================
+     MUAT DAFTAR
+  ========================================================= */
+
+  async function muatDaftar(){
 
     try{
-      const res = await fetch(`/api/serah-terima/${trxAktif.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ruangan,
-          tanggal,
-          detail,
-          nama_penerima: trxAktif.nama_penerima || null,
-          tanda_tangan: trxAktif.tanda_tangan || null
-        })
-      });
-      const result = await res.json();
-      if(!res.ok) throw new Error(result.error || 'Gagal menyimpan perubahan');
 
-      mode = 'lihat';
-      await muatDaftar();
-      await muatDetail(trxAktif.id);
+      const res =
+        await fetch(
+          '/api/serah-terima'
+        );
+
+      if(!res.ok){
+        throw new Error(
+          'Gagal memuat transaksi'
+        );
+      }
+
+      semuaTransaksi =
+        await res.json();
+
+      isiOpsiRuangan();
+
+      renderList();
+
     }catch(err){
-      alert(err.message || 'Terjadi kesalahan saat menyimpan perubahan.');
-      btnSimpan.disabled = false;
-      btnSimpan.textContent = 'Simpan';
+
+      console.error(err);
+
+      listScroll.innerHTML = `
+        <div class="empty-state">
+          Gagal memuat riwayat.
+          Coba muat ulang halaman.
+        </div>
+      `;
     }
   }
+
+
+  /* =========================================================
+     MUAT DETAIL
+  ========================================================= */
+
+  async function muatDetail(id){
+
+    activeId =
+      id;
+
+    mode =
+      'lihat';
+
+    renderList();
+
+    detailPanel.innerHTML = `
+      <div class="detail-placeholder">
+        Memuat rincian...
+      </div>
+    `;
+
+    try{
+
+      const res =
+        await fetch(
+          `/api/serah-terima/${id}`
+        );
+
+      if(!res.ok){
+
+        const result =
+          await res.json()
+            .catch(() => ({}));
+
+        throw new Error(
+          result.error ||
+          'Gagal memuat detail'
+        );
+      }
+
+      trxAktif =
+        await res.json();
+
+      renderDetail();
+
+    }catch(err){
+
+      console.error(err);
+
+      detailPanel.innerHTML = `
+        <div class="detail-placeholder">
+          ${err.message ||
+            'Gagal memuat rincian transaksi.'}
+        </div>
+      `;
+    }
+  }
+
+
+  /* =========================================================
+     RENDER DETAIL
+  ========================================================= */
+
+  function renderDetail(){
+
+    if(mode === 'edit'){
+
+      renderDetailEdit();
+
+    }else{
+
+      renderDetailLihat();
+
+    }
+  }
+
+
+  /* =========================================================
+     RENDER DETAIL - LIHAT
+  ========================================================= */
+
+  function renderDetailLihat(){
+
+    const trx =
+      trxAktif;
+
+    let totalKotor =
+      0;
+
+    let totalInfeksius =
+      0;
+
+    let totalNonInfeksius =
+      0;
+
+
+    const bolehKelola =
+      userLogin &&
+      (
+        userLogin.role === 'admin' ||
+        userLogin.role === 'laundry'
+      );
+
+
+    const bolehVerifikasi =
+      userLogin &&
+      (
+        userLogin.role === 'admin' ||
+        userLogin.role === 'laundry'
+      );
+
+
+    const baris =
+      trx.detail.map(
+        item => {
+
+          totalKotor +=
+            Number(item.jumlah_kotor) || 0;
+
+          totalInfeksius +=
+            Number(
+              item.jumlah_diambil_infeksius
+            ) || 0;
+
+          totalNonInfeksius +=
+            Number(
+              item.jumlah_diambil_non_infeksius
+            ) || 0;
+
+
+          const adaPengambilan =
+            Number(
+              item.jumlah_diambil_infeksius
+            ) > 0 ||
+            Number(
+              item.jumlah_diambil_non_infeksius
+            ) > 0;
+
+
+          let selVerif =
+            '<span class="verif-kosong">—</span>';
+
+
+          if(adaPengambilan){
+
+            const sudah =
+              Number(
+                item.verifikasi_pengambilan
+              ) === 1;
+
+
+            if(bolehVerifikasi){
+
+              if(sudah){
+
+                selVerif = `
+                  <span class="badge-verif sudah">
+                    ✓ Terverifikasi
+                  </span>
+                `;
+
+              }else{
+
+                selVerif = `
+                  <button
+                    class="badge-verif belum"
+                    data-detail-id="${item.id}"
+                  >
+                    ⚠ Belum diverifikasi
+                  </button>
+                `;
+              }
+
+            }else{
+
+              selVerif = `
+                <span
+                  class="badge-verif ${
+                    sudah ? 'sudah' : 'belum'
+                  }"
+                >
+                  ${
+                    sudah
+                      ? '✓ Terverifikasi'
+                      : '⚠ Belum diverifikasi'
+                  }
+                </span>
+              `;
+            }
+          }
+
+
+          return `
+            <tr>
+
+              <td>
+                ${item.jenis_linen_nama}
+              </td>
+
+              <td class="col-kotor">
+                ${item.jumlah_kotor}
+              </td>
+
+              <td class="col-infeksius">
+                ${item.jumlah_diambil_infeksius}
+              </td>
+
+              <td class="col-noninfeksius">
+                ${item.jumlah_diambil_non_infeksius}
+              </td>
+
+              <td
+                style="
+                  text-align:center;
+                  white-space:nowrap;
+                "
+              >
+                ${selVerif}
+              </td>
+
+              <td class="col-ket">
+                ${item.keterangan || '—'}
+              </td>
+
+            </tr>
+          `;
+
+        }
+      ).join('');
+
+
+    const statusSelesai =
+      trx.status === 'selesai';
+
+
+    const statusHtml =
+      statusSelesai
+        ? `
+          <div class="status-badge selesai">
+            ✓ Selesai
+          </div>
+        `
+        : `
+          <div class="status-badge menunggu">
+            ⚠ Menunggu Konfirmasi Ruangan
+          </div>
+        `;
+
+
+    const actionsHtml =
+      bolehKelola
+        ? `
+          <div class="detail-actions">
+
+            <button
+              class="btn"
+              id="btn-edit"
+            >
+              Edit
+            </button>
+
+            <button
+              class="btn btn-danger"
+              id="btn-hapus"
+            >
+              Hapus
+            </button>
+
+          </div>
+        `
+        : '';
+
+
+    const penerimaHtml =
+      (
+        trx.nama_penerima ||
+        trx.tanda_tangan ||
+        trx.diterima_at
+      )
+      ? `
+        <div class="penerima-info">
+
+          ${
+            trx.nama_penerima
+              ? `
+                <span class="nama-label">
+                  Diterima oleh:
+                  <strong>
+                    ${trx.nama_penerima}
+                  </strong>
+                </span>
+              `
+              : ''
+          }
+
+          ${
+            trx.diterima_at
+              ? `
+                <span class="diterima-waktu">
+                  Dikonfirmasi:
+                  ${formatTanggalWaktu(
+                    trx.diterima_at
+                  )}
+                </span>
+              `
+              : ''
+          }
+
+          ${
+            trx.tanda_tangan
+              ? `
+                <img
+                  class="ttd-img"
+                  src="${trx.tanda_tangan}"
+                  alt="Tanda tangan penerima"
+                >
+              `
+              : ''
+          }
+
+        </div>
+      `
+      : '';
+
+
+    detailPanel.innerHTML = `
+
+      <div class="detail-head">
+
+        <div>
+
+          <h2>
+            ${trx.ruangan}
+          </h2>
+
+          <div class="tanggal-lengkap">
+            ${formatTanggal(
+              trx.tanggal
+            )}
+          </div>
+
+          ${statusHtml}
+
+        </div>
+
+        ${actionsHtml}
+
+      </div>
+
+
+      <div
+        class="detail-head"
+        style="
+          border-top:1px solid var(--line-soft);
+          border-bottom:none;
+        "
+      >
+
+        <div class="detail-totals">
+
+          <span>
+            <span class="dot-kotor">●</span>
+            Diantar
+            <strong>${totalKotor}</strong>
+          </span>
+
+          <span>
+            <span class="dot-infeksius">●</span>
+            Infeksius
+            <strong>${totalInfeksius}</strong>
+          </span>
+
+          <span>
+            <span class="dot-noninfeksius">●</span>
+            Non-infeksius
+            <strong>${totalNonInfeksius}</strong>
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Jenis Linen
+            </th>
+
+            <th class="col-kotor hdr-kotor">
+              Diantar
+            </th>
+
+            <th class="col-infeksius hdr-infeksius">
+              Infeksius
+            </th>
+
+            <th class="col-noninfeksius hdr-noninfeksius">
+              Non-Infeksius
+            </th>
+
+            <th style="text-align:center;">
+              Verifikasi
+            </th>
+
+            <th class="col-ket">
+              Keterangan
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${
+            baris ||
+            `
+              <tr class="empty-detail">
+                <td colspan="6">
+                  Tidak ada rincian linen.
+                </td>
+              </tr>
+            `
+          }
+
+        </tbody>
+
+      </table>
+
+
+      ${penerimaHtml}
+
+    `;
+
+
+    /* =============================
+       BUTTON EDIT
+    ============================= */
+
+    if(bolehKelola){
+
+      const btnEdit =
+        document.getElementById(
+          'btn-edit'
+        );
+
+      const btnHapus =
+        document.getElementById(
+          'btn-hapus'
+        );
+
+
+      if(btnEdit){
+
+        btnEdit.addEventListener(
+          'click',
+          () => {
+
+            mode = 'edit';
+
+            renderDetail();
+
+          }
+        );
+      }
+
+
+      if(btnHapus){
+
+        btnHapus.addEventListener(
+          'click',
+          hapusTransaksi
+        );
+      }
+    }
+
+
+    /* =============================
+       BUTTON VERIFIKASI
+    ============================= */
+
+    if(bolehVerifikasi){
+
+      detailPanel
+        .querySelectorAll(
+          '.badge-verif.belum'
+        )
+        .forEach(
+          btn => {
+
+            btn.addEventListener(
+              'click',
+              () => {
+                verifikasiPengambilan(
+                  btn
+                );
+              }
+            );
+
+          }
+        );
+    }
+  }
+
+
+  /* =========================================================
+     VERIFIKASI PENGAMBILAN
+  ========================================================= */
+
+  async function verifikasiPengambilan(btn){
+
+    const detailId =
+      btn.dataset.detailId;
+
+    btn.disabled =
+      true;
+
+    btn.textContent =
+      'Memverifikasi...';
+
+    try{
+
+      const res =
+        await fetch(
+          `/api/serah-terima/detail/${detailId}/verifikasi`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+            body: JSON.stringify({
+              verifikasi_pengambilan: 1
+            })
+          }
+        );
+
+      const result =
+        await res.json();
+
+      if(!res.ok){
+
+        throw new Error(
+          result.error ||
+          'Gagal melakukan verifikasi'
+        );
+      }
+
+
+      const item =
+        trxAktif.detail.find(
+          d =>
+            d.id ===
+            Number(detailId)
+        );
+
+
+      if(item){
+
+        item.verifikasi_pengambilan =
+          1;
+      }
+
+
+      renderDetailLihat();
+
+    }catch(err){
+
+      alert(
+        err.message ||
+        'Terjadi kesalahan saat verifikasi.'
+      );
+
+      btn.disabled =
+        false;
+
+      btn.textContent =
+        '⚠ Belum diverifikasi';
+    }
+  }
+
+
+  /* =========================================================
+     RENDER DETAIL - EDIT
+  ========================================================= */
+
+  function renderDetailEdit(){
+
+    const trx =
+      trxAktif;
+
+    const tglValue =
+      String(trx.tanggal)
+        .split('T')[0];
+
+
+    const baris =
+      trx.detail.map(
+        (item, idx) => `
+
+          <tr>
+
+            <td>
+              ${item.jenis_linen_nama}
+            </td>
+
+            <td class="col-kotor">
+
+              <input
+                type="number"
+                min="0"
+                class="qty-edit"
+                data-idx="${idx}"
+                data-field="kotor"
+                value="${item.jumlah_kotor}"
+              >
+
+            </td>
+
+            <td class="col-infeksius">
+
+              <input
+                type="number"
+                min="0"
+                class="qty-edit"
+                data-idx="${idx}"
+                data-field="infeksius"
+                value="${item.jumlah_diambil_infeksius}"
+              >
+
+            </td>
+
+            <td class="col-noninfeksius">
+
+              <input
+                type="number"
+                min="0"
+                class="qty-edit"
+                data-idx="${idx}"
+                data-field="noninfeksius"
+                value="${item.jumlah_diambil_non_infeksius}"
+              >
+
+            </td>
+
+            <td class="col-ket">
+
+              <input
+                type="text"
+                class="ket-edit"
+                data-idx="${idx}"
+                value="${item.keterangan || ''}"
+              >
+
+            </td>
+
+          </tr>
+
+        `
+      ).join('');
+
+
+    detailPanel.innerHTML = `
+
+      <div class="detail-head">
+
+        <div
+          style="
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+          "
+        >
+
+          <input
+            type="text"
+            class="edit-field"
+            id="edit-ruangan"
+            value="${trx.ruangan}"
+          >
+
+          <input
+            type="date"
+            class="edit-field"
+            id="edit-tanggal"
+            value="${tglValue}"
+          >
+
+        </div>
+
+
+        <div class="detail-actions">
+
+          <button
+            class="btn btn-primary"
+            id="btn-simpan"
+          >
+            Simpan
+          </button>
+
+          <button
+            class="btn"
+            id="btn-batal"
+          >
+            Batal
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Jenis Linen
+            </th>
+
+            <th class="col-kotor hdr-kotor">
+              Diantar
+            </th>
+
+            <th class="col-infeksius hdr-infeksius">
+              Infeksius
+            </th>
+
+            <th class="col-noninfeksius hdr-noninfeksius">
+              Non-Infeksius
+            </th>
+
+            <th class="col-ket">
+              Keterangan
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${
+            baris ||
+            `
+              <tr class="empty-detail">
+                <td colspan="5">
+                  Tidak ada rincian linen untuk diedit.
+                </td>
+              </tr>
+            `
+          }
+
+        </tbody>
+
+      </table>
+
+    `;
+
+
+    document
+      .getElementById('btn-batal')
+      .addEventListener(
+        'click',
+        () => {
+
+          mode =
+            'lihat';
+
+          renderDetail();
+        }
+      );
+
+
+    document
+      .getElementById('btn-simpan')
+      .addEventListener(
+        'click',
+        simpanEdit
+      );
+  }
+
+
+  /* =========================================================
+     SIMPAN EDIT
+  ========================================================= */
+
+  async function simpanEdit(){
+
+    const btnSimpan =
+      document.getElementById(
+        'btn-simpan'
+      );
+
+    const ruangan =
+      document
+        .getElementById(
+          'edit-ruangan'
+        )
+        .value
+        .trim();
+
+    const tanggal =
+      document
+        .getElementById(
+          'edit-tanggal'
+        )
+        .value;
+
+
+    if(!ruangan || !tanggal){
+
+      alert(
+        'Ruangan dan tanggal wajib diisi.'
+      );
+
+      return;
+    }
+
+
+    const detail =
+      trxAktif.detail.map(
+        (item, idx) => {
+
+          const kotorInput =
+            document.querySelector(
+              `.qty-edit[data-idx="${idx}"][data-field="kotor"]`
+            );
+
+          const infeksiusInput =
+            document.querySelector(
+              `.qty-edit[data-idx="${idx}"][data-field="infeksius"]`
+            );
+
+          const nonInfeksiusInput =
+            document.querySelector(
+              `.qty-edit[data-idx="${idx}"][data-field="noninfeksius"]`
+            );
+
+          const ketInput =
+            document.querySelector(
+              `.ket-edit[data-idx="${idx}"]`
+            );
+
+
+          return {
+
+            jenis_linen_id:
+              item.jenis_linen_id,
+
+            jumlah_kotor:
+              Number(
+                kotorInput.value
+              ) || 0,
+
+            jumlah_diambil_infeksius:
+              Number(
+                infeksiusInput.value
+              ) || 0,
+
+            jumlah_diambil_non_infeksius:
+              Number(
+                nonInfeksiusInput.value
+              ) || 0,
+
+            verifikasi_pengambilan:
+              item.verifikasi_pengambilan
+                ? 1
+                : 0,
+
+            keterangan:
+              ketInput.value.trim()
+                || null
+          };
+        }
+      );
+
+
+    btnSimpan.disabled =
+      true;
+
+    btnSimpan.textContent =
+      'Menyimpan...';
+
+
+    try{
+
+      const res =
+        await fetch(
+          `/api/serah-terima/${trxAktif.id}`,
+          {
+            method: 'PUT',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body: JSON.stringify({
+
+              ruangan,
+
+              tanggal,
+
+              detail
+
+            })
+          }
+        );
+
+
+      const result =
+        await res.json();
+
+
+      if(!res.ok){
+
+        throw new Error(
+          result.error ||
+          'Gagal menyimpan perubahan'
+        );
+      }
+
+
+      mode =
+        'lihat';
+
+      await muatDaftar();
+
+      await muatDetail(
+        trxAktif.id
+      );
+
+
+    }catch(err){
+
+      alert(
+        err.message ||
+        'Terjadi kesalahan saat menyimpan perubahan.'
+      );
+
+      btnSimpan.disabled =
+        false;
+
+      btnSimpan.textContent =
+        'Simpan';
+    }
+  }
+
+
+  /* =========================================================
+     HAPUS TRANSAKSI
+  ========================================================= */
 
   async function hapusTransaksi(){
-    const konfirmasi = confirm(`Hapus transaksi "${trxAktif.ruangan}" tanggal ${formatTanggal(trxAktif.tanggal)}? Tindakan ini tidak bisa dibatalkan.`);
-    if(!konfirmasi) return;
+
+    if(!trxAktif){
+      return;
+    }
+
+
+    const konfirmasi =
+      confirm(
+        `Hapus transaksi "${trxAktif.ruangan}" tanggal ${formatTanggal(trxAktif.tanggal)}? Tindakan ini tidak bisa dibatalkan.`
+      );
+
+
+    if(!konfirmasi){
+      return;
+    }
+
 
     try{
-      const res = await fetch(`/api/serah-terima/${trxAktif.id}`, { method: 'DELETE' });
-      const result = await res.json();
-      if(!res.ok) throw new Error(result.error || 'Gagal menghapus transaksi');
 
-      activeId = null;
-      trxAktif = null;
-      detailPanel.innerHTML = '<div class="detail-placeholder">Pilih salah satu transaksi di sebelah kiri untuk melihat rinciannya.</div>';
+      const res =
+        await fetch(
+          `/api/serah-terima/${trxAktif.id}`,
+          {
+            method: 'DELETE'
+          }
+        );
+
+
+      const result =
+        await res.json();
+
+
+      if(!res.ok){
+
+        throw new Error(
+          result.error ||
+          'Gagal menghapus transaksi'
+        );
+      }
+
+
+      activeId =
+        null;
+
+      trxAktif =
+        null;
+
+
+      detailPanel.innerHTML = `
+        <div class="detail-placeholder">
+          Pilih salah satu transaksi di sebelah kiri
+          untuk melihat rinciannya.
+        </div>
+      `;
+
+
       await muatDaftar();
+
+
     }catch(err){
-      alert(err.message || 'Terjadi kesalahan saat menghapus transaksi.');
+
+      alert(
+        err.message ||
+        'Terjadi kesalahan saat menghapus transaksi.'
+      );
     }
   }
 
-  filterRuangan.addEventListener('change', renderList);
-  filterTanggal.addEventListener('input', renderList);
 
-  muatDaftar();
+  /* =========================================================
+     FILTER
+  ========================================================= */
+
+  filterRuangan.addEventListener(
+    'change',
+    renderList
+  );
+
+  filterTanggal.addEventListener(
+    'input',
+    renderList
+  );
+
+
+  /* =========================================================
+     MULAI
+  ========================================================= */
+
+  async function mulaiHalaman(){
+
+    const berhasil =
+      await muatInformasiLogin();
+
+    if(!berhasil){
+      return;
+    }
+
+    aturTampilanRole();
+
+    await muatDaftar();
+  }
+
+
+  mulaiHalaman();
+
 </script>
 
 </body>

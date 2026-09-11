@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Konfirmasi Serah Terima — Web Linen</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#F5F7F6;
+    --surface:#FFFFFF;
+    --ink:#1C2B33;
+    --ink-soft:#5B6B70;
+    --line:#DCE3E1;
+    --line-soft:#EAEFED;
+    --teal:#00b1b7;
+    --teal-tint:#E7F2EE;
+    --amber:#B8722E;
+    --amber-tint:#FBF0E3;
+    --danger:#B34A3E;
+    --danger-tint:#FBEAE7;
+    --green:#3B7A3F;
+    --green-tint:#EAF3EA;
+    --radius:10px;
+  }
+
+  *{box-sizing:border-box}
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Public Sans',system-ui,sans-serif;
+  }
+
+  body{
+    min-height:100vh;
+    padding:32px 20px 80px;
+  }
+
+  .wrap{
+    max-width:900px;
+    margin:0 auto;
+  }
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    margin-bottom:24px;
+    padding-bottom:20px;
+    border-bottom:1px solid var(--line);
+  }
+
+  .brand .unit{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--teal);
+    margin-bottom:5px;
+  }
+
+  h1{
+    margin:0;
+    font-family:'Source Serif 4',Georgia,serif;
+    font-size:27px;
+    font-weight:600;
+  }
+
+  .subtitle{
+    margin:7px 0 0;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+
+  .nav-link{
+    font-size:13px;
+    font-weight:600;
+    color:var(--teal);
+    text-decoration:none;
+    padding:8px 13px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--surface);
+    white-space:nowrap;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:18px;
+    align-items:start;
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+
+  .panel-title{
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+    font-weight:700;
+  }
+
+  .list{
+    max-height:65vh;
+    overflow-y:auto;
+  }
+
+  .trx{
+    width:100%;
+    text-align:left;
+    border:0;
+    border-bottom:1px solid var(--line-soft);
+    background:var(--surface);
+    padding:14px 16px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+
+  .trx:hover{
+    background:#FAFBFA;
+  }
+
+  .trx.active{
+    background:var(--teal-tint);
+  }
+
+  .trx:last-child{
+    border-bottom:none;
+  }
+
+  .trx .ruangan{
+    font-weight:700;
+    font-size:15px;
+  }
+
+  .trx .meta{
+    margin-top:4px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  .empty{
+    padding:28px 16px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+
+  .detail{
+    min-height:400px;
+  }
+
+  .placeholder{
+    min-height:400px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:30px;
+    color:var(--ink-soft);
+  }
+
+  .detail-header{
+    padding:20px;
+    border-bottom:1px solid var(--line);
+  }
+
+  .detail-header h2{
+    margin:0 0 5px;
+    font-family:'Source Serif 4',Georgia,serif;
+    font-size:22px;
+  }
+
+  .detail-header p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+
+  .status{
+    display:inline-block;
+    margin-top:10px;
+    padding:6px 10px;
+    border-radius:7px;
+    background:var(--amber-tint);
+    color:var(--amber);
+    font-size:12px;
+    font-weight:700;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+
+  th{
+    text-align:left;
+    padding:11px 16px;
+    font-size:12px;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+  }
+
+  td{
+    padding:11px 16px;
+    border-bottom:1px solid var(--line-soft);
+  }
+
+  td.num{
+    text-align:center;
+    font-weight:600;
+  }
+
+  .kotor{color:var(--amber)}
+  .infeksius{color:var(--danger)}
+  .noninfeksius{color:var(--green)}
+
+  .confirm{
+    padding:20px;
+    border-top:1px solid var(--line);
+  }
+
+  .confirm h3{
+    margin:0 0 15px;
+    font-family:'Source Serif 4',Georgia,serif;
+    font-size:18px;
+  }
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:16px;
+  }
+
+  .field label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+
+  .field input{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--bg);
+    font:inherit;
+    color:var(--ink);
+  }
+
+  .field input:focus{
+    outline:2px solid var(--teal);
+    outline-offset:1px;
+    border-color:var(--teal);
+  }
+
+  .ttd-shell{
+    height:170px;
+    border:1.5px dashed var(--line);
+    border-radius:10px;
+    background:var(--bg);
+    position:relative;
+    overflow:hidden;
+  }
+
+  #canvas-ttd{
+    width:100%;
+    height:100%;
+    display:block;
+    touch-action:none;
+    cursor:crosshair;
+  }
+
+  .ttd-placeholder{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    color:var(--ink-soft);
+    font-size:13px;
+    pointer-events:none;
+  }
+
+  .actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:10px;
+  }
+
+  .btn{
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--surface);
+    color:var(--ink);
+    padding:9px 14px;
+    font:600 13px inherit;
+    cursor:pointer;
+  }
+
+  .btn:hover{
+    background:#FAFBFA;
+  }
+
+  .btn-danger{
+    color:var(--danger);
+  }
+
+  .btn-primary{
+    background:var(--teal);
+    color:white;
+    border-color:var(--teal);
+  }
+
+  .btn-primary:hover{
+    background:#009da3;
+  }
+
+  .btn-primary:disabled{
+    background:#A9B6B2;
+    border-color:#A9B6B2;
+    cursor:not-allowed;
+  }
+
+  .banner{
+    display:none;
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:8px;
+    font-size:13.5px;
+  }
+
+  .banner.show{display:block}
+
+  .banner.success{
+    background:var(--teal-tint);
+    color:var(--teal);
+    border:1px solid #BFDED4;
+  }
+
+  .banner.error{
+    background:var(--danger-tint);
+    color:var(--danger);
+    border:1px solid #EFC7C0;
+  }
+
+  @media(max-width:760px){
+    .layout{
+      grid-template-columns:1fr;
+    }
+
+    .list{
+      max-height:none;
+    }
+
+    header{
+      flex-direction:column;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="unit">Instalasi Laundry</span>
+      <h1>Konfirmasi Serah Terima</h1>
+      <p class="subtitle">
+        Periksa transaksi dari Laundry sebelum menerima.
+      </p>
+    </div>
+
+    <a href="/user-dashboard.html" class="nav-link">
+      ← Kembali
+    </a>
+  </header>
+
+  <div class="layout">
+
+    <div class="panel">
+      <div class="panel-title">
+        Menunggu Konfirmasi
+      </div>
+
+      <div class="list" id="list-transaksi">
+        <div class="empty">
+          Memuat transaksi...
+        </div>
+      </div>
+    </div>
+
+    <div class="panel detail" id="detail-panel">
+
+      <div class="placeholder">
+        Pilih transaksi di sebelah kiri untuk melihat rincian.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+  const listTransaksi =
+    document.getElementById('list-transaksi');
+
+  const detailPanel =
+    document.getElementById('detail-panel');
+
+  let transaksi = [];
+  let transaksiAktif = null;
+
+  let menggambar = false;
+  let adaGambar = false;
+  let posisiTerakhir = {
+    x: 0,
+    y: 0
+  };
+
+  function formatTanggal(iso){
+
+    const tgl = iso.split('T')[0];
+
+    const [y, m, d] =
+      tgl.split('-');
+
+    const dateObj =
+      new Date(y, m - 1, d);
+
+    return dateObj.toLocaleDateString(
+      'id-ID',
+      {
+        day:'numeric',
+        month:'long',
+        year:'numeric'
+      }
+    );
+  }
+
+  function formatWaktu(iso){
+
+    return new Date(iso)
+      .toLocaleTimeString(
+        'id-ID',
+        {
+          hour:'2-digit',
+          minute:'2-digit'
+        }
+      );
+  }
+
+  async function cekUser(){
+
+    const res =
+      await fetch('/api/me');
+
+    if(!res.ok){
+      window.location.href =
+        '/login.html';
+
+      return null;
+    }
+
+    const result =
+      await res.json();
+
+    if(result.user.role !== 'user'){
+      window.location.href = '/';
+
+      return null;
+    }
+
+    return result.user;
+  }
+
+  async function muatTransaksi(){
+
+    try{
+
+      const res =
+        await fetch('/api/serah-terima');
+
+      if(!res.ok){
+        throw new Error(
+          'Gagal mengambil transaksi'
+        );
+      }
+
+      const data =
+        await res.json();
+
+      transaksi =
+        data.filter(
+          item =>
+            item.status ===
+            'menunggu_konfirmasi'
+        );
+
+      renderList();
+
+    }catch(err){
+
+      console.error(err);
+
+      listTransaksi.innerHTML = `
+        <div class="empty">
+          Gagal memuat transaksi.
+        </div>
+      `;
+    }
+  }
+
+  function renderList(){
+
+    if(transaksi.length === 0){
+
+      listTransaksi.innerHTML = `
+        <div class="empty">
+          Tidak ada transaksi yang
+          menunggu konfirmasi.
+        </div>
+      `;
+
+      detailPanel.innerHTML = `
+        <div class="placeholder">
+          Semua transaksi sudah dikonfirmasi.
+        </div>
+      `;
+
+      return;
+    }
+
+    listTransaksi.innerHTML = '';
+
+    transaksi.forEach(item => {
+
+      const btn =
+        document.createElement('button');
+
+      btn.className =
+        'trx' +
+        (
+          transaksiAktif &&
+          transaksiAktif.id === item.id
+            ? ' active'
+            : ''
+        );
+
+      btn.innerHTML = `
+        <div class="ruangan">
+          ${item.ruangan}
+        </div>
+
+        <div class="meta">
+          ${formatTanggal(item.tanggal)}
+          · dibuat ${formatWaktu(item.created_at)}
+        </div>
+      `;
+
+      btn.addEventListener(
+        'click',
+        () => muatDetail(item.id)
+      );
+
+      listTransaksi.appendChild(btn);
+
+    });
+  }
+
+  async function muatDetail(id){
+
+    detailPanel.innerHTML = `
+      <div class="placeholder">
+        Memuat rincian transaksi...
+      </div>
+    `;
+
+    try{
+
+      const res =
+        await fetch(
+          `/api/serah-terima/${id}`
+        );
+
+      if(!res.ok){
+        throw new Error(
+          'Gagal memuat detail transaksi'
+        );
+      }
+
+      transaksiAktif =
+        await res.json();
+
+      renderDetail();
+
+      renderList();
+
+    }catch(err){
+
+      console.error(err);
+
+      detailPanel.innerHTML = `
+        <div class="placeholder">
+          Gagal memuat rincian transaksi.
+        </div>
+      `;
+    }
+  }
+
+  function renderDetail(){
+
+    const trx =
+      transaksiAktif;
+
+    const baris =
+      trx.detail.map(item => {
+
+        return `
+          <tr>
+            <td>
+              ${item.jenis_linen_nama}
+            </td>
+
+            <td class="num kotor">
+              ${item.jumlah_kotor}
+            </td>
+
+            <td class="num infeksius">
+              ${item.jumlah_diambil_infeksius}
+            </td>
+
+            <td class="num noninfeksius">
+              ${item.jumlah_diambil_non_infeksius}
+            </td>
+          </tr>
+        `;
+
+      }).join('');
+
+    detailPanel.innerHTML = `
+
+      <div class="detail-header">
+
+        <h2>${trx.ruangan}</h2>
+
+        <p>
+          ${formatTanggal(trx.tanggal)}
+        </p>
+
+        <span class="status">
+          Menunggu Konfirmasi
+        </span>
+
+      </div>
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Jenis Linen</th>
+            <th class="kotor">Diantar</th>
+            <th class="infeksius">Infeksius</th>
+            <th class="noninfeksius">
+              Non-Infeksius
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${
+            baris ||
+            `
+            <tr>
+              <td colspan="4">
+                Tidak ada detail linen.
+              </td>
+            </tr>
+            `
+          }
+        </tbody>
+
+      </table>
+
+      <div class="confirm">
+
+        <h3>
+          Konfirmasi Penerimaan
+        </h3>
+
+        <div class="field">
+
+          <label for="nama-penerima">
+            Nama Penerima
+          </label>
+
+          <input
+            type="text"
+            id="nama-penerima"
+            placeholder="Nama petugas ruangan"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Tanda Tangan
+          </label>
+
+          <div class="ttd-shell">
+
+            <canvas
+              id="canvas-ttd"
+            ></canvas>
+
+            <span
+              class="ttd-placeholder"
+              id="ttd-placeholder"
+            >
+              Gambar tanda tangan di sini
+            </span>
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="btn-hapus-ttd"
+            >
+              Hapus & Ulangi
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="btn-konfirmasi"
+          >
+            ✓ Konfirmasi Penerimaan
+          </button>
+
+        </div>
+
+        <div
+          class="banner"
+          id="banner"
+        ></div>
+
+      </div>
+    `;
+
+    setupSignature();
+
+    document
+      .getElementById('btn-konfirmasi')
+      .addEventListener(
+        'click',
+        konfirmasiPenerimaan
+      );
+  }
+
+  function setupSignature(){
+
+    const canvas =
+      document.getElementById(
+        'canvas-ttd'
+      );
+
+    const ctx =
+      canvas.getContext('2d');
+
+    const placeholder =
+      document.getElementById(
+        'ttd-placeholder'
+      );
+
+    const btnHapus =
+      document.getElementById(
+        'btn-hapus-ttd'
+      );
+
+    function resizeCanvas(){
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const dpr =
+        window.devicePixelRatio || 1;
+
+      canvas.width =
+        rect.width * dpr;
+
+      canvas.height =
+        rect.height * dpr;
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#1C2B33';
+    }
+
+    resizeCanvas();
+
+    function getPos(e){
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const point =
+        e.touches
+          ? e.touches[0]
+          : e;
+
+      return {
+        x: point.clientX - rect.left,
+        y: point.clientY - rect.top
+      };
+    }
+
+    function startDraw(e){
+
+      e.preventDefault();
+
+      menggambar = true;
+      adaGambar = true;
+
+      placeholder.style.display =
+        'none';
+
+      posisiTerakhir =
+        getPos(e);
+    }
+
+    function draw(e){
+
+      if(!menggambar) return;
+
+      e.preventDefault();
+
+      const pos =
+        getPos(e);
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        posisiTerakhir.x,
+        posisiTerakhir.y
+      );
+
+      ctx.lineTo(
+        pos.x,
+        pos.y
+      );
+
+      ctx.stroke();
+
+      posisiTerakhir =
+        pos;
+    }
+
+    function endDraw(){
+
+      menggambar = false;
+    }
+
+    canvas.addEventListener(
+      'mousedown',
+      startDraw
+    );
+
+    canvas.addEventListener(
+      'mousemove',
+      draw
+    );
+
+    canvas.addEventListener(
+      'mouseup',
+      endDraw
+    );
+
+    canvas.addEventListener(
+      'mouseleave',
+      endDraw
+    );
+
+    canvas.addEventListener(
+      'touchstart',
+      startDraw,
+      { passive:false }
+    );
+
+    canvas.addEventListener(
+      'touchmove',
+      draw,
+      { passive:false }
+    );
+
+    canvas.addEventListener(
+      'touchend',
+      endDraw
+    );
+
+    btnHapus.addEventListener(
+      'click',
+      () => {
+
+        ctx.clearRect(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        adaGambar = false;
+
+        placeholder.style.display =
+          'block';
+      }
+    );
+  }
+
+  async function konfirmasiPenerimaan(){
+
+    const nama =
+      document
+        .getElementById(
+          'nama-penerima'
+        )
+        .value
+        .trim();
+
+    const canvas =
+      document.getElementById(
+        'canvas-ttd'
+      );
+
+    if(!nama){
+
+      tampilkanBanner(
+        'error',
+        'Nama penerima wajib diisi.'
+      );
+
+      return;
+    }
+
+    if(!adaGambar){
+
+      tampilkanBanner(
+        'error',
+        'Tanda tangan wajib diisi.'
+      );
+
+      return;
+    }
+
+    const btn =
+      document.getElementById(
+        'btn-konfirmasi'
+      );
+
+    btn.disabled = true;
+
+    btn.textContent =
+      'Menyimpan...';
+
+    try{
+
+      const res =
+        await fetch(
+          `/api/serah-terima/${transaksiAktif.id}/konfirmasi`,
+          {
+            method:'PUT',
+            headers:{
+              'Content-Type':
+                'application/json'
+            },
+            body:JSON.stringify({
+              nama_penerima:nama,
+              tanda_tangan:
+                canvas.toDataURL(
+                  'image/png'
+                )
+            })
+          }
+        );
+
+      const result =
+        await res.json();
+
+      if(!res.ok){
+
+        throw new Error(
+          result.error ||
+          'Gagal melakukan konfirmasi'
+        );
+      }
+
+      tampilkanBanner(
+        'success',
+        'Penerimaan berhasil dikonfirmasi.'
+      );
+
+      setTimeout(
+        async () => {
+
+          transaksiAktif = null;
+
+          await muatTransaksi();
+
+        },
+        700
+      );
+
+    }catch(err){
+
+      tampilkanBanner(
+        'error',
+        err.message ||
+        'Terjadi kesalahan.'
+      );
+
+      btn.disabled = false;
+
+      btn.textContent =
+        '✓ Konfirmasi Penerimaan';
+    }
+  }
+
+  function tampilkanBanner(
+    type,
+    message
+  ){
+
+    const banner =
+      document.getElementById(
+        'banner'
+      );
+
+    if(!banner) return;
+
+    banner.textContent =
+      message;
+
+    banner.className =
+      `banner show ${type}`;
+  }
+
+  async function mulai(){
+
+    const user =
+      await cekUser();
+
+    if(!user) return;
+
+    await muatTransaksi();
+  }
+
+  mulai();
+
+</script>
+
+</body>
+</html>

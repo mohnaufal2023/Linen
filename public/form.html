@@ -394,7 +394,7 @@
 
   <header>
     <div class="brand">
-      <span class="unit">Instalasi Loundry</span>
+      <span class="unit">Instalasi Laundry</span>
       <h1>Serah Terima Pencucian Linen</h1>
     </div>
     <div class="tanggal-hariini" id="tanggal-hariini"></div>
@@ -447,26 +447,6 @@
       </div>
     </div>
 
-    <div class="penerima-panel">
-      <h3>Konfirmasi Penerima</h3>
-      <div class="penerima-grid">
-        <div class="field">
-          <label for="nama-penerima">Nama Penerima</label>
-          <input type="text" id="nama-penerima" placeholder="Nama petugas ruangan yang menerima">
-        </div>
-        <div>
-          <label style="font-size:13px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:6px;">Tanda Tangan</label>
-          <div class="ttd-shell">
-            <canvas id="canvas-ttd"></canvas>
-            <span class="ttd-placeholder" id="ttd-placeholder">Gambar di sini</span>
-          </div>
-          <div class="ttd-actions">
-            <button type="button" class="btn-ulangi" id="btn-hapus-ttd">↺ Hapus & ulangi</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="banner" id="banner"></div>
   </form>
 
@@ -481,80 +461,7 @@
   const totalNonInfeksiusEl = document.getElementById('total-noninfeksius');
   const tanggalInput = document.getElementById('tanggal');
   const tanggalHariIni = document.getElementById('tanggal-hariini');
-  const namaPenerimaInput = document.getElementById('nama-penerima');
-  const canvas = document.getElementById('canvas-ttd');
-  const ctx = canvas.getContext('2d');
-  const ttdPlaceholder = document.getElementById('ttd-placeholder');
-  const btnHapusTtd = document.getElementById('btn-hapus-ttd');
-
-  let menggambar = false;
-  let adaGambar = false;
-  let posisiTerakhir = { x: 0, y: 0 };
-
-  function setupCanvas(){
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#1C2B33';
-  }
-  setupCanvas();
-  window.addEventListener('resize', () => {
-    const dataLama = adaGambar ? canvas.toDataURL() : null;
-    setupCanvas();
-    if(dataLama){
-      const img = new Image();
-      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width / (window.devicePixelRatio||1), canvas.height / (window.devicePixelRatio||1));
-      img.src = dataLama;
-    }
-  });
-
-  function getPos(e){
-    const rect = canvas.getBoundingClientRect();
-    const titik = e.touches ? e.touches[0] : e;
-    return { x: titik.clientX - rect.left, y: titik.clientY - rect.top };
-  }
-
-  function mulaiGambar(e){
-    menggambar = true;
-    adaGambar = true;
-    ttdPlaceholder.style.display = 'none';
-    posisiTerakhir = getPos(e);
-  }
-
-  function gambar(e){
-    if(!menggambar) return;
-    e.preventDefault();
-    const pos = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(posisiTerakhir.x, posisiTerakhir.y);
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-    posisiTerakhir = pos;
-  }
-
-  function selesaiGambar(){
-    menggambar = false;
-  }
-
-  canvas.addEventListener('mousedown', mulaiGambar);
-  canvas.addEventListener('mousemove', gambar);
-  canvas.addEventListener('mouseup', selesaiGambar);
-  canvas.addEventListener('mouseleave', selesaiGambar);
-
-  canvas.addEventListener('touchstart', mulaiGambar);
-  canvas.addEventListener('touchmove', gambar);
-  canvas.addEventListener('touchend', selesaiGambar);
-
-  btnHapusTtd.addEventListener('click', () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    adaGambar = false;
-    ttdPlaceholder.style.display = 'block';
-  });
+  let currentUser = null;
 
   const todayISO = new Date().toISOString().split('T')[0];
   tanggalInput.value = todayISO;
@@ -577,27 +484,65 @@
     totalNonInfeksiusEl.textContent = nonInfeksius;
   }
 
-  async function muatDaftarRuangan(){
+  async function muatInformasiUser(){
     const selectRuangan = document.getElementById('ruangan');
+    const navKembali = document.querySelector('.nav-link');
+
     try{
-      const res = await fetch('/api/ruangan');
-      if(!res.ok) throw new Error('Gagal memuat');
-      const data = await res.json();
+      const res = await fetch('/api/me');
+      if(!res.ok) throw new Error('Gagal memuat informasi akun');
+
+      const result = await res.json();
+      currentUser = result.user;
+
+      // User ruangan tidak membuat transaksi baru.
+      if(currentUser.role === 'user'){
+        window.location.href = '/user-dashboard.html';
+        return;
+      }
+
+      // Laundry kembali ke dashboard Laundry.
+      if(currentUser.role === 'laundry'){
+        if(navKembali){
+          navKembali.href = '/laundry-dashboard.html';
+        }
+      } else if(currentUser.role === 'admin'){
+        // Admin kembali ke dashboard Admin.
+        if(navKembali){
+          navKembali.href = '/';
+        }
+      } else {
+        throw new Error('Role akun tidak dikenali');
+      }
+
+      // Admin dan Laundry boleh memilih ruangan.
+      const resRuangan = await fetch('/api/ruangan');
+      if(!resRuangan.ok) throw new Error('Gagal memuat daftar ruangan');
+
+      const data = await resRuangan.json();
 
       if(data.length === 0){
         selectRuangan.innerHTML = '<option value="" disabled selected>Belum ada ruangan terdaftar</option>';
+        selectRuangan.disabled = true;
+        submitBtn.disabled = true;
         return;
       }
 
       selectRuangan.innerHTML = '<option value="" disabled selected>Pilih ruangan…</option>';
+
       data.forEach(item => {
         const opt = document.createElement('option');
         opt.value = item.nama;
         opt.textContent = item.nama;
         selectRuangan.appendChild(opt);
       });
+
     }catch(err){
-      selectRuangan.innerHTML = '<option value="" disabled selected>Gagal memuat daftar ruangan</option>';
+      console.error(err);
+      selectRuangan.innerHTML = '<option value="" disabled selected>Gagal memuat informasi ruangan</option>';
+      selectRuangan.disabled = true;
+      submitBtn.disabled = true;
+      showBanner('error', err.message || 'Gagal memuat informasi akun.');
     }
   }
 
@@ -680,23 +625,17 @@
         body: JSON.stringify({
           ruangan,
           tanggal,
-          detail,
-          nama_penerima: namaPenerimaInput.value.trim() || null,
-          tanda_tangan: adaGambar ? canvas.toDataURL('image/png') : null
+          detail
         })
       });
       const result = await res.json();
 
       if(!res.ok) throw new Error(result.error || 'Gagal menyimpan');
 
-      showBanner('success', `Tersimpan. Data serah terima untuk ruangan "${ruangan}" berhasil dicatat.`);
+      showBanner('success', `Tersimpan. Data serah terima untuk ruangan "${ruangan}" berhasil dicatat dan menunggu konfirmasi dari ruangan.`);
       document.getElementById('ruangan').value = '';
       document.querySelectorAll('.qty-input').forEach(el => el.value = 0);
       document.querySelectorAll('.ket-input').forEach(el => el.value = '');
-      namaPenerimaInput.value = '';
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      adaGambar = false;
-      ttdPlaceholder.style.display = 'block';
       hitungTotal();
     }catch(err){
       showBanner('error', err.message || 'Terjadi kesalahan saat menyimpan data.');
@@ -706,7 +645,7 @@
     }
   });
 
-  muatDaftarRuangan();
+  muatInformasiUser();
   muatJenisLinen();
 </script>
 
