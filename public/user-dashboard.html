@@ -17,10 +17,16 @@
     --ink: #1C2B33;
     --ink-soft: #5B6B70;
     --line: #DCE3E1;
+
     --teal: #00b1b7;
     --teal-tint: #E7F2EE;
+
     --amber: #B8722E;
     --amber-tint: #FBF0E3;
+
+    --purple: #4B4B8F;
+    --purple-tint: #EAEAF5;
+
     --radius: 12px;
   }
 
@@ -147,7 +153,6 @@
   }
 
   .menu-card:hover{
-    border-color: var(--teal);
     transform: translateY(-1px);
   }
 
@@ -162,14 +167,24 @@
     font-size: 20px;
   }
 
-  .menu-card.baru .menu-icon{
-    background: var(--teal-tint);
-    color: var(--teal);
-  }
-
+  /* Riwayat */
   .menu-card.riwayat .menu-icon{
     background: var(--amber-tint);
     color: var(--amber);
+  }
+
+  .menu-card.riwayat:hover{
+    border-color: var(--amber);
+  }
+
+  /* Konfirmasi */
+  .menu-card.konfirmasi .menu-icon{
+    background: var(--purple-tint);
+    color: var(--purple);
+  }
+
+  .menu-card.konfirmasi:hover{
+    border-color: var(--purple);
   }
 
   .menu-text h2{
@@ -197,15 +212,6 @@
     font-size: 13px;
     padding: 8px;
   }
-
-  .menu-card.konfirmasi .menu-icon{
-  background: #EAEAF5;
-  color: #4B4B8F;
-}
-
-.menu-card.konfirmasi:hover{
-  border-color: #4B4B8F;
-}
 
   @media (max-width: 600px){
     body{
@@ -237,35 +243,55 @@
 <div class="wrap">
 
   <div class="brand">
-    <span class="unit">Instalasi Laundry</span>
 
-    <h1>Dashboard User</h1>
+    <span class="unit">
+      Instalasi Laundry
+    </span>
+
+    <h1>
+      Dashboard User
+    </h1>
 
     <p class="subtitle">
       Serah Terima Pencucian Linen
     </p>
+
   </div>
 
+
+  <!-- INFORMASI AKUN -->
   <div class="user-info" id="user-info">
+
     <div class="loading">
       Memuat informasi akun...
     </div>
+
   </div>
 
+
+  <!-- MENU USER -->
   <div class="menu">
 
-    <a class="menu-card baru" href="/form.html">
+    <!-- MENUNGGU KONFIRMASI -->
+    <a
+      class="menu-card konfirmasi"
+      href="/konfirmasi.html"
+    >
 
       <div class="menu-icon">
-        ＋
+        ✓
       </div>
 
       <div class="menu-text">
-        <h2>Serah Terima Baru</h2>
+
+        <h2>
+          Menunggu Konfirmasi
+        </h2>
 
         <p>
-          Catat linen yang diantar dan diambil
+          Periksa dan konfirmasi serah terima dari Laundry
         </p>
+
       </div>
 
       <div class="menu-arrow">
@@ -274,18 +300,27 @@
 
     </a>
 
-    <a class="menu-card riwayat" href="/riwayat.html">
+
+    <!-- RIWAYAT -->
+    <a
+      class="menu-card riwayat"
+      href="/riwayat.html"
+    >
 
       <div class="menu-icon">
         📋
       </div>
 
       <div class="menu-text">
-        <h2>Riwayat Serah Terima</h2>
+
+        <h2>
+          Riwayat Serah Terima
+        </h2>
 
         <p>
           Lihat riwayat serah terima ruangan
         </p>
+
       </div>
 
       <div class="menu-arrow">
@@ -294,67 +329,84 @@
 
     </a>
 
-    <a class="menu-card konfirmasi" href="/konfirmasi.html">
-
-  <div class="menu-icon">
-    ✓
-  </div>
-
-  <div class="menu-text">
-    <h2>Menunggu Konfirmasi</h2>
-    <p>
-      Periksa dan konfirmasi serah terima dari Laundry
-    </p>
-  </div>
-
-  <div class="menu-arrow">
-    ›
-  </div>
-
-</a>
-
   </div>
 
 </div>
 
+
 <script>
+
   async function muatInformasiUser(){
-    const userInfo = document.getElementById('user-info');
+
+    const userInfo =
+      document.getElementById('user-info');
 
     try{
-      const res = await fetch('/api/me');
+
+      const res =
+        await fetch('/api/me');
 
       if(!res.ok){
-        throw new Error('Gagal mengambil informasi akun');
+        throw new Error(
+          'Gagal mengambil informasi akun'
+        );
       }
 
-      const result = await res.json();
-      const user = result.user;
+      const result =
+        await res.json();
+
+      const user =
+        result.user;
+
 
       userInfo.innerHTML = `
-        <div class="user-info-row">
-          <div class="user-label">Username</div>
-          <div class="user-value">${user.username}</div>
-        </div>
 
         <div class="user-info-row">
-          <div class="user-label">Ruangan</div>
-          <div class="user-value">${user.ruangan_nama || '-'}</div>
+
+          <div class="user-label">
+            Username
+          </div>
+
+          <div class="user-value">
+            ${user.username}
+          </div>
+
         </div>
+
+
+        <div class="user-info-row">
+
+          <div class="user-label">
+            Ruangan
+          </div>
+
+          <div class="user-value">
+            ${user.ruangan_nama || '-'}
+          </div>
+
+        </div>
+
       `;
 
     }catch(err){
+
       console.error(err);
 
       userInfo.innerHTML = `
+
         <div class="loading">
           Gagal memuat informasi akun.
         </div>
+
       `;
+
     }
+
   }
 
+
   muatInformasiUser();
+
 </script>
 
 </body>

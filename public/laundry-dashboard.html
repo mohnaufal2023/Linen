@@ -17,12 +17,19 @@
     --ink: #1C2B33;
     --ink-soft: #5B6B70;
     --line: #DCE3E1;
+
     --teal: #00b1b7;
     --teal-tint: #E7F2EE;
+
     --amber: #B8722E;
     --amber-tint: #FBF0E3;
+
     --purple: #4B4B8F;
     --purple-tint: #EAEAF5;
+
+    --green: #2D7A4B;
+    --green-tint: #EAF5EE;
+
     --radius: 12px;
   }
 
@@ -82,7 +89,7 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--teal);
-    letter-spacing: 0.03em;
+    letter-spacing: .03em;
     margin-bottom: 6px;
   }
 
@@ -130,6 +137,105 @@
     font-weight: 700;
   }
 
+
+  /* =====================================================
+     RINGKASAN STOK
+     ===================================================== */
+
+  .stock-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  .stock-top{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stock-icon{
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: var(--green-tint);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    flex-shrink: 0;
+  }
+
+  .stock-title{
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .stock-subtitle{
+    margin: 3px 0 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  .stock-summary{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .summary-box{
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px;
+  }
+
+  .summary-label{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+
+  .summary-value{
+    font-size: 21px;
+    font-weight: 800;
+  }
+
+  .view-stock{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 9px;
+    background: var(--green);
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .view-stock:hover{
+    opacity: .9;
+  }
+
+  .stock-loading{
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 12px;
+  }
+
+
+  /* =====================================================
+     MENU
+     ===================================================== */
+
   .menu{
     display: grid;
     gap: 14px;
@@ -145,7 +251,9 @@
     padding: 22px;
     text-decoration: none;
     color: inherit;
-    transition: border-color .15s ease, transform .15s ease;
+    transition:
+      border-color .15s ease,
+      transform .15s ease;
   }
 
   .menu-card:hover{
@@ -158,6 +266,10 @@
 
   .menu-card.riwayat:hover{
     border-color: var(--amber);
+  }
+
+  .menu-card.verifikasi:hover{
+    border-color: var(--purple);
   }
 
   .menu-icon{
@@ -205,7 +317,9 @@
     flex-shrink: 0;
   }
 
+
   @media (max-width: 600px){
+
     body{
       padding: 32px 16px;
     }
@@ -224,124 +338,414 @@
       flex-direction: column;
       gap: 3px;
     }
+
+    .stock-summary{
+      grid-template-columns: 1fr 1fr;
+    }
+
   }
 </style>
 </head>
 
 <body>
 
-<a class="logout-link" href="/logout">Keluar</a>
+<a
+  class="logout-link"
+  href="/logout"
+>
+  Keluar
+</a>
+
 
 <div class="wrap">
 
-  <div class="brand">
-    <span class="unit">Instalasi Laundry</span>
 
-    <h1>Dashboard Laundry</h1>
+  <div class="brand">
+
+    <span class="unit">
+      Instalasi Laundry
+    </span>
+
+    <h1>
+      Dashboard Laundry
+    </h1>
 
     <p class="subtitle">
       Sistem Serah Terima Pencucian Linen
     </p>
+
   </div>
 
-  <div class="user-info" id="user-info">
-    <div class="user-info-row">
-      <div class="user-label">Username</div>
-      <div class="user-value" id="username">Memuat...</div>
-    </div>
+
+  <!-- INFORMASI AKUN -->
+
+  <div class="user-info">
 
     <div class="user-info-row">
-      <div class="user-label">Role</div>
-      <div class="user-value">Laundry</div>
+
+      <div class="user-label">
+        Username
+      </div>
+
+      <div
+        class="user-value"
+        id="username"
+      >
+        Memuat...
+      </div>
+
     </div>
+
+
+    <div class="user-info-row">
+
+      <div class="user-label">
+        Role
+      </div>
+
+      <div class="user-value">
+        Laundry
+      </div>
+
+    </div>
+
   </div>
+
+
+  <!-- RINGKASAN STOK -->
+
+  <div class="stock-card">
+
+    <div class="stock-top">
+
+      <div class="stock-icon">
+        🧺
+      </div>
+
+      <div>
+
+        <h2 class="stock-title">
+          Stok Linen Laundry
+        </h2>
+
+        <p class="stock-subtitle">
+          Ringkasan stok linen bersih yang tersedia
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="stock-loading"
+      id="stock-loading"
+    >
+      Memuat ringkasan stok...
+    </div>
+
+
+    <div
+      id="stock-content"
+      style="display:none;"
+    >
+
+      <div class="stock-summary">
+
+        <div class="summary-box">
+
+          <div class="summary-label">
+            Total jenis linen
+          </div>
+
+          <div
+            class="summary-value"
+            id="total-jenis"
+          >
+            0
+          </div>
+
+        </div>
+
+
+        <div class="summary-box">
+
+          <div class="summary-label">
+            Total stok
+          </div>
+
+          <div
+            class="summary-value"
+            id="total-stok"
+          >
+            0
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <a
+        class="view-stock"
+        href="/stok-laundry.html"
+      >
+        Lihat Stok Linen →
+      </a>
+
+    </div>
+
+  </div>
+
+
+  <!-- MENU -->
 
   <div class="menu">
 
-    <a class="menu-card baru" href="/form.html">
+
+    <!-- SERAH TERIMA -->
+
+    <a
+      class="menu-card baru"
+      href="/form.html"
+    >
+
       <div class="menu-icon">
         ＋
       </div>
 
       <div class="menu-text">
-        <h2>Serah Terima Baru</h2>
+
+        <h2>
+          Serah Terima Baru
+        </h2>
+
         <p>
           Catat linen yang diantar dan diambil dari ruangan
         </p>
+
       </div>
 
       <div class="menu-arrow">
         ›
       </div>
+
     </a>
 
-    <a class="menu-card verifikasi" href="/riwayat.html">
+
+    <!-- VERIFIKASI -->
+
+    <a
+      class="menu-card verifikasi"
+      href="/riwayat.html"
+    >
+
       <div class="menu-icon">
         ✓
       </div>
 
       <div class="menu-text">
-        <h2>Verifikasi Pengambilan</h2>
+
+        <h2>
+          Verifikasi Pengambilan
+        </h2>
+
         <p>
           Periksa dan verifikasi linen yang diambil
         </p>
+
       </div>
 
       <div class="menu-arrow">
         ›
       </div>
+
     </a>
 
-    <a class="menu-card riwayat" href="/riwayat.html">
+
+    <!-- RIWAYAT -->
+
+    <a
+      class="menu-card riwayat"
+      href="/riwayat.html"
+    >
+
       <div class="menu-icon">
         📋
       </div>
 
       <div class="menu-text">
-        <h2>Riwayat Serah Terima</h2>
+
+        <h2>
+          Riwayat Serah Terima
+        </h2>
+
         <p>
           Lihat seluruh transaksi serah terima
         </p>
+
       </div>
 
       <div class="menu-arrow">
         ›
       </div>
+
     </a>
 
   </div>
 
 </div>
 
+
 <script>
+
+  // ========================================================
+  // INFORMASI LAUNDRY
+  // ========================================================
+
   async function muatInformasiLaundry(){
 
     try{
-      const res = await fetch('/api/me');
+
+      const res =
+        await fetch('/api/me');
+
 
       if(!res.ok){
-        throw new Error('Gagal mengambil informasi akun');
+        throw new Error(
+          'Gagal mengambil informasi akun'
+        );
       }
 
-      const result = await res.json();
 
-      if(result.user.role !== 'laundry'){
+      const result =
+        await res.json();
+
+
+      if(
+        result.user.role !== 'laundry'
+      ){
+
         window.location.href = '/';
+
         return;
+
       }
 
-      document.getElementById('username').textContent =
-        result.user.username;
+
+      document
+        .getElementById('username')
+        .textContent =
+          result.user.username;
+
 
     }catch(err){
 
       console.error(err);
 
-      document.getElementById('username').textContent = '-';
+      document
+        .getElementById('username')
+        .textContent =
+          '-';
+
     }
+
   }
 
+
+  // ========================================================
+  // RINGKASAN STOK
+  // ========================================================
+
+  async function muatRingkasanStok(){
+
+    const loading =
+      document.getElementById(
+        'stock-loading'
+      );
+
+    const content =
+      document.getElementById(
+        'stock-content'
+      );
+
+
+    try{
+
+      const res =
+        await fetch(
+          '/api/stok-laundry'
+        );
+
+
+      if(!res.ok){
+
+        throw new Error(
+          'Gagal mengambil stok Laundry'
+        );
+
+      }
+
+
+      const data =
+        await res.json();
+
+
+      const totalJenis =
+        data.length;
+
+
+      const totalStok =
+        data.reduce(
+          (total, item) =>
+            total +
+            (
+              Number(
+                item.jumlah_stok
+              ) || 0
+            ),
+          0
+        );
+
+
+      document
+        .getElementById(
+          'total-jenis'
+        )
+        .textContent =
+          totalJenis;
+
+
+      document
+        .getElementById(
+          'total-stok'
+        )
+        .textContent =
+          totalStok;
+
+
+      loading.style.display =
+        'none';
+
+      content.style.display =
+        'block';
+
+
+    }catch(err){
+
+      console.error(err);
+
+      loading.textContent =
+        'Gagal memuat ringkasan stok.';
+
+    }
+
+  }
+
+
   muatInformasiLaundry();
+  muatRingkasanStok();
+
 </script>
 
 </body>

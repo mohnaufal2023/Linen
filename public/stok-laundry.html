@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Stok Linen Laundry — Web Linen</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+
+    --teal: #00b1b7;
+    --teal-tint: #E7F2EE;
+
+    --green: #2D7A4B;
+    --green-tint: #EAF5EE;
+
+    --amber: #B8722E;
+    --amber-tint: #FBF0E3;
+
+    --red: #B34A3E;
+    --red-tint: #FBEAE7;
+
+    --radius: 12px;
+  }
+
+  *{
+    box-sizing: border-box;
+  }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .wrap{
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .topbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .back-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .back-link:hover{
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .logout-link{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+
+  .logout-link:hover{
+    color: var(--red);
+  }
+
+  .brand{
+    margin-bottom: 24px;
+  }
+
+  .brand .unit{
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: .03em;
+    margin-bottom: 6px;
+  }
+
+  h1{
+    margin: 0;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 31px;
+    font-weight: 600;
+  }
+
+  .subtitle{
+    margin: 8px 0 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  .summary{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .summary-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+
+  .summary-label{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  .summary-value{
+    font-size: 25px;
+    font-weight: 800;
+  }
+
+  .search-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .search-input{
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 13px 14px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .search-input:focus{
+    border-color: var(--teal);
+  }
+
+  .list{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .list-header{
+    display: grid;
+    grid-template-columns: 1fr 120px 120px;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    background: #FAFBFB;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  .item{
+    display: grid;
+    grid-template-columns: 1fr 120px 120px;
+    gap: 12px;
+    align-items: center;
+    padding: 15px 18px;
+    border-bottom: 1px solid #EEF2F0;
+  }
+
+  .item:last-child{
+    border-bottom: none;
+  }
+
+  .item-name{
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .item-stock{
+    font-size: 14px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .status{
+    justify-self: center;
+    min-width: 78px;
+    text-align: center;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .status.aman{
+    background: var(--green-tint);
+    color: var(--green);
+  }
+
+  .status.menipis{
+    background: var(--amber-tint);
+    color: var(--amber);
+  }
+
+  .status.habis{
+    background: var(--red-tint);
+    color: var(--red);
+  }
+
+  .loading{
+    padding: 25px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .error{
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 8px;
+    background: var(--red-tint);
+    border: 1px solid #EFC7C0;
+    color: var(--red);
+    font-size: 13px;
+  }
+
+  .empty{
+    padding: 30px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .refresh{
+    margin-top: 16px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .refresh:hover{
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  @media (max-width: 700px){
+
+    body{
+      padding: 24px 14px;
+    }
+
+    .topbar{
+      align-items: flex-start;
+    }
+
+    h1{
+      font-size: 27px;
+    }
+
+    .summary{
+      grid-template-columns: 1fr;
+    }
+
+    .list-header{
+      grid-template-columns: 1fr 80px 80px;
+      padding: 12px 14px;
+    }
+
+    .item{
+      grid-template-columns: 1fr 80px 80px;
+      padding: 13px 14px;
+    }
+
+    .item-name{
+      font-size: 13px;
+    }
+
+    .item-stock{
+      font-size: 13px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+
+    <a
+      class="back-link"
+      id="back-link"
+      href="/laundry-dashboard.html"
+    >
+      ← Kembali
+    </a>
+
+    <a
+      class="logout-link"
+      href="/logout"
+    >
+      Keluar
+    </a>
+
+  </div>
+
+
+  <div class="brand">
+
+    <span class="unit">
+      Instalasi Laundry
+    </span>
+
+    <h1>
+      Stok Linen Laundry
+    </h1>
+
+    <p class="subtitle">
+      Daftar linen bersih yang tersedia di Laundry
+    </p>
+
+  </div>
+
+
+  <div class="summary">
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Total jenis linen
+      </div>
+
+      <div
+        class="summary-value"
+        id="total-jenis"
+      >
+        -
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Total stok
+      </div>
+
+      <div
+        class="summary-value"
+        id="total-stok"
+      >
+        -
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="search-card">
+
+    <input
+      type="text"
+      id="search"
+      class="search-input"
+      placeholder="Cari nama linen..."
+      autocomplete="off"
+    >
+
+  </div>
+
+
+  <div class="list">
+
+    <div class="list-header">
+
+      <div>
+        Jenis Linen
+      </div>
+
+      <div style="text-align:center;">
+        Stok
+      </div>
+
+      <div style="text-align:center;">
+        Status
+      </div>
+
+    </div>
+
+
+    <div id="stock-list">
+
+      <div class="loading">
+        Memuat stok linen...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div id="error-container"></div>
+
+
+  <button
+    class="refresh"
+    id="refresh-button"
+    type="button"
+  >
+    ↻ Refresh Stok
+  </button>
+
+</div>
+
+
+<script>
+
+  let semuaStok = [];
+
+
+  // ========================================================
+  // CEK ROLE
+  // ========================================================
+
+  async function cekAkses(){
+
+    try{
+
+      const res =
+        await fetch('/api/me');
+
+
+      if(!res.ok){
+
+        window.location.href =
+          '/login.html';
+
+        return false;
+
+      }
+
+
+      const result =
+        await res.json();
+
+
+      const role =
+        result.user.role;
+
+
+      if(
+        role !== 'laundry' &&
+        role !== 'admin'
+      ){
+
+        window.location.href =
+          '/user-dashboard.html';
+
+        return false;
+
+      }
+
+
+      // Admin kembali ke dashboard admin
+      if(role === 'admin'){
+
+        document
+          .getElementById('back-link')
+          .href = '/';
+
+      }
+
+
+      return true;
+
+    }catch(err){
+
+      console.error(err);
+
+      window.location.href =
+        '/login.html';
+
+      return false;
+
+    }
+
+  }
+
+
+  // ========================================================
+  // LOAD STOK
+  // ========================================================
+
+  async function muatStok(){
+
+    const list =
+      document.getElementById(
+        'stock-list'
+      );
+
+    const errorContainer =
+      document.getElementById(
+        'error-container'
+      );
+
+
+    list.innerHTML = `
+      <div class="loading">
+        Memuat stok linen...
+      </div>
+    `;
+
+    errorContainer.innerHTML = '';
+
+
+    try{
+
+      const res =
+        await fetch(
+          '/api/stok-laundry'
+        );
+
+
+      const result =
+        await res.json()
+          .catch(() => ([]));
+
+
+      if(!res.ok){
+
+        throw new Error(
+          result.error ||
+          'Gagal mengambil data stok'
+        );
+
+      }
+
+
+      semuaStok =
+        Array.isArray(result)
+          ? result
+          : [];
+
+
+      renderStok(
+        semuaStok
+      );
+
+    }catch(err){
+
+      console.error(err);
+
+      list.innerHTML = `
+        <div class="empty">
+          Data stok tidak dapat dimuat.
+        </div>
+      `;
+
+      errorContainer.innerHTML = `
+        <div class="error">
+          ${escapeHtml(err.message)}
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  // ========================================================
+  // RENDER STOK
+  // ========================================================
+
+  function renderStok(data){
+
+    const list =
+      document.getElementById(
+        'stock-list'
+      );
+
+
+    const totalJenis =
+      data.length;
+
+
+    const totalStok =
+      data.reduce(
+        (total, item) => {
+
+          return total +
+            (Number(item.jumlah_stok) || 0);
+
+        },
+        0
+      );
+
+
+    document
+      .getElementById(
+        'total-jenis'
+      )
+      .textContent =
+        totalJenis;
+
+
+    document
+      .getElementById(
+        'total-stok'
+      )
+      .textContent =
+        totalStok;
+
+
+    if(data.length === 0){
+
+      list.innerHTML = `
+        <div class="empty">
+          Belum ada data jenis linen.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    list.innerHTML =
+      data.map(item => {
+
+        const stok =
+          Number(item.jumlah_stok) || 0;
+
+
+        let statusText;
+        let statusClass;
+
+
+        if(stok <= 0){
+
+          statusText = 'Habis';
+          statusClass = 'habis';
+
+        }else if(stok <= 5){
+
+          statusText = 'Menipis';
+          statusClass = 'menipis';
+
+        }else{
+
+          statusText = 'Aman';
+          statusClass = 'aman';
+
+        }
+
+
+        return `
+
+          <div
+            class="item"
+            data-name="${escapeHtml(item.nama)}"
+          >
+
+            <div class="item-name">
+              ${escapeHtml(item.nama)}
+            </div>
+
+            <div class="item-stock">
+              ${stok}
+            </div>
+
+            <div class="status ${statusClass}">
+              ${statusText}
+            </div>
+
+          </div>
+
+        `;
+
+      }).join('');
+
+  }
+
+
+  // ========================================================
+  // PENCARIAN
+  // ========================================================
+
+  document
+    .getElementById('search')
+    .addEventListener(
+      'input',
+      function(){
+
+        const keyword =
+          this.value
+            .trim()
+            .toLowerCase();
+
+
+        const hasil =
+          semuaStok.filter(item =>
+            String(item.nama)
+              .toLowerCase()
+              .includes(keyword)
+          );
+
+
+        renderStok(hasil);
+
+      }
+    );
+
+
+  // ========================================================
+  // REFRESH
+  // ========================================================
+
+  document
+    .getElementById('refresh-button')
+    .addEventListener(
+      'click',
+      async function(){
+
+        const oldText =
+          this.textContent;
+
+        this.disabled = true;
+        this.textContent = 'Memuat...';
+
+        await muatStok();
+
+        this.disabled = false;
+        this.textContent = oldText;
+
+      }
+    );
+
+
+  // ========================================================
+  // ESCAPE HTML
+  // ========================================================
+
+  function escapeHtml(value){
+
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+  }
+
+
+  // ========================================================
+  // JALANKAN
+  // ========================================================
+
+  (async function(){
+
+    const bolehMasuk =
+      await cekAkses();
+
+    if(!bolehMasuk){
+      return;
+    }
+
+    await muatStok();
+
+  })();
+
+</script>
+
+</body>
+</html>

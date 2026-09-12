@@ -26,18 +26,182 @@ app.use(session({
 // ==============================
 app.use(express.json());
 
-// ==============================
+
+// ==========================================================
+// HAK AKSES HALAMAN BERDASARKAN ROLE
+// ==========================================================
+const pageAccess = {
+
+  // ==============================
+  // ADMIN
+  // ==============================
+  '/': ['admin'],
+  '/index.html': ['admin'],
+  '/kelola-linen.html': ['admin'],
+  '/kelola-ruangan.html': ['admin'],
+  '/stock-ruangan.html': ['admin'],
+
+  // ==============================
+  // ADMIN + LAUNDRY
+  // ==============================
+  '/form.html': ['admin', 'laundry'],
+
+  // ==============================
+  // ADMIN + LAUNDRY + USER
+  // ==============================
+  '/riwayat.html': ['admin', 'laundry', 'user'],
+
+  // ==============================
+  // LAUNDRY
+  // ==============================
+  '/laundry-dashboard.html': ['laundry'],
+  '/stok-laundry.html': ['admin', 'laundry'],
+
+  // ==============================
+  // USER RUANGAN
+  // ==============================
+  '/user-dashboard.html': ['user'],
+  '/konfirmasi.html': ['user']
+};
+
+
+// ==========================================================
 // LOGIN PROTECTION
-// ==============================
+// ==========================================================
 function requireLogin(req, res, next) {
-  const isLoggedIn = req.session && req.session.loggedIn;
 
-  // ==================================
-  // SUDAH LOGIN TAPI BUKA LOGIN.HTML
-  // ==================================
-  if (req.path === '/login.html' && isLoggedIn) {
+  const isLoggedIn =
+    req.session &&
+    req.session.loggedIn;
 
-    const role = req.session.user?.role;
+  const role =
+    req.session?.user?.role;
+
+
+  // =========================================
+  // HALAMAN LOGIN
+  // =========================================
+  if (req.path === '/login.html') {
+
+    // Sudah login
+    if (isLoggedIn) {
+
+      if (role === 'admin') {
+        return res.redirect('/');
+      }
+
+      if (role === 'laundry') {
+        return res.redirect('/laundry-dashboard.html');
+      }
+
+      if (role === 'user') {
+        return res.redirect('/user-dashboard.html');
+      }
+
+      return res.redirect('/login.html');
+    }
+
+    return next();
+  }
+
+
+  // =========================================
+  // API LOGIN
+  // =========================================
+  if (req.path === '/login') {
+    return next();
+  }
+
+
+  // =========================================
+  // LOGOUT
+  // =========================================
+  if (req.path === '/logout') {
+    return next();
+  }
+
+
+  // =========================================
+  // GAMBAR
+  // =========================================
+  if (req.path.startsWith('/images/')) {
+    return next();
+  }
+
+
+  // =========================================
+  // BELUM LOGIN
+  // =========================================
+  if (!isLoggedIn) {
+
+    // API
+    if (req.path.startsWith('/api/')) {
+
+      return res.status(401).json({
+        error: 'Silakan login terlebih dahulu'
+      });
+
+    }
+
+    // Halaman
+    return res.redirect('/login.html');
+  }
+
+
+  // ========================================================
+  // USER SUDAH LOGIN
+  // SEKARANG CEK HAK AKSES HALAMAN
+  // ========================================================
+
+  const allowedRoles =
+    pageAccess[req.path];
+
+
+  // =========================================
+  // HALAMAN YANG ADA DI DAFTAR pageAccess
+  // =========================================
+  if (allowedRoles) {
+
+    if (!allowedRoles.includes(role)) {
+
+      // =====================================
+      // ADMIN
+      // =====================================
+      if (role === 'admin') {
+        return res.redirect('/');
+      }
+
+      // =====================================
+      // LAUNDRY
+      // =====================================
+      if (role === 'laundry') {
+        return res.redirect('/laundry-dashboard.html');
+      }
+
+      // =====================================
+      // USER
+      // =====================================
+      if (role === 'user') {
+        return res.redirect('/user-dashboard.html');
+      }
+
+      return res.redirect('/login.html');
+    }
+
+    return next();
+  }
+
+
+  // ========================================================
+  // HTML YANG TIDAK TERDAFTAR
+  // ========================================================
+  if (
+    req.path.endsWith('.html') ||
+    req.path === '/'
+  ) {
+
+    // Tolak halaman HTML yang belum diberi izin
+    // agar tidak ada halaman yang bocor antar-role.
 
     if (role === 'admin') {
       return res.redirect('/');
@@ -54,55 +218,24 @@ function requireLogin(req, res, next) {
     return res.redirect('/login.html');
   }
 
-  // ==================================
-  // HALAMAN TANPA LOGIN
-  // ==================================
-  const publicPaths = [
-    '/login.html',
-    '/login'
-  ];
 
-  if (publicPaths.includes(req.path)) {
-    return next();
-  }
-
-  // ==================================
-  // LOGOUT
-  // ==================================
-  if (req.path === '/logout') {
-    return next();
-  }
-
-  // ==================================
-  // GAMBAR
-  // ==================================
-  if (req.path.startsWith('/images/')) {
-    return next();
-  }
-
-  // ==================================
-  // SUDAH LOGIN
-  // ==================================
-  if (isLoggedIn) {
-    return next();
-  }
-
-  // ==================================
-  // API BELUM LOGIN
-  // ==================================
+  // =========================================
+  // API YANG SUDAH LOGIN
+  // =========================================
   if (req.path.startsWith('/api/')) {
-    return res.status(401).json({
-      error: 'Silakan login terlebih dahulu'
-    });
+    return next();
   }
 
-  // ==================================
-  // HALAMAN BELUM LOGIN
-  // ==================================
-  return res.redirect('/login.html');
+
+  // =========================================
+  // FILE LAIN
+  // =========================================
+  return next();
 }
 
+
 app.use(requireLogin);
+
 
 // ==============================
 // STATIC FILE
@@ -113,9 +246,10 @@ app.use(
   )
 );
 
-// ==============================
+
+// ==========================================================
 // INFO USER YANG SEDANG LOGIN
-// ==============================
+// ==========================================================
 app.get('/api/me', async (req, res) => {
 
   if (
@@ -123,14 +257,19 @@ app.get('/api/me', async (req, res) => {
     !req.session.loggedIn ||
     !req.session.user
   ) {
+
     return res.status(401).json({
       error: 'Silakan login terlebih dahulu'
     });
+
   }
+
 
   try {
 
-    const userSession = req.session.user;
+    const userSession =
+      req.session.user;
+
 
     // ==================================
     // ADMIN
@@ -146,7 +285,9 @@ app.get('/api/me', async (req, res) => {
           ruangan_nama: null
         }
       });
+
     }
+
 
     // ==================================
     // LAUNDRY
@@ -162,7 +303,9 @@ app.get('/api/me', async (req, res) => {
           ruangan_nama: null
         }
       });
+
     }
+
 
     // ==================================
     // USER RUANGAN
@@ -184,30 +327,43 @@ app.get('/api/me', async (req, res) => {
         [userSession.id]
       );
 
+
       if (rows.length === 0) {
+
         return res.status(404).json({
           error: 'Data user tidak ditemukan'
         });
+
       }
+
 
       return res.json({
         user: rows[0]
       });
+
     }
+
 
     return res.status(403).json({
       error: 'Role akun tidak dikenali'
     });
 
+
   } catch (err) {
 
-    console.error('Error /api/me:', err);
+    console.error(
+      'Error /api/me:',
+      err
+    );
 
     return res.status(500).json({
       error: 'Gagal mengambil informasi akun'
     });
+
   }
+
 });
+
 
 // ==============================
 // ROUTES
@@ -221,6 +377,7 @@ app.use(
   jenisLinenRoutes
 );
 
+
 const serahTerimaRoutes =
   require('./routes/serahTerima');
 
@@ -228,6 +385,7 @@ app.use(
   '/api/serah-terima',
   serahTerimaRoutes
 );
+
 
 const stokRuanganRoutes =
   require('./routes/stokRuangan');
@@ -237,6 +395,15 @@ app.use(
   stokRuanganRoutes
 );
 
+const stokLaundryRoutes =
+  require('./routes/stokLaundry');
+
+app.use(
+  '/api/stok-laundry',
+  stokLaundryRoutes
+);
+
+
 const ruanganRoutes =
   require('./routes/ruangan');
 
@@ -245,9 +412,10 @@ app.use(
   ruanganRoutes
 );
 
-// ==============================
+
+// ==========================================================
 // LOGIN
-// ==============================
+// ==========================================================
 app.post('/login', async (req, res) => {
 
   const {
@@ -255,14 +423,18 @@ app.post('/login', async (req, res) => {
     password
   } = req.body;
 
+
   // ==================================
   // VALIDASI
   // ==================================
   if (!username || !password) {
+
     return res.status(400).json({
       error: 'Username dan password wajib diisi'
     });
+
   }
+
 
   try {
 
@@ -283,12 +455,15 @@ app.post('/login', async (req, res) => {
         ruangan_id: null
       };
 
+
       return res.json({
         message: 'Login admin berhasil',
         role: 'admin',
         redirect: '/'
       });
+
     }
+
 
     // ==================================
     // 2. CEK USER DATABASE
@@ -308,6 +483,7 @@ app.post('/login', async (req, res) => {
       [username]
     );
 
+
     // ==================================
     // USER TIDAK DITEMUKAN
     // ==================================
@@ -316,9 +492,13 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({
         error: 'Username atau password salah'
       });
+
     }
 
-    const user = rows[0];
+
+    const user =
+      rows[0];
+
 
     // ==================================
     // 3. CEK PASSWORD BCRYPT
@@ -329,12 +509,15 @@ app.post('/login', async (req, res) => {
         user.password
       );
 
+
     if (!passwordCocok) {
 
       return res.status(401).json({
         error: 'Username atau password salah'
       });
+
     }
+
 
     // ==================================
     // 4. USER RUANGAN WAJIB PUNYA RUANGAN
@@ -347,7 +530,9 @@ app.post('/login', async (req, res) => {
       return res.status(403).json({
         error: 'Akun user belum terhubung dengan ruangan'
       });
+
     }
+
 
     // ==================================
     // 5. SIMPAN SESSION
@@ -361,6 +546,7 @@ app.post('/login', async (req, res) => {
       ruangan_id: user.ruangan_id
     };
 
+
     // ==================================
     // 6. REDIRECT ADMIN
     // ==================================
@@ -371,7 +557,9 @@ app.post('/login', async (req, res) => {
         role: 'admin',
         redirect: '/'
       });
+
     }
+
 
     // ==================================
     // 7. REDIRECT LAUNDRY
@@ -383,7 +571,9 @@ app.post('/login', async (req, res) => {
         role: 'laundry',
         redirect: '/laundry-dashboard.html'
       });
+
     }
+
 
     // ==================================
     // 8. REDIRECT USER RUANGAN
@@ -396,25 +586,34 @@ app.post('/login', async (req, res) => {
         ruangan_id: user.ruangan_id,
         redirect: '/user-dashboard.html'
       });
+
     }
+
 
     return res.status(403).json({
       error: 'Role akun tidak dikenali'
     });
 
+
   } catch (err) {
 
-    console.error('Error login:', err);
+    console.error(
+      'Error login:',
+      err
+    );
 
     return res.status(500).json({
       error: 'Terjadi kesalahan pada server'
     });
+
   }
+
 });
 
-// ==============================
+
+// ==========================================================
 // LOGOUT
-// ==============================
+// ==========================================================
 app.get('/logout', (req, res) => {
 
   req.session.destroy((err) => {
@@ -429,15 +628,19 @@ app.get('/logout', (req, res) => {
       return res.status(500).send(
         'Gagal logout'
       );
+
     }
 
     res.redirect('/login.html');
+
   });
+
 });
 
-// ==============================
+
+// ==========================================================
 // SERVER
-// ==============================
+// ==========================================================
 const PORT =
   process.env.PORT || 3000;
 
@@ -446,4 +649,5 @@ app.listen(PORT, () => {
   console.log(
     `Server jalan di http://localhost:${PORT}`
   );
+
 });
