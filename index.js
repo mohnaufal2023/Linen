@@ -41,6 +41,7 @@ const pageAccess = {
 '/kelola-ruangan.html': ['admin'],
 '/kelola-user.html': ['admin'],
 '/stock-ruangan.html': ['admin'],
+'/stok-ruangan-user.html': ['user'],
 
   // ==============================
   // ADMIN + LAUNDRY
@@ -397,6 +398,9 @@ app.use(
   '/api/stok-ruangan',
   stokRuanganRoutes
 );
+
+const stokRuanganUserRoutes = require('./routes/stokRuanganUser');
+app.use('/api/stok-ruangan-user', stokRuanganUserRoutes);
 
 const stokLaundryRoutes =
   require('./routes/stokLaundry');

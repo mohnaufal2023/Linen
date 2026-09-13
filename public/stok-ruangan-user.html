@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Stok Linen Ruangan</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+      min-height: 100vh;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+    .header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 18px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #e8f0fe;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .header-title h1 {
+      font-size: 22px;
+      margin-bottom: 4px;
+      color: #111827;
+    }
+
+    .header-title p {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      background: #2563eb;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #1d4ed8;
+    }
+
+    /* =========================
+       CONTAINER
+    ========================= */
+    .container {
+      max-width: 1250px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    /* =========================
+       INFO RUANGAN
+    ========================= */
+    .room-info {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .room-info-label {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+
+    .room-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .room-status {
+      background: #ecfdf5;
+      color: #047857;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* =========================
+       SUMMARY
+    ========================= */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .summary-card .label {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .summary-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    /* =========================
+       TOOLBAR
+    ========================= */
+    .toolbar {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .refresh-btn {
+      border: none;
+      background: #f3f4f6;
+      color: #374151;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .refresh-btn:hover {
+      background: #e5e7eb;
+    }
+
+    /* =========================
+       TABLE
+    ========================= */
+    .table-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .table-header h2 {
+      font-size: 18px;
+      color: #111827;
+    }
+
+    .table-header p {
+      margin-top: 5px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 850px;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #4b5563;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 14px 12px;
+      text-align: center;
+      border-bottom: 1px solid #e5e7eb;
+      white-space: nowrap;
+    }
+
+    th:first-child {
+      text-align: left;
+      padding-left: 20px;
+    }
+
+    td {
+      padding: 15px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    td:first-child {
+      text-align: left;
+      padding-left: 20px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background: #fafafa;
+    }
+
+    .stock-value {
+      display: inline-flex;
+      min-width: 45px;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 7px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .stock-empty {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    /* =========================
+       LOADING / EMPTY / ERROR
+    ========================= */
+    .message {
+      padding: 35px 20px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .error {
+      background: #fef2f2;
+      color: #b91c1c;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+    .footer {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 12px;
+      padding: 25px 20px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+    @media (max-width: 768px) {
+      .header {
+        padding: 15px 18px;
+        align-items: flex-start;
+      }
+
+      .header-left {
+        align-items: flex-start;
+      }
+
+      .header-title h1 {
+        font-size: 18px;
+      }
+
+      .header-title p {
+        font-size: 12px;
+      }
+
+      .header-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+      }
+
+      .back-btn {
+        font-size: 12px;
+        padding: 9px 12px;
+        white-space: nowrap;
+      }
+
+      .container {
+        margin: 20px auto;
+        padding: 0 12px;
+      }
+
+      .room-info {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .room-name {
+        font-size: 21px;
+      }
+
+      .room-status {
+        align-self: flex-start;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .summary-card {
+        padding: 16px;
+      }
+
+      .summary-card .value {
+        font-size: 24px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-box {
+        max-width: none;
+      }
+
+      .refresh-btn {
+        width: 100%;
+      }
+
+      .table-header {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       HEADER
+  ========================= -->
+  <header class="header">
+
+    <div class="header-left">
+
+      <div class="header-icon">
+        🧺
+      </div>
+
+      <div class="header-title">
+        <h1>Stok Linen Ruangan</h1>
+        <p>Monitoring stok linen ruangan</p>
+      </div>
+
+    </div>
+
+    <a href="/user-dashboard.html" class="back-btn">
+      ← Dashboard
+    </a>
+
+  </header>
+
+
+  <!-- =========================
+       CONTENT
+  ========================= -->
+  <main class="container">
+
+    <!-- ERROR -->
+    <div id="errorMessage" class="error"></div>
+
+
+    <!-- INFO RUANGAN -->
+    <section class="room-info">
+
+      <div>
+        <div class="room-info-label">
+          Ruangan
+        </div>
+
+        <div class="room-name" id="roomName">
+          Memuat...
+        </div>
+      </div>
+
+      <div class="room-status">
+        👁️ Mode Tampilan
+      </div>
+
+    </section>
+
+
+    <!-- SUMMARY -->
+    <section class="summary">
+
+      <div class="summary-card">
+
+        <div class="label">
+          Jenis Linen
+        </div>
+
+        <div class="value" id="totalJenis">
+          0
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="label">
+          Total Linen Diantar
+        </div>
+
+        <div class="value" id="totalDiantar">
+          0
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="label">
+          Stok Linen Saat Ini
+        </div>
+
+        <div class="value" id="totalStok">
+          0
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- TOOLBAR -->
+    <section class="toolbar">
+
+      <div class="search-box">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Cari jenis linen..."
+          autocomplete="off"
+        />
+      </div>
+
+      <button
+        type="button"
+        class="refresh-btn"
+        onclick="loadStock()"
+      >
+        ↻ Refresh
+      </button>
+
+    </section>
+
+
+    <!-- TABLE -->
+    <section class="table-card">
+
+      <div class="table-header">
+
+        <h2>Daftar Stok Linen</h2>
+
+        <p>
+          Stok dihitung berdasarkan linen yang diantar dan diambil
+        </p>
+
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Jenis Linen</th>
+              <th>Diantar</th>
+              <th>Diambil Infeksius</th>
+              <th>Diambil Non-Infeksius</th>
+              <th>Total Diambil</th>
+              <th>Stok Saat Ini</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="stockTable">
+
+            <tr>
+              <td colspan="6" class="message">
+                Memuat data stok...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <footer class="footer">
+    Sistem Informasi Linen Rumah Sakit
+  </footer>
+
+
+  <script>
+
+    let stockData = [];
+
+
+    // ======================================================
+    // LOAD DATA
+    // ======================================================
+    async function loadStock() {
+
+      const table = document.getElementById('stockTable');
+      const errorMessage = document.getElementById('errorMessage');
+
+      errorMessage.style.display = 'none';
+
+      table.innerHTML = `
+        <tr>
+          <td colspan="6" class="message">
+            Memuat data stok...
+          </td>
+        </tr>
+      `;
+
+      try {
+
+        const response = await fetch('/api/stok-ruangan-user');
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.error || 'Gagal mengambil data stok'
+          );
+        }
+
+
+        // Simpan data
+        stockData = result.data || [];
+
+
+        // Nama ruangan
+        document.getElementById('roomName').textContent =
+          result.ruangan_nama || '-';
+
+
+        // Update summary
+        updateSummary();
+
+
+        // Tampilkan tabel
+        renderTable(stockData);
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        errorMessage.textContent =
+          error.message || 'Terjadi kesalahan';
+
+        errorMessage.style.display = 'block';
+
+        table.innerHTML = `
+          <tr>
+            <td colspan="6" class="message">
+              Gagal mengambil data stok.
+            </td>
+          </tr>
+        `;
+
+      }
+
+    }
+
+
+    // ======================================================
+    // SUMMARY
+    // ======================================================
+    function updateSummary() {
+
+      const totalJenis = stockData.length;
+
+
+      const totalDiantar = stockData.reduce(
+        (total, item) =>
+          total + Number(item.total_diantar || 0),
+        0
+      );
+
+
+      const totalStok = stockData.reduce(
+        (total, item) =>
+          total + Number(item.stok || 0),
+        0
+      );
+
+
+      document.getElementById('totalJenis').textContent =
+        totalJenis;
+
+      document.getElementById('totalDiantar').textContent =
+        totalDiantar;
+
+      document.getElementById('totalStok').textContent =
+        totalStok;
+
+    }
+
+
+    // ======================================================
+    // RENDER TABLE
+    // ======================================================
+    function renderTable(data) {
+
+      const table = document.getElementById('stockTable');
+
+
+      if (!data || data.length === 0) {
+
+        table.innerHTML = `
+          <tr>
+            <td colspan="6" class="message">
+              Belum ada data stok linen.
+            </td>
+          </tr>
+        `;
+
+        return;
+      }
+
+
+      table.innerHTML = data.map(item => {
+
+        const stok = Number(item.stok || 0);
+
+        const stockClass =
+          stok === 0
+            ? 'stock-value stock-empty'
+            : 'stock-value';
+
+
+        return `
+          <tr>
+
+            <td>
+              ${escapeHtml(item.jenis_linen_nama)}
+            </td>
+
+            <td>
+              ${Number(item.total_diantar || 0)}
+            </td>
+
+            <td>
+              ${Number(item.total_diambil_infeksius || 0)}
+            </td>
+
+            <td>
+              ${Number(item.total_diambil_non_infeksius || 0)}
+            </td>
+
+            <td>
+              ${Number(item.total_diambil || 0)}
+            </td>
+
+            <td>
+              <span class="${stockClass}">
+                ${stok}
+              </span>
+            </td>
+
+          </tr>
+        `;
+
+      }).join('');
+
+    }
+
+
+    // ======================================================
+    // SEARCH
+    // ======================================================
+    document
+      .getElementById('searchInput')
+      .addEventListener('input', function () {
+
+        const keyword =
+          this.value.toLowerCase().trim();
+
+
+        const filtered = stockData.filter(item =>
+          String(item.jenis_linen_nama || '')
+            .toLowerCase()
+            .includes(keyword)
+        );
+
+
+        renderTable(filtered);
+
+      });
+
+
+    // ======================================================
+    // ESCAPE HTML
+    // ======================================================
+    function escapeHtml(value) {
+
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+    }
+
+
+    // ======================================================
+    // LOAD AWAL
+    // ======================================================
+    loadStock();
+
+  </script>
+
+</body>
+</html>
