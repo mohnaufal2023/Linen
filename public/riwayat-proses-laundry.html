@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Riwayat Proses Laundry — Web Linen</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+
+    --teal: #00b1b7;
+    --green: #2D7A4B;
+    --green-tint: #EAF5EE;
+
+    --amber: #B8722E;
+    --amber-tint: #FBF0E3;
+
+    --red: #B34A3E;
+    --red-tint: #FBEAE7;
+
+    --radius: 12px;
+  }
+
+  *{
+    box-sizing: border-box;
+  }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    padding: 32px 20px 50px;
+  }
+
+  .wrap{
+    width: 100%;
+    max-width: 950px;
+    margin: 0 auto;
+  }
+
+  .topbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .back-link{
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .back-link:hover{
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .logout-link{
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .logout-link:hover{
+    color: var(--red);
+  }
+
+  .brand{
+    margin-bottom: 24px;
+  }
+
+  .unit{
+    display: block;
+    color: var(--teal);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: .03em;
+  }
+
+  h1{
+    margin: 0;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 31px;
+    font-weight: 600;
+  }
+
+  .subtitle{
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .summary{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .summary-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+
+  .summary-label{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  .summary-value{
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .summary-value.rusak{
+    color: var(--red);
+  }
+
+  .filters{
+    display: grid;
+    grid-template-columns: 1fr 180px auto;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .input,
+  .select,
+  .refresh{
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+  }
+
+  .input:focus,
+  .select:focus{
+    border-color: var(--teal);
+  }
+
+  .refresh{
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  .refresh:hover{
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .list{
+    display: grid;
+    gap: 14px;
+  }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .card-top{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 16px;
+  }
+
+  .title h2{
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .title p{
+    margin: 5px 0 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .status{
+    flex-shrink: 0;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: var(--green-tint);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .numbers{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .number-box{
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 12px;
+    background: #FAFBFB;
+  }
+
+  .number-label{
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+
+  .number-value{
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .results{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .result-box{
+    border-radius: 9px;
+    padding: 12px;
+    border: 1px solid var(--line);
+  }
+
+  .result-box.layak{
+    background: var(--green-tint);
+  }
+
+  .result-box.rusak{
+    background: var(--red-tint);
+  }
+
+  .result-label{
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  .result-value{
+    margin-top: 3px;
+    font-size: 19px;
+    font-weight: 800;
+  }
+
+  .meta{
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .meta-item{
+    color: var(--ink-soft);
+    font-size: 11px;
+  }
+
+  .meta-item strong{
+    display: block;
+    margin-top: 4px;
+    color: var(--ink);
+    font-size: 12.5px;
+  }
+
+  .loading,
+  .empty{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 30px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .error{
+    margin-bottom: 14px;
+    padding: 12px;
+    border-radius: 9px;
+    background: var(--red-tint);
+    border: 1px solid #EFC7C0;
+    color: var(--red);
+    font-size: 13px;
+  }
+
+  @media (max-width: 700px){
+
+    body{
+      padding: 24px 14px 40px;
+    }
+
+    h1{
+      font-size: 27px;
+    }
+
+    .summary{
+      grid-template-columns: 1fr;
+    }
+
+    .filters{
+      grid-template-columns: 1fr;
+    }
+
+    .card-top{
+      flex-direction: column;
+    }
+
+    .numbers{
+      grid-template-columns: 1fr;
+    }
+
+    .results{
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .meta{
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+
+    <a
+      class="back-link"
+      id="back-link"
+      href="/laundry-dashboard.html"
+    >
+      ← Kembali
+    </a>
+
+    <a
+      class="logout-link"
+      href="/logout"
+    >
+      Keluar
+    </a>
+
+  </div>
+
+
+  <div class="brand">
+
+    <span class="unit">
+      Instalasi Laundry
+    </span>
+
+    <h1>
+      Riwayat Proses Laundry
+    </h1>
+
+    <p class="subtitle">
+      Riwayat linen yang telah selesai diproses
+    </p>
+
+  </div>
+
+
+  <div class="summary">
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Total proses selesai
+      </div>
+
+      <div
+        class="summary-value"
+        id="total-proses"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Total linen layak
+      </div>
+
+      <div
+        class="summary-value"
+        id="total-layak"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Total linen rusak
+      </div>
+
+      <div
+        class="summary-value rusak"
+        id="total-rusak"
+      >
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="filters">
+
+    <input
+      class="input"
+      id="search"
+      type="text"
+      placeholder="Cari nama linen atau ruangan..."
+      autocomplete="off"
+    >
+
+
+    <select
+      class="select"
+      id="filter-status"
+    >
+      <option value="selesai">
+        Hanya selesai
+      </option>
+
+      <option value="semua">
+        Semua status
+      </option>
+
+      <option value="menunggu_cuci">
+        Menunggu dicuci
+      </option>
+
+      <option value="sedang_dicuci">
+        Sedang dicuci
+      </option>
+    </select>
+
+
+    <button
+      class="refresh"
+      id="refresh"
+      type="button"
+    >
+      ↻ Refresh
+    </button>
+
+  </div>
+
+
+  <div id="error-container"></div>
+
+
+  <div
+    class="list"
+    id="list"
+  >
+
+    <div class="loading">
+      Memuat riwayat proses Laundry...
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  let semuaData = [];
+
+
+  // ========================================================
+  // CEK AKSES
+  // ========================================================
+
+  async function cekAkses(){
+
+    try{
+
+      const res =
+        await fetch('/api/me');
+
+
+      if(!res.ok){
+
+        window.location.href =
+          '/login.html';
+
+        return false;
+      }
+
+
+      const result =
+        await res.json();
+
+
+      const role =
+        result.user.role;
+
+
+      if(
+        role !== 'admin' &&
+        role !== 'laundry'
+      ){
+
+        window.location.href =
+          '/user-dashboard.html';
+
+        return false;
+      }
+
+
+      if(role === 'admin'){
+
+        document
+          .getElementById('back-link')
+          .href = '/';
+
+      }
+
+
+      return true;
+
+    }catch(err){
+
+      console.error(err);
+
+      window.location.href =
+        '/login.html';
+
+      return false;
+    }
+
+  }
+
+
+  // ========================================================
+  // LOAD DATA
+  // ========================================================
+
+  async function muatData(){
+
+    const list =
+      document.getElementById('list');
+
+    const errorContainer =
+      document.getElementById(
+        'error-container'
+      );
+
+
+    list.innerHTML = `
+      <div class="loading">
+        Memuat riwayat proses Laundry...
+      </div>
+    `;
+
+    errorContainer.innerHTML = '';
+
+
+    try{
+
+      const res =
+        await fetch(
+          '/api/proses-laundry'
+        );
+
+
+      const data =
+        await res.json()
+          .catch(() => []);
+
+
+      if(!res.ok){
+
+        throw new Error(
+          data.error ||
+          'Gagal mengambil riwayat proses Laundry'
+        );
+
+      }
+
+
+      semuaData =
+        Array.isArray(data)
+          ? data
+          : [];
+
+
+      render();
+
+
+    }catch(err){
+
+      console.error(err);
+
+
+      list.innerHTML = `
+        <div class="empty">
+          Data riwayat tidak dapat dimuat.
+        </div>
+      `;
+
+
+      errorContainer.innerHTML = `
+        <div class="error">
+          ${escapeHtml(err.message)}
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  // ========================================================
+  // FILTER + RENDER
+  // ========================================================
+
+  function render(){
+
+    const keyword =
+      document
+        .getElementById('search')
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const statusFilter =
+      document
+        .getElementById('filter-status')
+        .value;
+
+
+    let data =
+      semuaData.filter(item => {
+
+        // hanya proses selesai secara default
+        if(
+          statusFilter !== 'semua' &&
+          item.status !== statusFilter
+        ){
+          return false;
+        }
+
+
+        const nama =
+          String(
+            item.jenis_linen_nama || ''
+          ).toLowerCase();
+
+
+        const ruangan =
+          String(
+            item.ruangan || ''
+          ).toLowerCase();
+
+
+        return (
+          !keyword ||
+          nama.includes(keyword) ||
+          ruangan.includes(keyword)
+        );
+
+      });
+
+
+    // ============================================
+    // SUMMARY
+    // ============================================
+
+    const selesai =
+      semuaData.filter(
+        item =>
+          item.status === 'selesai'
+      );
+
+
+    const totalLayak =
+      selesai.reduce(
+        (total, item) =>
+          total +
+          (
+            Number(
+              item.jumlah_layak
+            ) || 0
+          ),
+        0
+      );
+
+
+    const totalRusak =
+      selesai.reduce(
+        (total, item) =>
+          total +
+          (
+            Number(
+              item.jumlah_rusak
+            ) || 0
+          ),
+        0
+      );
+
+
+    document
+      .getElementById('total-proses')
+      .textContent =
+        selesai.length;
+
+
+    document
+      .getElementById('total-layak')
+      .textContent =
+        totalLayak;
+
+
+    document
+      .getElementById('total-rusak')
+      .textContent =
+        totalRusak;
+
+
+    // ============================================
+    // EMPTY
+    // ============================================
+
+    if(data.length === 0){
+
+      document
+        .getElementById('list')
+        .innerHTML = `
+          <div class="empty">
+            Tidak ada data proses Laundry yang sesuai.
+          </div>
+        `;
+
+      return;
+
+    }
+
+
+    // ============================================
+    // RENDER CARD
+    // ============================================
+
+    document
+      .getElementById('list')
+      .innerHTML =
+        data.map(item => {
+
+
+          const total =
+            Number(
+              item.jumlah_total
+            ) || 0;
+
+
+          const layak =
+            Number(
+              item.jumlah_layak
+            ) || 0;
+
+
+          const rusak =
+            Number(
+              item.jumlah_rusak
+            ) || 0;
+
+
+          const infeksius =
+            Number(
+              item.jumlah_infeksius
+            ) || 0;
+
+
+          const nonInfeksius =
+            Number(
+              item.jumlah_non_infeksius
+            ) || 0;
+
+
+          const statusText =
+            getStatusText(
+              item.status
+            );
+
+
+          return `
+
+            <div class="card">
+
+              <div class="card-top">
+
+                <div class="title">
+
+                  <h2>
+                    ${escapeHtml(
+                      item.jenis_linen_nama
+                    )}
+                  </h2>
+
+                  <p>
+                    Diambil dari
+                    <strong>
+                      ${escapeHtml(
+                        item.ruangan || '-'
+                      )}
+                    </strong>
+                  </p>
+
+                </div>
+
+                <div class="status">
+                  ${statusText}
+                </div>
+
+              </div>
+
+
+              <div class="numbers">
+
+                <div class="number-box">
+
+                  <div class="number-label">
+                    Infeksius
+                  </div>
+
+                  <div class="number-value">
+                    ${infeksius}
+                  </div>
+
+                </div>
+
+
+                <div class="number-box">
+
+                  <div class="number-label">
+                    Non-infeksius
+                  </div>
+
+                  <div class="number-value">
+                    ${nonInfeksius}
+                  </div>
+
+                </div>
+
+
+                <div class="number-box">
+
+                  <div class="number-label">
+                    Total masuk
+                  </div>
+
+                  <div class="number-value">
+                    ${total}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              ${
+                item.status === 'selesai'
+                ? `
+
+                  <div class="results">
+
+                    <div class="result-box layak">
+
+                      <div class="result-label">
+                        Layak Pakai
+                      </div>
+
+                      <div class="result-value">
+                        ${layak}
+                      </div>
+
+                    </div>
+
+
+                    <div class="result-box rusak">
+
+                      <div class="result-label">
+                        Rusak
+                      </div>
+
+                      <div class="result-value">
+                        ${rusak}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                `
+                : ''
+              }
+
+
+              <div class="meta">
+
+                <div class="meta-item">
+
+                  Tanggal transaksi
+
+                  <strong>
+                    ${formatTanggal(
+                      item.tanggal
+                    )}
+                  </strong>
+
+                </div>
+
+
+                <div class="meta-item">
+
+                  Masuk proses
+
+                  <strong>
+                    ${formatTanggalWaktu(
+                      item.created_at
+                    )}
+                  </strong>
+
+                </div>
+
+
+                <div class="meta-item">
+
+                  Selesai
+
+                  <strong>
+                    ${formatTanggalWaktu(
+                      item.selesai_at
+                    )}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }).join('');
+
+  }
+
+
+  // ========================================================
+  // STATUS
+  // ========================================================
+
+  function getStatusText(status){
+
+    if(status === 'menunggu_cuci'){
+      return 'Menunggu Dicuci';
+    }
+
+    if(status === 'sedang_dicuci'){
+      return 'Sedang Dicuci';
+    }
+
+    return 'Selesai';
+
+  }
+
+
+  // ========================================================
+  // FORMAT TANGGAL
+  // ========================================================
+
+  function formatTanggal(value){
+
+    if(!value){
+      return '-';
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if(
+      Number.isNaN(
+        date.getTime()
+      )
+    ){
+      return value;
+    }
+
+
+    return date.toLocaleDateString(
+      'id-ID',
+      {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      }
+    );
+
+  }
+
+
+  function formatTanggalWaktu(value){
+
+    if(!value){
+      return '-';
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if(
+      Number.isNaN(
+        date.getTime()
+      )
+    ){
+      return value;
+    }
+
+
+    return date.toLocaleString(
+      'id-ID',
+      {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    );
+
+  }
+
+
+  // ========================================================
+  // ESCAPE HTML
+  // ========================================================
+
+  function escapeHtml(value){
+
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+  }
+
+
+  // ========================================================
+  // EVENTS
+  // ========================================================
+
+  document
+    .getElementById('search')
+    .addEventListener(
+      'input',
+      render
+    );
+
+
+  document
+    .getElementById('filter-status')
+    .addEventListener(
+      'change',
+      render
+    );
+
+
+  document
+    .getElementById('refresh')
+    .addEventListener(
+      'click',
+      async function(){
+
+        const oldText =
+          this.textContent;
+
+        this.disabled = true;
+        this.textContent = 'Memuat...';
+
+        await muatData();
+
+        this.disabled = false;
+        this.textContent = oldText;
+
+      }
+    );
+
+
+  // ========================================================
+  // START
+  // ========================================================
+
+  (async function(){
+
+    const bolehMasuk =
+      await cekAkses();
+
+    if(!bolehMasuk){
+      return;
+    }
+
+    await muatData();
+
+  })();
+
+</script>
+
+</body>
+</html>

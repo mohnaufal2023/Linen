@@ -346,8 +346,13 @@ router.get('/:id', async (req, res) => {
 // LAUNDRY : boleh
 // USER    : tidak boleh
 //
-// Verifikasi hanya tersedia jika:
-// infeksius > 0 ATAU non-infeksius > 0
+// Jika ada linen yang diambil:
+//
+// 1. verifikasi_pengambilan = 1
+// 2. otomatis dibuatkan proses_laundry
+// 3. status proses_laundry = menunggu_cuci
+//
+// Hanya dibuat satu kali untuk setiap detail transaksi.
 // ============================================================
 router.put(
   '/detail/:detailId/verifikasi',
@@ -358,58 +363,91 @@ router.put(
     } = req.params;
 
 
+    // ========================================================
+    // CEK LOGIN DAN ROLE
+    // ========================================================
+    const access =
+      await getAccessInfo(req);
+
+
+    if (access.error) {
+
+      return res.status(403).json({
+        error: access.error
+      });
+
+    }
+
+
+    // ========================================================
+    // USER RUANGAN TIDAK BOLEH VERIFIKASI
+    // ========================================================
+    if (
+      access.role !== 'admin' &&
+      access.role !== 'laundry'
+    ) {
+
+      return res.status(403).json({
+        error:
+          'Hanya Laundry atau Admin yang dapat melakukan verifikasi'
+      });
+
+    }
+
+
+    // ========================================================
+    // GUNAKAN CONNECTION KHUSUS
+    // Agar verifikasi + proses laundry menjadi satu transaksi
+    // ========================================================
+    const connection =
+      await db.getConnection();
+
+
     try {
 
-      const access =
-        await getAccessInfo(req);
+      await connection.beginTransaction();
 
 
-      if (access.error) {
-
-        return res.status(403).json({
-          error: access.error
-        });
-
-      }
-
-
-      // ==================================
-      // USER RUANGAN TIDAK BOLEH VERIFIKASI
-      // ==================================
-      if (
-        access.role !== 'admin' &&
-        access.role !== 'laundry'
-      ) {
-
-        return res.status(403).json({
-          error:
-            'Hanya Laundry atau Admin yang dapat melakukan verifikasi'
-        });
-
-      }
-
-
+      // ======================================================
+      // AMBIL DATA DETAIL
+      // ======================================================
       const [rows] =
-        await db.query(
-          `SELECT
+        await connection.query(
+          `
+          SELECT
             d.id,
+            d.jenis_linen_id,
             d.jumlah_diambil_infeksius,
             d.jumlah_diambil_non_infeksius,
-            st.ruangan
+            d.verifikasi_pengambilan,
+            st.id AS serah_terima_id,
+            st.ruangan,
+            l.nama AS jenis_linen_nama
 
-           FROM serah_terima_detail d
+          FROM serah_terima_detail d
 
-           JOIN serah_terima st
-             ON st.id = d.serah_terima_id
+          JOIN serah_terima st
+            ON st.id = d.serah_terima_id
 
-           WHERE d.id = ?
+          JOIN jenis_linen l
+            ON l.id = d.jenis_linen_id
 
-           LIMIT 1`,
+          WHERE d.id = ?
+
+          LIMIT 1
+
+          FOR UPDATE
+          `,
           [detailId]
         );
 
 
+      // ======================================================
+      // DETAIL TIDAK DITEMUKAN
+      // ======================================================
       if (rows.length === 0) {
+
+        await connection.rollback();
 
         return res.status(404).json({
           error:
@@ -423,15 +461,32 @@ router.put(
         rows[0];
 
 
-      const adaPengambilan =
-        Number(item.jumlah_diambil_infeksius) > 0 ||
-        Number(item.jumlah_diambil_non_infeksius) > 0;
+      // ======================================================
+      // CEK JUMLAH PENGAMBILAN
+      // ======================================================
+      const jumlahInfeksius =
+        Number(
+          item.jumlah_diambil_infeksius
+        ) || 0;
 
 
-      // ==================================
-      // TIDAK ADA YANG DIAMBIL
-      // ==================================
-      if (!adaPengambilan) {
+      const jumlahNonInfeksius =
+        Number(
+          item.jumlah_diambil_non_infeksius
+        ) || 0;
+
+
+      const jumlahTotal =
+        jumlahInfeksius +
+        jumlahNonInfeksius;
+
+
+      // ======================================================
+      // TIDAK ADA LINEN YANG DIAMBIL
+      // ======================================================
+      if (jumlahTotal <= 0) {
+
+        await connection.rollback();
 
         return res.status(400).json({
           error:
@@ -441,30 +496,156 @@ router.put(
       }
 
 
-      await db.query(
-        `UPDATE serah_terima_detail
-         SET verifikasi_pengambilan = 1
-         WHERE id = ?`,
+      // ======================================================
+      // SUDAH DIVERIFIKASI
+      // ======================================================
+      if (
+        Number(item.verifikasi_pengambilan) === 1
+      ) {
+
+        await connection.rollback();
+
+        return res.status(400).json({
+          error:
+            'Pengambilan untuk linen ini sudah diverifikasi'
+        });
+
+      }
+
+
+      // ======================================================
+      // CEK APAKAH SUDAH ADA PROSES LAUNDRY
+      // ======================================================
+      const [existingProcess] =
+        await connection.query(
+          `
+          SELECT
+            id,
+            status
+
+          FROM proses_laundry
+
+          WHERE serah_terima_detail_id = ?
+
+          LIMIT 1
+          `,
+          [detailId]
+        );
+
+
+      if (existingProcess.length > 0) {
+
+        await connection.rollback();
+
+        return res.status(400).json({
+          error:
+            'Linen ini sudah masuk ke proses Laundry'
+        });
+
+      }
+
+
+      // ======================================================
+      // 1. UBAH STATUS VERIFIKASI
+      // ======================================================
+      await connection.query(
+        `
+        UPDATE serah_terima_detail
+
+        SET
+          verifikasi_pengambilan = 1
+
+        WHERE id = ?
+        `,
         [detailId]
       );
 
 
+      // ======================================================
+      // 2. BUAT PROSES LAUNDRY
+      // ======================================================
+      await connection.query(
+        `
+        INSERT INTO proses_laundry
+        (
+          serah_terima_detail_id,
+          jenis_linen_id,
+          jumlah_infeksius,
+          jumlah_non_infeksius,
+          jumlah_total,
+          status
+        )
+
+        VALUES (?, ?, ?, ?, ?, 'menunggu_cuci')
+        `,
+        [
+          detailId,
+          item.jenis_linen_id,
+          jumlahInfeksius,
+          jumlahNonInfeksius,
+          jumlahTotal
+        ]
+      );
+
+
+      // ======================================================
+      // COMMIT
+      // ======================================================
+      await connection.commit();
+
+
+      // ======================================================
+      // RESPONSE
+      // ======================================================
       res.json({
+
         message:
-          'Pengambilan berhasil diverifikasi'
+          'Pengambilan berhasil diverifikasi dan linen masuk ke proses Laundry',
+
+        proses:
+          'menunggu_cuci',
+
+        jenis_linen:
+          item.jenis_linen_nama,
+
+        jumlah_infeksius:
+          jumlahInfeksius,
+
+        jumlah_non_infeksius:
+          jumlahNonInfeksius,
+
+        jumlah_total:
+          jumlahTotal
+
       });
 
 
     } catch (err) {
 
-      console.error(err);
+      // ======================================================
+      // ROLLBACK JIKA GAGAL
+      // ======================================================
+      await connection.rollback();
+
+
+      console.error(
+        'Error verifikasi + proses Laundry:',
+        err
+      );
+
 
       res.status(500).json({
         error:
-          'Gagal melakukan verifikasi'
+          'Gagal melakukan verifikasi dan membuat proses Laundry'
       });
 
+
+    } finally {
+
+      connection.release();
+
     }
+
   }
 );
 
@@ -583,7 +764,28 @@ router.put('/:id', async (req, res) => {
 
     }
 
+    // ======================================================
+// CEGAH EDIT JIKA SUDAH MASUK PROSES LAUNDRY
+// ======================================================
+const [existingProcess] = await connection.query(`
+  SELECT p.id, p.status
+  FROM proses_laundry p
+  JOIN serah_terima_detail d
+    ON d.id = p.serah_terima_detail_id
+  WHERE d.serah_terima_id = ?
+  LIMIT 1
+`, [id]);
 
+if (existingProcess.length > 0) {
+
+  connection.release();
+
+  return res.status(400).json({
+    error:
+      'Transaksi tidak dapat diedit karena linen sudah masuk ke proses Laundry'
+  });
+
+}
     // ==================================
     // CEGAH EDIT TRANSAKSI SELESAI
     // ==================================
@@ -1015,6 +1217,29 @@ router.delete('/:id', async (req, res) => {
       });
 
     }
+
+    // ======================================================
+// CEGAH HAPUS JIKA SUDAH MASUK PROSES LAUNDRY
+// ======================================================
+const [existingProcess] = await connection.query(`
+  SELECT p.id, p.status
+  FROM proses_laundry p
+  JOIN serah_terima_detail d
+    ON d.id = p.serah_terima_detail_id
+  WHERE d.serah_terima_id = ?
+  LIMIT 1
+`, [id]);
+
+if (existingProcess.length > 0) {
+
+  connection.release();
+
+  return res.status(400).json({
+    error:
+      'Transaksi tidak dapat dihapus karena linen sudah masuk ke proses Laundry'
+  });
+
+}
 
 
     // ======================================================

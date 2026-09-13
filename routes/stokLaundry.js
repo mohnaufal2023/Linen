@@ -47,7 +47,8 @@ router.get('/', async (req, res) => {
         id,
         nama,
         urutan,
-        jumlah_stok
+        jumlah_stok,
+        jumlah_rusak
       FROM jenis_linen
       ORDER BY urutan ASC
       `

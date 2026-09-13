@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Proses Laundry — Web Linen</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #F5F7F6;
+    --surface: #FFFFFF;
+    --ink: #1C2B33;
+    --ink-soft: #5B6B70;
+    --line: #DCE3E1;
+
+    --teal: #00b1b7;
+    --teal-tint: #E7F2EE;
+
+    --purple: #4B4B8F;
+    --purple-tint: #EAEAF5;
+
+    --amber: #B8722E;
+    --amber-tint: #FBF0E3;
+
+    --green: #2D7A4B;
+    --green-tint: #EAF5EE;
+
+    --red: #B34A3E;
+    --red-tint: #FBEAE7;
+
+    --radius: 12px;
+  }
+
+  *{
+    box-sizing: border-box;
+  }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Public Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    padding: 32px 20px 50px;
+  }
+
+  .wrap{
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .topbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .back-link,
+  .logout-link{
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .back-link{
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .back-link:hover{
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .logout-link:hover{
+    color: var(--red);
+  }
+
+  .brand{
+    margin-bottom: 24px;
+  }
+
+  .unit{
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: .03em;
+    margin-bottom: 6px;
+  }
+
+  h1{
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 31px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .subtitle{
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .toolbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .summary{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .summary-badge{
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .summary-badge strong{
+    color: var(--ink);
+    margin-left: 4px;
+  }
+
+  .refresh{
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-soft);
+    border-radius: 8px;
+    padding: 9px 13px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .refresh:hover{
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .list{
+    display: grid;
+    gap: 14px;
+  }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .card-top{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .card-title h2{
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .card-title p{
+    margin: 5px 0 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .status{
+    flex-shrink: 0;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .status.menunggu{
+    background: var(--amber-tint);
+    color: var(--amber);
+  }
+
+  .status.dicuci{
+    background: var(--purple-tint);
+    color: var(--purple);
+  }
+
+  .status.selesai{
+    background: var(--green-tint);
+    color: var(--green);
+  }
+
+  .numbers{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .number-box{
+    background: #FAFBFB;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 12px;
+  }
+
+  .number-label{
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+
+  .number-value{
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .meta{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+    margin-bottom: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+
+  .meta-item{
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .meta-item strong{
+    display: block;
+    color: var(--ink);
+    font-size: 13px;
+    margin-top: 3px;
+  }
+
+  .result-box{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .result{
+    padding: 12px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+  }
+
+  .result.layak{
+    background: var(--green-tint);
+  }
+
+  .result.rusak{
+    background: var(--red-tint);
+  }
+
+  .result-label{
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  .result-value{
+    font-size: 18px;
+    font-weight: 800;
+    margin-top: 3px;
+  }
+
+  .actions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .button{
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .button:hover{
+    transform: translateY(-1px);
+  }
+
+  .button.primary{
+    background: var(--teal);
+    color: white;
+    border-color: var(--teal);
+  }
+
+  .button.primary:hover{
+    opacity: .92;
+  }
+
+  .button.finish{
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+  }
+
+  .button:disabled{
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .loading,
+  .empty{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 30px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .error{
+    background: var(--red-tint);
+    border: 1px solid #EFC7C0;
+    color: var(--red);
+    border-radius: 9px;
+    padding: 12px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  /* MODAL */
+  .modal-backdrop{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 43, 51, .35);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+  }
+
+  .modal-backdrop.show{
+    display: flex;
+  }
+
+  .modal{
+    width: 100%;
+    max-width: 460px;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.16);
+  }
+
+  .modal h2{
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .modal p{
+    color: var(--ink-soft);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 7px 0 18px;
+  }
+
+  .field{
+    margin-bottom: 14px;
+  }
+
+  .field label{
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .field input{
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 12px 13px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .field input:focus{
+    border-color: var(--teal);
+  }
+
+  .total-info{
+    padding: 11px 12px;
+    background: #FAFBFB;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 15px;
+  }
+
+  .modal-error{
+    display: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--red-tint);
+    border: 1px solid #EFC7C0;
+    color: var(--red);
+    font-size: 12px;
+    margin-bottom: 14px;
+  }
+
+  .modal-actions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  @media (max-width: 700px){
+
+    body{
+      padding: 24px 14px 40px;
+    }
+
+    .toolbar{
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .card-top{
+      flex-direction: column;
+    }
+
+    .numbers{
+      grid-template-columns: 1fr;
+    }
+
+    .meta{
+      grid-template-columns: 1fr;
+    }
+
+    .result-box{
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .actions{
+      justify-content: stretch;
+    }
+
+    .actions .button{
+      flex: 1;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+
+    <a
+      class="back-link"
+      id="back-link"
+      href="/laundry-dashboard.html"
+    >
+      ← Kembali
+    </a>
+
+    <a
+      class="logout-link"
+      href="/logout"
+    >
+      Keluar
+    </a>
+
+  </div>
+
+
+  <div class="brand">
+
+    <span class="unit">
+      Instalasi Laundry
+    </span>
+
+    <h1>
+      Proses Laundry
+    </h1>
+
+    <p class="subtitle">
+      Kelola linen kotor sampai kembali menjadi linen bersih
+    </p>
+
+  </div>
+
+
+  <div class="toolbar">
+
+    <div class="summary">
+
+      <div class="summary-badge">
+        Menunggu
+        <strong id="count-menunggu">0</strong>
+      </div>
+
+      <div class="summary-badge">
+        Sedang Dicuci
+        <strong id="count-dicuci">0</strong>
+      </div>
+
+      <div class="summary-badge">
+        Selesai
+        <strong id="count-selesai">0</strong>
+      </div>
+
+    </div>
+
+
+    <button
+      class="refresh"
+      id="refresh"
+      type="button"
+    >
+      ↻ Refresh
+    </button>
+
+  </div>
+
+
+  <div id="page-error"></div>
+
+
+  <div
+    class="list"
+    id="process-list"
+  >
+
+    <div class="loading">
+      Memuat proses Laundry...
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     MODAL SELESAI CUCI
+     ====================================================== -->
+
+<div
+  class="modal-backdrop"
+  id="finish-modal"
+>
+
+  <div class="modal">
+
+    <h2>
+      Selesaikan Pencucian
+    </h2>
+
+    <p>
+      Masukkan jumlah linen yang berhasil dicuci dan
+      jumlah linen yang rusak. Total keduanya harus sama
+      dengan jumlah linen yang masuk proses.
+    </p>
+
+
+    <div
+      class="total-info"
+      id="finish-total"
+    >
+      Total linen: -
+    </div>
+
+
+    <div class="field">
+
+      <label for="jumlah-layak">
+        Jumlah Layak Pakai
+      </label>
+
+      <input
+        type="number"
+        id="jumlah-layak"
+        min="0"
+        step="1"
+        value="0"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label for="jumlah-rusak">
+        Jumlah Rusak
+      </label>
+
+      <input
+        type="number"
+        id="jumlah-rusak"
+        min="0"
+        step="1"
+        value="0"
+      >
+
+    </div>
+
+
+    <div
+      class="modal-error"
+      id="modal-error"
+    ></div>
+
+
+    <div class="modal-actions">
+
+      <button
+        type="button"
+        class="button"
+        id="cancel-finish"
+      >
+        Batal
+      </button>
+
+      <button
+        type="button"
+        class="button finish"
+        id="confirm-finish"
+      >
+        Selesai Dicuci
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  let prosesData = [];
+  let prosesYangDiselesaikan = null;
+
+
+  // ========================================================
+  // CEK AKSES
+  // ========================================================
+
+  async function cekAkses(){
+
+    try{
+
+      const res =
+        await fetch('/api/me');
+
+
+      if(!res.ok){
+
+        window.location.href =
+          '/login.html';
+
+        return false;
+      }
+
+
+      const result =
+        await res.json();
+
+
+      const role =
+        result.user.role;
+
+
+      if(
+        role !== 'laundry' &&
+        role !== 'admin'
+      ){
+
+        window.location.href =
+          '/user-dashboard.html';
+
+        return false;
+      }
+
+
+      if(role === 'admin'){
+
+        document
+          .getElementById('back-link')
+          .href = '/';
+
+      }
+
+
+      return true;
+
+    }catch(err){
+
+      console.error(err);
+
+      window.location.href =
+        '/login.html';
+
+      return false;
+    }
+
+  }
+
+
+  // ========================================================
+  // LOAD DATA
+  // ========================================================
+
+  async function muatProses(){
+
+    const list =
+      document.getElementById(
+        'process-list'
+      );
+
+    const error =
+      document.getElementById(
+        'page-error'
+      );
+
+
+    list.innerHTML = `
+      <div class="loading">
+        Memuat proses Laundry...
+      </div>
+    `;
+
+    error.innerHTML = '';
+
+
+    try{
+
+      const res =
+        await fetch(
+          '/api/proses-laundry'
+        );
+
+
+      const data =
+        await res.json()
+          .catch(() => []);
+
+
+      if(!res.ok){
+
+        throw new Error(
+          data.error ||
+          'Gagal mengambil data proses Laundry'
+        );
+
+      }
+
+
+      prosesData =
+        Array.isArray(data)
+          ? data
+          : [];
+
+
+      updateSummary();
+      renderProses();
+
+
+    }catch(err){
+
+      console.error(err);
+
+      list.innerHTML = `
+        <div class="empty">
+          Data proses Laundry tidak dapat dimuat.
+        </div>
+      `;
+
+      error.innerHTML = `
+        <div class="error">
+          ${escapeHtml(err.message)}
+        </div>
+      `;
+    }
+
+  }
+
+
+  // ========================================================
+  // SUMMARY
+  // ========================================================
+
+  function updateSummary(){
+
+    const menunggu =
+      prosesData.filter(
+        item =>
+          item.status === 'menunggu_cuci'
+      ).length;
+
+
+    const dicuci =
+      prosesData.filter(
+        item =>
+          item.status === 'sedang_dicuci'
+      ).length;
+
+
+    const selesai =
+      prosesData.filter(
+        item =>
+          item.status === 'selesai'
+      ).length;
+
+
+    document
+      .getElementById('count-menunggu')
+      .textContent =
+        menunggu;
+
+
+    document
+      .getElementById('count-dicuci')
+      .textContent =
+        dicuci;
+
+
+    document
+      .getElementById('count-selesai')
+      .textContent =
+        selesai;
+
+  }
+
+
+  // ========================================================
+  // RENDER
+  // ========================================================
+
+  function renderProses(){
+
+    const list =
+      document.getElementById(
+        'process-list'
+      );
+
+
+    if(prosesData.length === 0){
+
+      list.innerHTML = `
+        <div class="empty">
+          Belum ada linen yang masuk ke proses Laundry.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    list.innerHTML =
+      prosesData.map(item => {
+
+        const status =
+          getStatus(item.status);
+
+
+        const total =
+          Number(
+            item.jumlah_total
+          ) || 0;
+
+
+        const infeksius =
+          Number(
+            item.jumlah_infeksius
+          ) || 0;
+
+
+        const nonInfeksius =
+          Number(
+            item.jumlah_non_infeksius
+          ) || 0;
+
+
+        const layak =
+          Number(
+            item.jumlah_layak
+          ) || 0;
+
+
+        const rusak =
+          Number(
+            item.jumlah_rusak
+          ) || 0;
+
+
+        let action = '';
+
+
+        if(
+          item.status === 'menunggu_cuci'
+        ){
+
+          action = `
+            <button
+              class="button primary"
+              onclick="mulaiCuci(${item.id})"
+            >
+              Mulai Dicuci
+            </button>
+          `;
+
+        }else if(
+          item.status === 'sedang_dicuci'
+        ){
+
+          action = `
+            <button
+              class="button finish"
+              onclick="bukaModalSelesai(${item.id})"
+            >
+              Selesai Dicuci
+            </button>
+          `;
+
+        }else{
+
+          action = `
+            <span
+              style="
+                color:var(--green);
+                font-size:12px;
+                font-weight:700;
+              "
+            >
+              ✓ Proses Selesai
+            </span>
+          `;
+        }
+
+
+        return `
+
+          <div class="card">
+
+            <div class="card-top">
+
+              <div class="card-title">
+
+                <h2>
+                  ${escapeHtml(
+                    item.jenis_linen_nama
+                  )}
+                </h2>
+
+                <p>
+                  Diambil dari ${escapeHtml(
+                    item.ruangan || '-'
+                  )}
+                </p>
+
+              </div>
+
+              <div class="status ${status.class}">
+                ${status.text}
+              </div>
+
+            </div>
+
+
+            <div class="numbers">
+
+              <div class="number-box">
+
+                <div class="number-label">
+                  Infeksius
+                </div>
+
+                <div class="number-value">
+                  ${infeksius}
+                </div>
+
+              </div>
+
+
+              <div class="number-box">
+
+                <div class="number-label">
+                  Non-infeksius
+                </div>
+
+                <div class="number-value">
+                  ${nonInfeksius}
+                </div>
+
+              </div>
+
+
+              <div class="number-box">
+
+                <div class="number-label">
+                  Total Masuk
+                </div>
+
+                <div class="number-value">
+                  ${total}
+                </div>
+
+              </div>
+
+            </div>
+
+
+            ${
+              item.status === 'selesai'
+              ? `
+
+                <div class="result-box">
+
+                  <div class="result layak">
+
+                    <div class="result-label">
+                      Layak Pakai
+                    </div>
+
+                    <div class="result-value">
+                      ${layak}
+                    </div>
+
+                  </div>
+
+
+                  <div class="result rusak">
+
+                    <div class="result-label">
+                      Rusak
+                    </div>
+
+                    <div class="result-value">
+                      ${rusak}
+                    </div>
+
+                  </div>
+
+                </div>
+
+              `
+              : ''
+            }
+
+
+            <div class="meta">
+
+              <div class="meta-item">
+
+                Tanggal Transaksi
+
+                <strong>
+                  ${formatTanggal(
+                    item.tanggal
+                  )}
+                </strong>
+
+              </div>
+
+
+              <div class="meta-item">
+
+                Masuk Proses
+
+                <strong>
+                  ${formatTanggalWaktu(
+                    item.created_at
+                  )}
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <div class="actions">
+
+              ${action}
+
+            </div>
+
+          </div>
+
+        `;
+
+      }).join('');
+
+  }
+
+
+  // ========================================================
+  // MULAI CUCI
+  // ========================================================
+
+  async function mulaiCuci(id){
+
+    if(
+      !confirm(
+        'Mulai proses pencucian untuk linen ini?'
+      )
+    ){
+      return;
+    }
+
+
+    try{
+
+      const res =
+        await fetch(
+          `/api/proses-laundry/${id}/mulai`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type':
+                'application/json'
+            }
+          }
+        );
+
+
+      const result =
+        await res.json()
+          .catch(() => ({}));
+
+
+      if(!res.ok){
+
+        throw new Error(
+          result.error ||
+          'Gagal memulai pencucian'
+        );
+
+      }
+
+
+      await muatProses();
+
+
+    }catch(err){
+
+      alert(
+        err.message
+      );
+
+    }
+
+  }
+
+
+  // ========================================================
+  // MODAL SELESAI
+  // ========================================================
+
+  function bukaModalSelesai(id){
+
+    const item =
+      prosesData.find(
+        data =>
+          Number(data.id) === Number(id)
+      );
+
+
+    if(!item){
+      return;
+    }
+
+
+    prosesYangDiselesaikan =
+      item;
+
+
+    document
+      .getElementById('finish-total')
+      .textContent =
+        `Total linen: ${Number(item.jumlah_total) || 0}`;
+
+
+    document
+      .getElementById('jumlah-layak')
+      .value = 0;
+
+
+    document
+      .getElementById('jumlah-rusak')
+      .value = 0;
+
+
+    document
+      .getElementById('modal-error')
+      .style.display =
+        'none';
+
+
+    document
+      .getElementById('finish-modal')
+      .classList.add('show');
+
+  }
+
+
+  // ========================================================
+  // TUTUP MODAL
+  // ========================================================
+
+  function tutupModal(){
+
+    prosesYangDiselesaikan =
+      null;
+
+
+    document
+      .getElementById('finish-modal')
+      .classList.remove('show');
+
+  }
+
+
+  // ========================================================
+  // KONFIRMASI SELESAI
+  // ========================================================
+
+  async function selesaiCuci(){
+
+    if(!prosesYangDiselesaikan){
+      return;
+    }
+
+
+    const layak =
+      Number(
+        document
+          .getElementById(
+            'jumlah-layak'
+          )
+          .value
+      );
+
+
+    const rusak =
+      Number(
+        document
+          .getElementById(
+            'jumlah-rusak'
+          )
+          .value
+      );
+
+
+    const total =
+      Number(
+        prosesYangDiselesaikan
+          .jumlah_total
+      ) || 0;
+
+
+    const modalError =
+      document
+        .getElementById(
+          'modal-error'
+        );
+
+
+    // ==============================================
+    // VALIDASI
+    // ==============================================
+
+    if(
+      !Number.isInteger(layak) ||
+      !Number.isInteger(rusak) ||
+      layak < 0 ||
+      rusak < 0
+    ){
+
+      tampilkanModalError(
+        'Jumlah harus berupa angka bulat dan tidak boleh negatif.'
+      );
+
+      return;
+    }
+
+
+    if(
+      layak + rusak !== total
+    ){
+
+      tampilkanModalError(
+        `Jumlah layak + rusak harus sama dengan ${total}.`
+      );
+
+      return;
+    }
+
+
+    const button =
+      document
+        .getElementById(
+          'confirm-finish'
+        );
+
+
+    button.disabled = true;
+    button.textContent = 'Menyimpan...';
+
+
+    try{
+
+      const res =
+        await fetch(
+          `/api/proses-laundry/${prosesYangDiselesaikan.id}/selesai`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+            body: JSON.stringify({
+              jumlah_layak:
+                layak,
+
+              jumlah_rusak:
+                rusak
+            })
+          }
+        );
+
+
+      const result =
+        await res.json()
+          .catch(() => ({}));
+
+
+      if(!res.ok){
+
+        throw new Error(
+          result.error ||
+          'Gagal menyelesaikan pencucian'
+        );
+
+      }
+
+
+      tutupModal();
+
+      await muatProses();
+
+
+    }catch(err){
+
+      tampilkanModalError(
+        err.message
+      );
+
+
+    }finally{
+
+      button.disabled = false;
+      button.textContent =
+        'Selesai Dicuci';
+
+    }
+
+  }
+
+
+  // ========================================================
+  // MODAL ERROR
+  // ========================================================
+
+  function tampilkanModalError(message){
+
+    const element =
+      document
+        .getElementById(
+          'modal-error'
+        );
+
+
+    element.textContent =
+      message;
+
+
+    element.style.display =
+      'block';
+
+  }
+
+
+  // ========================================================
+  // STATUS
+  // ========================================================
+
+  function getStatus(status){
+
+    if(status === 'menunggu_cuci'){
+
+      return {
+        text: 'Menunggu Dicuci',
+        class: 'menunggu'
+      };
+
+    }
+
+
+    if(status === 'sedang_dicuci'){
+
+      return {
+        text: 'Sedang Dicuci',
+        class: 'dicuci'
+      };
+
+    }
+
+
+    return {
+      text: 'Selesai',
+      class: 'selesai'
+    };
+
+  }
+
+
+  // ========================================================
+  // FORMAT TANGGAL
+  // ========================================================
+
+  function formatTanggal(value){
+
+    if(!value){
+      return '-';
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if(
+      Number.isNaN(
+        date.getTime()
+      )
+    ){
+      return value;
+    }
+
+
+    return date.toLocaleDateString(
+      'id-ID',
+      {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      }
+    );
+
+  }
+
+
+  function formatTanggalWaktu(value){
+
+    if(!value){
+      return '-';
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if(
+      Number.isNaN(
+        date.getTime()
+      )
+    ){
+      return value;
+    }
+
+
+    return date.toLocaleString(
+      'id-ID',
+      {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    );
+
+  }
+
+
+  // ========================================================
+  // ESCAPE HTML
+  // ========================================================
+
+  function escapeHtml(value){
+
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+  }
+
+
+  // ========================================================
+  // EVENT
+  // ========================================================
+
+  document
+    .getElementById('refresh')
+    .addEventListener(
+      'click',
+      async function(){
+
+        const oldText =
+          this.textContent;
+
+        this.disabled = true;
+        this.textContent = 'Memuat...';
+
+        await muatProses();
+
+        this.disabled = false;
+        this.textContent = oldText;
+
+      }
+    );
+
+
+  document
+    .getElementById('cancel-finish')
+    .addEventListener(
+      'click',
+      tutupModal
+    );
+
+
+  document
+    .getElementById('confirm-finish')
+    .addEventListener(
+      'click',
+      selesaiCuci
+    );
+
+
+  document
+    .getElementById('finish-modal')
+    .addEventListener(
+      'click',
+      function(event){
+
+        if(
+          event.target === this
+        ){
+          tutupModal();
+        }
+
+      }
+    );
+
+
+  // ========================================================
+  // START
+  // ========================================================
+
+  (async function(){
+
+    const bolehMasuk =
+      await cekAkses();
+
+    if(!bolehMasuk){
+      return;
+    }
+
+    await muatProses();
+
+  })();
+
+</script>
+
+</body>
+</html>

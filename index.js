@@ -38,8 +38,9 @@ const pageAccess = {
   '/': ['admin'],
   '/index.html': ['admin'],
   '/kelola-linen.html': ['admin'],
-  '/kelola-ruangan.html': ['admin'],
-  '/stock-ruangan.html': ['admin'],
+'/kelola-ruangan.html': ['admin'],
+'/kelola-user.html': ['admin'],
+'/stock-ruangan.html': ['admin'],
 
   // ==============================
   // ADMIN + LAUNDRY
@@ -56,6 +57,8 @@ const pageAccess = {
   // ==============================
   '/laundry-dashboard.html': ['laundry'],
   '/stok-laundry.html': ['admin', 'laundry'],
+  '/proses-laundry.html': ['admin', 'laundry'],
+  '/riwayat-proses-laundry.html': ['admin', 'laundry'],
 
   // ==============================
   // USER RUANGAN
@@ -403,6 +406,14 @@ app.use(
   stokLaundryRoutes
 );
 
+const prosesLaundryRoutes =
+  require('./routes/prosesLaundry');
+
+app.use(
+  '/api/proses-laundry',
+  prosesLaundryRoutes
+);
+
 
 const ruanganRoutes =
   require('./routes/ruangan');
@@ -410,6 +421,14 @@ const ruanganRoutes =
 app.use(
   '/api/ruangan',
   ruanganRoutes
+);
+
+const usersRoutes =
+  require('./routes/users');
+
+app.use(
+  '/api/users',
+  usersRoutes
 );
 
 
