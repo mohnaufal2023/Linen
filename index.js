@@ -42,11 +42,13 @@ const pageAccess = {
 '/kelola-user.html': ['admin'],
 '/stock-ruangan.html': ['admin'],
 '/stok-ruangan-user.html': ['user'],
+'/konfirmasi-pengantaran.html': ['admin', 'laundry'],
+'/konfirmasi-penerimaan-laundry.html': ['admin', 'laundry'],
 
   // ==============================
-  // ADMIN + LAUNDRY
+  // ADMIN + LAUNDRY + USER
   // ==============================
-  '/form.html': ['admin', 'laundry'],
+  '/form.html': ['admin', 'laundry', 'user'],
 
   // ==============================
   // ADMIN + LAUNDRY + USER

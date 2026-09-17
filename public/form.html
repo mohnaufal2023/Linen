@@ -1,653 +1,1775 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Serah Terima Pencucian Linen</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg: #F5F7F6;
-    --surface: #FFFFFF;
-    --ink: #1C2B33;
-    --ink-soft: #5B6B70;
-    --line: #DCE3E1;
-    --line-soft: #EAEFED;
-    --teal: #00b1b7;
-    --teal-deep: #00b1b7;
-    --teal-tint: #E7F2EE;
-    --amber: #B8722E;
-    --amber-tint: #FBF0E3;
-    --danger: #B34A3E;
-    --danger-tint: #FBEAE7;
-    --green: #3B7A3F;
-    --green-tint: #EAF3EA;
-    --radius: 10px;
-  }
+  <meta charset="UTF-8">
 
-  *{ box-sizing: border-box; }
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  html, body{
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Public Sans', system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
+  <title>Serah Terima Baru — Web Linen</title>
 
-  body{
-    min-height: 100vh;
-    padding: 32px 20px 80px;
-  }
+  <style>
 
-  .wrap{
-    max-width: 880px;
-    margin: 0 auto;
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  /* ---------- Header ---------- */
-  header{
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 28px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--line);
-  }
+    body {
+      margin: 0;
+      background: #f5f7f6;
+      color: #1c2b33;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-  .brand{
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
+    .container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px 50px;
+    }
 
-  .brand .unit{
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--teal-deep);
-    letter-spacing: 0.02em;
-  }
+    .header {
+      margin-bottom: 25px;
+    }
 
-  h1{
-    font-family: 'Source Serif 4', Georgia, serif;
-    font-weight: 600;
-    font-size: 26px;
-    margin: 2px 0 0;
-    color: var(--ink);
-  }
+    .back {
+      display: inline-block;
+      margin-bottom: 15px;
+      color: #00a9b0;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-  .tanggal-hariini{
-    font-size: 13px;
-    color: var(--ink-soft);
-    text-align: right;
-  }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
 
-  .header-right{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-  }
+    .subtitle {
+      margin: 0;
+      color: #66757a;
+      font-size: 14px;
+    }
 
-  a.nav-link{
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--teal-deep);
-    text-decoration: none;
-    padding: 7px 13px;
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    background: var(--surface);
-    white-space: nowrap;
-  }
-  a.nav-link:hover{ background: var(--teal-tint); border-color: #BFDED4; }
+    .card {
+      background: white;
+      border: 1px solid #dce3e1;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 18px;
+    }
 
-  /* ---------- Info fields ---------- */
-  .info-row{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
+    .card-title {
+      margin: 0 0 18px;
+      font-size: 18px;
+    }
 
-  .field{
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
 
-  .field label{
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink-soft);
-  }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
 
-  .field input, .field select{
-    font-family: inherit;
-    font-size: 16px;
-    padding: 11px 13px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--ink);
-  }
+    label {
+      font-size: 13px;
+      font-weight: 700;
+    }
 
-  .field select{ cursor: pointer; }
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #ccd6d4;
+      border-radius: 9px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
 
-  .field input:focus-visible, .field select:focus-visible{
-    outline: 2px solid var(--teal);
-    outline-offset: 1px;
-    border-color: var(--teal);
-  }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #00a9b0;
+      box-shadow: 0 0 0 3px rgba(0, 169, 176, 0.08);
+    }
 
-  /* ---------- Table ---------- */
-  .table-shell{
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
+    input[readonly],
+    select:disabled {
+      background: #f3f6f5;
+      color: #56666b;
+    }
 
-  .table-scroll{
-    max-height: 62vh;
-    overflow-y: auto;
-  }
+    .transaction-info {
+      padding: 13px 15px;
+      border-radius: 9px;
+      background: #e9f6f4;
+      color: #28666a;
+      font-size: 13px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
 
-  table{
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14.5px;
-  }
+    .hidden {
+      display: none !important;
+    }
 
-  thead th{
-    position: sticky;
-    top: 0;
-    background: var(--surface);
-    z-index: 2;
-    text-align: left;
-    font-weight: 600;
-    color: var(--ink-soft);
-    font-size: 12.5px;
-    padding: 12px 12px;
-    border-bottom: 1px solid var(--line);
-  }
+    /* =====================================================
+       TABLE
+       ===================================================== */
 
-  thead th.col-no{ width: 44px; text-align: center; }
-  thead th.col-kotor, thead th.col-infeksius, thead th.col-noninfeksius{ width: 96px; text-align: center; }
-  thead th.col-ket{ width: 140px; }
+    .table-wrapper {
+      overflow-x: auto;
+    }
 
-  thead th.hdr-kotor{ color: var(--amber); }
-  thead th.hdr-infeksius{ color: var(--danger); }
-  thead th.hdr-noninfeksius{ color: var(--green); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 850px;
+    }
 
-  tbody td{
-    padding: 6px 12px;
-    border-bottom: 1px solid var(--line-soft);
-    vertical-align: middle;
-  }
+    th,
+    td {
+      border-bottom: 1px solid #e1e7e5;
+      padding: 12px 10px;
+      text-align: left;
+      vertical-align: middle;
+    }
 
-  tbody tr:last-child td{ border-bottom: none; }
-  tbody tr:hover{ background: #FAFBFA; }
+    th {
+      background: #f7f9f8;
+      font-size: 13px;
+      color: #45565b;
+    }
 
-  td.col-no{
-    text-align: center;
-    color: var(--ink-soft);
-    font-variant-numeric: tabular-nums;
-    font-size: 13px;
-  }
+    td {
+      font-size: 13px;
+    }
 
-  td.col-nama{
-    font-weight: 500;
-  }
+    .linen-name {
+      font-weight: 600;
+    }
 
-  .qty-input{
-    width: 100%;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 8px 4px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--ink);
-  }
+    .number-input {
+      width: 110px;
+      text-align: center;
+    }
 
-  .qty-input.kotor{ background: var(--amber-tint); }
-  .qty-input.kotor:focus-visible{ outline: 2px solid var(--amber); background: #fff; }
-  .qty-input.infeksius{ background: var(--danger-tint); }
-  .qty-input.infeksius:focus-visible{ outline: 2px solid var(--danger); background: #fff; }
-  .qty-input.noninfeksius{ background: var(--green-tint); }
-  .qty-input.noninfeksius:focus-visible{ outline: 2px solid var(--green); background: #fff; }
+    .keterangan-input {
+      min-width: 180px;
+    }
 
-  .qty-input::-webkit-outer-spin-button,
-  .qty-input::-webkit-inner-spin-button{
-    -webkit-appearance: none;
-    margin: 0;
-  }
+    /* =====================================================
+       TOTAL
+       ===================================================== */
 
-  .ket-input{
-    width: 100%;
-    font-size: 13.5px;
-    padding: 8px 8px;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    background: transparent;
-    color: var(--ink);
-  }
-  .ket-input:hover, .ket-input:focus{
-    border-color: var(--line);
-    background: var(--bg);
-  }
-  .ket-input:focus-visible{ outline: 2px solid var(--teal); }
+    .total-container {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
 
-  /* ---------- Footer / totals ---------- */
-  .footer-bar{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 16px;
-    background: var(--surface);
-    border-top: 1px solid var(--line);
-  }
+    .total-box {
+      border: 1px solid #dce3e1;
+      border-radius: 10px;
+      padding: 14px;
+      background: #fafcfb;
+    }
 
-  .totals{
-    display: flex;
-    gap: 22px;
-    font-size: 13.5px;
-    color: var(--ink-soft);
-  }
+    .total-label {
+      font-size: 12px;
+      color: #66757a;
+      margin-bottom: 5px;
+    }
 
-  .totals strong{
-    font-variant-numeric: tabular-nums;
-    font-size: 15px;
-    color: var(--ink);
-  }
+    .total-number {
+      font-size: 22px;
+      font-weight: 800;
+    }
 
-  .totals .dot-kotor{ color: var(--amber); }
-  .totals .dot-infeksius{ color: var(--danger); }
-  .totals .dot-noninfeksius{ color: var(--green); }
+    .total-number.infeksius {
+      color: #c04b3c;
+    }
 
-  button#submit-btn{
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    color: #fff;
-    background: var(--teal);
-    border: none;
-    padding: 12px 22px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-  button#submit-btn:hover{ background: var(--teal-deep); }
-  button#submit-btn:disabled{ background: #A9B6B2; cursor: not-allowed; }
+    .total-number.non-infeksius {
+      color: #2d6ca2;
+    }
 
-  /* ---------- Status banner ---------- */
-  .banner{
-    display: none;
-    align-items: center;
-    gap: 10px;
-    margin-top: 18px;
-    padding: 13px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-  }
-  .banner.show{ display: flex; }
-  .banner.success{ background: var(--teal-tint); color: var(--teal-deep); border: 1px solid #BFDED4; }
-  .banner.error{ background: #FBEAE7; color: var(--danger); border: 1px solid #EFC7C0; }
+    .total-number.semua {
+      color: #00a9b0;
+    }
 
-  .loading-row td{
-    text-align: center;
-    color: var(--ink-soft);
-    padding: 30px 12px;
-    font-size: 14px;
-  }
+    /* =====================================================
+       ACTION
+       ===================================================== */
 
-  /* ---------- Konfirmasi Penerima ---------- */
-  .penerima-panel{
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    margin-top: 20px;
-  }
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
 
-  .penerima-panel h3{
-    font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 14px;
-  }
+    button {
+      border: none;
+      border-radius: 9px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-  .penerima-grid{
-    display: grid;
-    grid-template-columns: 1fr 1.4fr;
-    gap: 18px;
-  }
+    .btn-primary {
+      background: #00a9b0;
+      color: white;
+    }
 
-  .ttd-shell{
-    border: 1.5px dashed var(--line);
-    border-radius: 10px;
-    background: var(--bg);
-    position: relative;
-    overflow: hidden;
-  }
+    .btn-primary:hover {
+      background: #008f96;
+    }
 
-  #canvas-ttd{
-    display: block;
-    width: 100%;
-    height: 150px;
-    touch-action: none;
-    cursor: crosshair;
-  }
+    .btn-secondary {
+      background: #edf1f0;
+      color: #425257;
+    }
 
-  .ttd-placeholder{
-    position: absolute;
-    bottom: 8px;
-    right: 12px;
-    font-size: 11px;
-    color: var(--ink-soft);
-    pointer-events: none;
-  }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-  .ttd-actions{
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 8px;
-  }
+    /* =====================================================
+       MESSAGE
+       ===================================================== */
 
-  .btn-ulangi{
-    font-family: inherit;
-    font-size: 12px;
-    color: var(--ink-soft);
-    background: transparent;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 6px 12px;
-    cursor: pointer;
-  }
-  .btn-ulangi:hover{ background: #FAFBFA; }
+    .message {
+      display: none;
+      padding: 13px 15px;
+      border-radius: 9px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
 
-  @media (max-width: 680px){
-    .info-row{ grid-template-columns: 1fr; }
-    header{ flex-direction: column; align-items: flex-start; gap: 6px; }
-    .tanggal-hariini{ text-align: left; }
-    thead th.col-ket, td.col-ket{ display: none; }
-    thead th.col-kotor, td.col-kotor{ display: none; }
-    .footer-bar{ flex-direction: column; align-items: stretch; }
-    .totals{ justify-content: space-between; flex-wrap: wrap; row-gap: 6px; }
-    button#submit-btn{ width: 100%; }
-    .penerima-grid{ grid-template-columns: 1fr; }
-  }
-</style>
+    .message.success {
+      display: block;
+      background: #e8f6ec;
+      color: #23673a;
+      border: 1px solid #c9e8d2;
+    }
+
+    .message.error {
+      display: block;
+      background: #fbeaea;
+      color: #9b3434;
+      border: 1px solid #efcaca;
+    }
+
+    /* =====================================================
+       LOADING
+       ===================================================== */
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: #69797d;
+      font-size: 14px;
+    }
+
+    /* =====================================================
+       PETUNJUK
+       ===================================================== */
+
+    .instruction {
+      padding: 13px 15px;
+      background: #f7f9f8;
+      border: 1px solid #e1e7e5;
+      border-radius: 9px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #56666b;
+    }
+
+    .instruction strong {
+      color: #1c2b33;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (max-width: 700px) {
+
+      .container {
+        margin: 25px auto;
+        padding: 0 14px 40px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .total-container {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions button {
+        width: 100%;
+      }
+
+    }
+
+  </style>
+
 </head>
+
+
 <body>
 
-<div class="wrap">
 
-  <header>
-    <div class="brand">
-      <span class="unit">Instalasi Laundry</span>
-      <h1>Serah Terima Pencucian Linen</h1>
-    </div>
-    <div class="tanggal-hariini" id="tanggal-hariini"></div>
-  </header>
+<div class="container">
 
-  <div style="display:flex; justify-content:flex-end; margin:-16px 0 24px;">
-    <a class="nav-link" href="/">← Kembali</a>
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <div class="header">
+
+    <a
+      href="#"
+      class="back"
+      id="backButton"
+    >
+      ← Kembali
+    </a>
+
+    <h1>
+      Serah Terima Baru
+    </h1>
+
+    <p class="subtitle">
+      Sistem Serah Terima Pencucian Linen
+    </p>
+
   </div>
 
-  <form id="form-linen">
-    <div class="info-row">
-      <div class="field">
-        <label for="ruangan">Ruangan</label>
-        <select id="ruangan" name="ruangan" required>
-          <option value="" disabled selected>Memuat daftar ruangan…</option>
+
+  <!-- =====================================================
+       MESSAGE
+       ===================================================== -->
+
+  <div
+    id="message"
+    class="message"
+  ></div>
+
+
+  <!-- =====================================================
+       INFORMASI TRANSAKSI
+       ===================================================== -->
+
+  <div
+    id="transactionInfo"
+    class="transaction-info"
+  >
+    Memuat informasi akun...
+  </div>
+
+
+  <!-- =====================================================
+       INFORMASI TRANSAKSI
+       ===================================================== -->
+
+  <div class="card">
+
+    <h2 class="card-title">
+      Informasi Transaksi
+    </h2>
+
+
+    <div class="form-grid">
+
+
+      <!-- RUANGAN -->
+
+      <div class="form-group">
+
+        <label for="ruangan">
+          Ruangan
+        </label>
+
+        <select
+          id="ruangan"
+        >
+
+          <option value="">
+            Memuat ruangan...
+          </option>
+
         </select>
+
       </div>
-      <div class="field">
-        <label for="tanggal">Tanggal</label>
-        <input type="date" id="tanggal" name="tanggal" required>
+
+
+      <!-- TANGGAL -->
+
+      <div class="form-group">
+
+        <label for="tanggal">
+          Tanggal
+        </label>
+
+        <input
+          type="date"
+          id="tanggal"
+        >
+
       </div>
+
+
     </div>
 
-    <div class="table-shell">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th class="col-no">No</th>
-              <th>Jenis Linen</th>
-              <th class="col-kotor hdr-kotor">Diantar</th>
-              <th class="col-infeksius hdr-infeksius">Diambil Infeksius</th>
-              <th class="col-noninfeksius hdr-noninfeksius">Diambil Non-Infeksius</th>
-              <th class="col-ket">Keterangan</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-linen">
-            <tr class="loading-row"><td colspan="6">Memuat daftar linen…</td></tr>
-          </tbody>
-        </table>
-      </div>
+  </div>
 
-      <div class="footer-bar">
-        <div class="totals">
-          <span><span class="dot-kotor">●</span> Total diantar <strong id="total-kotor">0</strong></span>
-          <span><span class="dot-infeksius">●</span> Diambil infeksius <strong id="total-infeksius">0</strong></span>
-          <span><span class="dot-noninfeksius">●</span> Diambil non-infeksius <strong id="total-noninfeksius">0</strong></span>
+
+  <!-- =====================================================
+       DETAIL LINEN
+       ===================================================== -->
+
+  <div class="card">
+
+    <h2 class="card-title">
+      Detail Linen
+    </h2>
+
+
+    <div
+      id="userInstruction"
+      class="instruction hidden"
+    >
+      <strong>Petunjuk:</strong>
+      Isi jumlah linen kotor pada kolom
+      <strong>Infeksius</strong> dan/atau
+      <strong>Non-infeksius</strong>.
+      Keduanya dapat diisi dalam satu transaksi.
+    </div>
+
+
+    <div
+      id="loading"
+      class="loading"
+    >
+      Memuat jenis linen...
+    </div>
+
+
+    <div
+      id="tableContainer"
+      class="table-wrapper hidden"
+    >
+
+      <table>
+
+        <thead id="tableHead">
+
+        </thead>
+
+
+        <tbody id="linenBody">
+
+        </tbody>
+
+      </table>
+
+
+      <!-- =================================================
+           TOTAL
+           ================================================= -->
+
+      <div
+        id="totalContainer"
+        class="total-container"
+      >
+
+        <!-- TOTAL INFEKSIUS -->
+
+        <div class="total-box">
+
+          <div class="total-label">
+            Total Infeksius
+          </div>
+
+          <div
+            id="totalInfeksius"
+            class="total-number infeksius"
+          >
+            0
+          </div>
+
         </div>
-        <button type="submit" id="submit-btn">Simpan serah terima</button>
+
+
+        <!-- TOTAL NON INFEKSIUS -->
+
+        <div class="total-box">
+
+          <div class="total-label">
+            Total Non-infeksius
+          </div>
+
+          <div
+            id="totalNonInfeksius"
+            class="total-number non-infeksius"
+          >
+            0
+          </div>
+
+        </div>
+
+
+        <!-- TOTAL SEMUA -->
+
+        <div class="total-box">
+
+          <div class="total-label">
+            Total Keseluruhan
+          </div>
+
+          <div
+            id="total"
+            class="total-number semua"
+          >
+            0
+          </div>
+
+        </div>
+
       </div>
+
+
     </div>
 
-    <div class="banner" id="banner"></div>
-  </form>
+  </div>
+
+
+  <!-- =====================================================
+       ACTION
+       ===================================================== -->
+
+  <div class="actions">
+
+    <button
+      type="button"
+      class="btn-secondary"
+      id="cancelButton"
+    >
+      Batal
+    </button>
+
+
+    <button
+      type="button"
+      class="btn-primary"
+      id="saveButton"
+    >
+      Simpan Transaksi
+    </button>
+
+  </div>
+
 
 </div>
 
+
 <script>
-  const tbody = document.getElementById('tbody-linen');
-  const banner = document.getElementById('banner');
-  const submitBtn = document.getElementById('submit-btn');
-  const totalKotorEl = document.getElementById('total-kotor');
-  const totalInfeksiusEl = document.getElementById('total-infeksius');
-  const totalNonInfeksiusEl = document.getElementById('total-noninfeksius');
-  const tanggalInput = document.getElementById('tanggal');
-  const tanggalHariIni = document.getElementById('tanggal-hariini');
+
+
+  // ========================================================
+  // STATE
+  // ========================================================
+
   let currentUser = null;
 
-  const todayISO = new Date().toISOString().split('T')[0];
-  tanggalInput.value = todayISO;
-  tanggalHariIni.textContent = new Date().toLocaleDateString('id-ID', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-  });
+  let transactionType = 'pengantaran';
 
-  function showBanner(type, message){
-    banner.textContent = message;
-    banner.className = 'banner show ' + type;
+  let linenData = [];
+
+
+  // ========================================================
+  // ELEMENT
+  // ========================================================
+
+  const ruangan =
+    document.getElementById('ruangan');
+
+  const tanggal =
+    document.getElementById('tanggal');
+
+  const loading =
+    document.getElementById('loading');
+
+  const tableContainer =
+    document.getElementById('tableContainer');
+
+  const tableHead =
+    document.getElementById('tableHead');
+
+  const linenBody =
+    document.getElementById('linenBody');
+
+  const total =
+    document.getElementById('total');
+
+  const totalInfeksius =
+    document.getElementById('totalInfeksius');
+
+  const totalNonInfeksius =
+    document.getElementById('totalNonInfeksius');
+
+  const saveButton =
+    document.getElementById('saveButton');
+
+  const transactionInfo =
+    document.getElementById('transactionInfo');
+
+  const userInstruction =
+    document.getElementById('userInstruction');
+
+  const message =
+    document.getElementById('message');
+
+
+  // ========================================================
+  // TANGGAL HARI INI
+  // ========================================================
+
+  function setTanggalHariIni() {
+
+    const now = new Date();
+
+    const year =
+      now.getFullYear();
+
+    const month =
+      String(
+        now.getMonth() + 1
+      ).padStart(2, '0');
+
+    const day =
+      String(
+        now.getDate()
+      ).padStart(2, '0');
+
+    tanggal.value =
+      `${year}-${month}-${day}`;
+
   }
 
-  function hitungTotal(){
-    let kotor = 0, infeksius = 0, nonInfeksius = 0;
-    document.querySelectorAll('.qty-input.kotor').forEach(el => kotor += Number(el.value) || 0);
-    document.querySelectorAll('.qty-input.infeksius').forEach(el => infeksius += Number(el.value) || 0);
-    document.querySelectorAll('.qty-input.noninfeksius').forEach(el => nonInfeksius += Number(el.value) || 0);
-    totalKotorEl.textContent = kotor;
-    totalInfeksiusEl.textContent = infeksius;
-    totalNonInfeksiusEl.textContent = nonInfeksius;
-  }
 
-  async function muatInformasiUser(){
-    const selectRuangan = document.getElementById('ruangan');
-    const navKembali = document.querySelector('.nav-link');
+  // ========================================================
+  // MESSAGE
+  // ========================================================
 
-    try{
-      const res = await fetch('/api/me');
-      if(!res.ok) throw new Error('Gagal memuat informasi akun');
+  function showMessage(text, type) {
 
-      const result = await res.json();
-      currentUser = result.user;
+    message.textContent = text;
 
-      // User ruangan tidak membuat transaksi baru.
-      if(currentUser.role === 'user'){
-        window.location.href = '/user-dashboard.html';
-        return;
-      }
+    message.className =
+      `message ${type}`;
 
-      // Laundry kembali ke dashboard Laundry.
-      if(currentUser.role === 'laundry'){
-        if(navKembali){
-          navKembali.href = '/laundry-dashboard.html';
-        }
-      } else if(currentUser.role === 'admin'){
-        // Admin kembali ke dashboard Admin.
-        if(navKembali){
-          navKembali.href = '/';
-        }
-      } else {
-        throw new Error('Role akun tidak dikenali');
-      }
-
-      // Admin dan Laundry boleh memilih ruangan.
-      const resRuangan = await fetch('/api/ruangan');
-      if(!resRuangan.ok) throw new Error('Gagal memuat daftar ruangan');
-
-      const data = await resRuangan.json();
-
-      if(data.length === 0){
-        selectRuangan.innerHTML = '<option value="" disabled selected>Belum ada ruangan terdaftar</option>';
-        selectRuangan.disabled = true;
-        submitBtn.disabled = true;
-        return;
-      }
-
-      selectRuangan.innerHTML = '<option value="" disabled selected>Pilih ruangan…</option>';
-
-      data.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item.nama;
-        opt.textContent = item.nama;
-        selectRuangan.appendChild(opt);
-      });
-
-    }catch(err){
-      console.error(err);
-      selectRuangan.innerHTML = '<option value="" disabled selected>Gagal memuat informasi ruangan</option>';
-      selectRuangan.disabled = true;
-      submitBtn.disabled = true;
-      showBanner('error', err.message || 'Gagal memuat informasi akun.');
-    }
-  }
-
-  async function muatJenisLinen(){
-    try{
-      const res = await fetch('/api/jenis-linen');
-      if(!res.ok) throw new Error('Gagal memuat');
-      const data = await res.json();
-
-      tbody.innerHTML = '';
-      data.forEach((item, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="col-no">${idx + 1}</td>
-          <td class="col-nama">${item.nama}</td>
-          <td class="col-kotor">
-            <input type="number" min="0" inputmode="numeric" class="qty-input kotor"
-                   data-id="${item.id}" value="0">
-          </td>
-          <td class="col-infeksius">
-            <input type="number" min="0" inputmode="numeric" class="qty-input infeksius"
-                   data-id="${item.id}" value="0">
-          </td>
-          <td class="col-noninfeksius">
-            <input type="number" min="0" inputmode="numeric" class="qty-input noninfeksius"
-                   data-id="${item.id}" value="0">
-          </td>
-          <td class="col-ket">
-            <input type="text" class="ket-input" data-id="${item.id}" placeholder="—">
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      tbody.addEventListener('input', hitungTotal);
-    }catch(err){
-      tbody.innerHTML = '<tr class="loading-row"><td colspan="6">Gagal memuat daftar linen. Coba muat ulang halaman.</td></tr>';
-    }
-  }
-
-  document.getElementById('form-linen').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    banner.className = 'banner';
-
-    const ruangan = document.getElementById('ruangan').value.trim();
-    const tanggal = tanggalInput.value;
-
-    const detail = [];
-    document.querySelectorAll('#tbody-linen tr').forEach(tr => {
-      const kotorInput = tr.querySelector('.qty-input.kotor');
-      const infeksiusInput = tr.querySelector('.qty-input.infeksius');
-      const nonInfeksiusInput = tr.querySelector('.qty-input.noninfeksius');
-      const ketInput = tr.querySelector('.ket-input');
-      if(!kotorInput) return;
-      const kotor = Number(kotorInput.value) || 0;
-      const infeksius = Number(infeksiusInput.value) || 0;
-      const nonInfeksius = Number(nonInfeksiusInput.value) || 0;
-      if(kotor === 0 && infeksius === 0 && nonInfeksius === 0) return;
-      detail.push({
-        jenis_linen_id: Number(kotorInput.dataset.id),
-        jumlah_kotor: kotor,
-        jumlah_diambil_infeksius: infeksius,
-        jumlah_diambil_non_infeksius: nonInfeksius,
-        keterangan: ketInput.value.trim() || null
-      });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
     });
 
-    if(detail.length === 0){
-      showBanner('error', 'Isi minimal satu jumlah linen (diantar atau diambil) sebelum menyimpan.');
+  }
+
+
+  function clearMessage() {
+
+    message.textContent = '';
+
+    message.className = 'message';
+
+  }
+
+
+  // ========================================================
+  // LOAD USER
+  // ========================================================
+
+  async function loadUser() {
+
+    const response =
+      await fetch('/api/me');
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        'Sesi login tidak ditemukan.'
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.user) {
+
+      throw new Error(
+        'Data user tidak ditemukan.'
+      );
+
+    }
+
+
+    currentUser =
+      data.user;
+
+
+    // ======================================================
+    // TENTUKAN TRANSAKSI
+    // ======================================================
+
+    if (
+      currentUser.role === 'user'
+    ) {
+
+      transactionType =
+        'pengambilan';
+
+    } else {
+
+      transactionType =
+        'pengantaran';
+
+    }
+
+
+    // ======================================================
+    // INFO
+    // ======================================================
+
+    if (
+      transactionType === 'pengantaran'
+    ) {
+
+      transactionInfo.textContent =
+        'Anda sedang membuat transaksi PENGANTARAN linen bersih dari Laundry ke ruangan.';
+
+    } else {
+
+      transactionInfo.textContent =
+        'Anda sedang membuat transaksi PENGAMBILAN linen kotor dari ruangan untuk diserahkan kepada Laundry.';
+
+
+      userInstruction.classList.remove(
+        'hidden'
+      );
+
+    }
+
+
+    // ======================================================
+    // USER RUANGAN
+    // ======================================================
+
+    if (
+      currentUser.role === 'user'
+    ) {
+
+      const namaRuangan =
+        currentUser.ruangan_nama ||
+        currentUser.ruangan ||
+        '';
+
+
+      ruangan.innerHTML =
+        `
+        <option value="${escapeHtml(namaRuangan)}">
+          ${escapeHtml(namaRuangan)}
+        </option>
+        `;
+
+      ruangan.disabled = true;
+
+
+      // ----------------------------------------------
+      // HEADER PENGAMBILAN
+      // ----------------------------------------------
+
+      tableHead.innerHTML =
+        `
+        <tr>
+
+          <th>
+            Jenis Linen
+          </th>
+
+          <th>
+            Infeksius
+          </th>
+
+          <th>
+            Non-infeksius
+          </th>
+
+          <th>
+            Keterangan
+          </th>
+
+        </tr>
+        `;
+
+    }
+
+
+    // ======================================================
+    // ADMIN / LAUNDRY
+    // ======================================================
+
+    else {
+
+      ruangan.disabled = false;
+
+      await loadRuangan();
+
+
+      // ----------------------------------------------
+      // HEADER PENGANTARAN
+      // ----------------------------------------------
+
+      tableHead.innerHTML =
+        `
+        <tr>
+
+          <th>
+            Jenis Linen
+          </th>
+
+          <th>
+            Stok Laundry
+          </th>
+
+          <th>
+            Diantar
+          </th>
+
+          <th>
+            Keterangan
+          </th>
+
+        </tr>
+        `;
+
+    }
+
+  }
+
+
+  // ========================================================
+  // LOAD RUANGAN
+  // ========================================================
+
+  async function loadRuangan() {
+
+    const response =
+      await fetch('/api/ruangan');
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        'Gagal mengambil data ruangan.'
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    ruangan.innerHTML =
+      `
+      <option value="">
+        Pilih ruangan
+      </option>
+      `;
+
+
+    data.forEach(item => {
+
+      const option =
+        document.createElement('option');
+
+      option.value =
+        item.nama;
+
+      option.textContent =
+        item.nama;
+
+      ruangan.appendChild(option);
+
+    });
+
+  }
+
+
+  // ========================================================
+  // LOAD JENIS LINEN
+  // ========================================================
+
+  async function loadLinen() {
+
+    loading.classList.remove(
+      'hidden'
+    );
+
+    tableContainer.classList.add(
+      'hidden'
+    );
+
+
+    const response =
+      await fetch('/api/jenis-linen');
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        'Gagal mengambil jenis linen.'
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    linenData =
+      Array.isArray(data)
+        ? data
+        : (
+            Array.isArray(data.data)
+              ? data.data
+              : []
+          );
+
+
+    renderLinen();
+
+
+    loading.classList.add(
+      'hidden'
+    );
+
+    tableContainer.classList.remove(
+      'hidden'
+    );
+
+  }
+
+
+  // ========================================================
+  // RENDER LINEN
+  // ========================================================
+
+  function renderLinen() {
+
+    linenBody.innerHTML = '';
+
+
+    linenData.forEach(item => {
+
+      const tr =
+        document.createElement('tr');
+
+
+      // ==================================================
+      // PENGANTARAN
+      // ==================================================
+
+      if (
+        transactionType === 'pengantaran'
+      ) {
+
+        tr.innerHTML =
+          `
+          <td class="linen-name">
+            ${escapeHtml(item.nama)}
+          </td>
+
+          <td>
+            ${Number(item.jumlah_stok) || 0}
+          </td>
+
+          <td>
+
+            <input
+              type="number"
+              class="number-input"
+              min="0"
+              max="${Number(item.jumlah_stok) || 0}"
+              value="0"
+              data-id="${item.id}"
+              data-type="jumlah_kotor"
+              oninput="updateTotal()"
+            >
+
+          </td>
+
+          <td>
+
+            <input
+              type="text"
+              class="keterangan-input"
+              placeholder="Keterangan"
+              data-id="${item.id}"
+              data-type="keterangan"
+            >
+
+          </td>
+          `;
+
+      }
+
+
+      // ==================================================
+      // PENGAMBILAN
+      // ==================================================
+
+      else {
+
+        tr.innerHTML =
+          `
+          <td class="linen-name">
+            ${escapeHtml(item.nama)}
+          </td>
+
+          <td>
+
+            <input
+              type="number"
+              class="number-input"
+              min="0"
+              value="0"
+              data-id="${item.id}"
+              data-type="jumlah_infeksius"
+              oninput="updateTotal()"
+            >
+
+          </td>
+
+          <td>
+
+            <input
+              type="number"
+              class="number-input"
+              min="0"
+              value="0"
+              data-id="${item.id}"
+              data-type="jumlah_non_infeksius"
+              oninput="updateTotal()"
+            >
+
+          </td>
+
+          <td>
+
+            <input
+              type="text"
+              class="keterangan-input"
+              placeholder="Keterangan"
+              data-id="${item.id}"
+              data-type="keterangan"
+            >
+
+          </td>
+          `;
+
+      }
+
+
+      linenBody.appendChild(tr);
+
+    });
+
+
+    updateTotal();
+
+  }
+
+
+  // ========================================================
+  // UPDATE TOTAL
+  // ========================================================
+
+  function updateTotal() {
+
+    let jumlahInfeksius = 0;
+
+    let jumlahNonInfeksius = 0;
+
+    let jumlahPengantaran = 0;
+
+
+    // ======================================================
+    // PENGAMBILAN
+    // ======================================================
+
+    if (
+      transactionType === 'pengambilan'
+    ) {
+
+      document
+        .querySelectorAll(
+          'input[data-type="jumlah_infeksius"]'
+        )
+        .forEach(input => {
+
+          jumlahInfeksius +=
+            Number(input.value) || 0;
+
+        });
+
+
+      document
+        .querySelectorAll(
+          'input[data-type="jumlah_non_infeksius"]'
+        )
+        .forEach(input => {
+
+          jumlahNonInfeksius +=
+            Number(input.value) || 0;
+
+        });
+
+
+      totalInfeksius.textContent =
+        jumlahInfeksius;
+
+      totalNonInfeksius.textContent =
+        jumlahNonInfeksius;
+
+      total.textContent =
+        jumlahInfeksius +
+        jumlahNonInfeksius;
+
+    }
+
+
+    // ======================================================
+    // PENGANTARAN
+    // ======================================================
+
+    else {
+
+      document
+        .querySelectorAll(
+          'input[data-type="jumlah_kotor"]'
+        )
+        .forEach(input => {
+
+          jumlahPengantaran +=
+            Number(input.value) || 0;
+
+        });
+
+
+      totalInfeksius.textContent =
+        '-';
+
+      totalNonInfeksius.textContent =
+        '-';
+
+      total.textContent =
+        jumlahPengantaran;
+
+    }
+
+  }
+
+
+  // ========================================================
+  // SIMPAN TRANSAKSI
+  // ========================================================
+
+  async function saveTransaction() {
+
+    clearMessage();
+
+
+    // ======================================================
+    // CEK USER
+    // ======================================================
+
+    if (!currentUser) {
+
+      showMessage(
+        'Data akun belum selesai dimuat.',
+        'error'
+      );
+
       return;
+
     }
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Menyimpan…';
 
-    try{
-      const res = await fetch('/api/serah-terima', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ruangan,
-          tanggal,
-          detail
-        })
-      });
-      const result = await res.json();
+    // ======================================================
+    // CEK TANGGAL
+    // ======================================================
 
-      if(!res.ok) throw new Error(result.error || 'Gagal menyimpan');
+    if (!tanggal.value) {
 
-      showBanner('success', `Tersimpan. Data serah terima untuk ruangan "${ruangan}" berhasil dicatat dan menunggu konfirmasi dari ruangan.`);
-      document.getElementById('ruangan').value = '';
-      document.querySelectorAll('.qty-input').forEach(el => el.value = 0);
-      document.querySelectorAll('.ket-input').forEach(el => el.value = '');
-      hitungTotal();
-    }catch(err){
-      showBanner('error', err.message || 'Terjadi kesalahan saat menyimpan data.');
-    }finally{
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Simpan serah terima';
+      showMessage(
+        'Tanggal wajib diisi.',
+        'error'
+      );
+
+      return;
+
     }
-  });
 
-  muatInformasiUser();
-  muatJenisLinen();
+
+    // ======================================================
+    // CEK RUANGAN
+    // ======================================================
+
+    const namaRuangan =
+      ruangan.value.trim();
+
+
+    if (!namaRuangan) {
+
+      showMessage(
+        'Ruangan wajib dipilih.',
+        'error'
+      );
+
+      return;
+
+    }
+
+
+    // ======================================================
+    // DETAIL
+    // ======================================================
+
+    const detail = [];
+
+
+    // ======================================================
+    // LOOP LINEN
+    // ======================================================
+
+    linenData.forEach(item => {
+
+      const id =
+        Number(item.id);
+
+
+      const keteranganInput =
+        document.querySelector(
+          `input[data-id="${id}"][data-type="keterangan"]`
+        );
+
+
+      const keterangan =
+        keteranganInput
+          ? keteranganInput.value.trim()
+          : '';
+
+
+      // ==================================================
+      // PENGANTARAN
+      // ==================================================
+
+      if (
+        transactionType === 'pengantaran'
+      ) {
+
+        const jumlahInput =
+          document.querySelector(
+            `input[data-id="${id}"][data-type="jumlah_kotor"]`
+          );
+
+
+        const jumlah =
+          Number(jumlahInput?.value) || 0;
+
+
+        if (jumlah > 0) {
+
+          detail.push({
+
+            jenis_linen_id:
+              id,
+
+            jumlah_kotor:
+              jumlah,
+
+            jumlah_diambil_infeksius:
+              0,
+
+            jumlah_diambil_non_infeksius:
+              0,
+
+            keterangan:
+              keterangan
+
+          });
+
+        }
+
+      }
+
+
+      // ==================================================
+      // PENGAMBILAN
+      // ==================================================
+
+      else {
+
+        const infeksiusInput =
+          document.querySelector(
+            `input[data-id="${id}"][data-type="jumlah_infeksius"]`
+          );
+
+
+        const nonInfeksiusInput =
+          document.querySelector(
+            `input[data-id="${id}"][data-type="jumlah_non_infeksius"]`
+          );
+
+
+        const jumlahInfeksius =
+          Number(
+            infeksiusInput?.value
+          ) || 0;
+
+
+        const jumlahNonInfeksius =
+          Number(
+            nonInfeksiusInput?.value
+          ) || 0;
+
+
+        // ----------------------------------------------
+        // BOLEH SALAH SATU ATAU KEDUANYA
+        // ----------------------------------------------
+
+        if (
+          jumlahInfeksius > 0 ||
+          jumlahNonInfeksius > 0
+        ) {
+
+          detail.push({
+
+            jenis_linen_id:
+              id,
+
+            jumlah_kotor:
+              0,
+
+            jumlah_diambil_infeksius:
+              jumlahInfeksius,
+
+            jumlah_diambil_non_infeksius:
+              jumlahNonInfeksius,
+
+            keterangan:
+              keterangan
+
+          });
+
+        }
+
+      }
+
+    });
+
+
+    // ======================================================
+    // CEK DETAIL
+    // ======================================================
+
+    if (
+      detail.length === 0
+    ) {
+
+      showMessage(
+        transactionType === 'pengantaran'
+          ? 'Minimal satu jenis linen harus memiliki jumlah Diantar.'
+          : 'Minimal satu jenis linen harus memiliki jumlah Infeksius atau Non-infeksius.',
+        'error'
+      );
+
+      return;
+
+    }
+
+
+    // ======================================================
+    // VALIDASI PENGANTARAN
+    // ======================================================
+
+    if (
+      transactionType === 'pengantaran'
+    ) {
+
+      for (
+        const item of detail
+      ) {
+
+        const linen =
+          linenData.find(
+            x =>
+              Number(x.id) ===
+              Number(item.jenis_linen_id)
+          );
+
+
+        const stok =
+          Number(
+            linen?.jumlah_stok
+          ) || 0;
+
+
+        if (
+          item.jumlah_kotor > stok
+        ) {
+
+          showMessage(
+            `Jumlah ${linen?.nama || 'linen'} melebihi stok Laundry.`,
+            'error'
+          );
+
+          return;
+
+        }
+
+      }
+
+    }
+
+
+    // ======================================================
+    // KONFIRMASI
+    // ======================================================
+
+    const label =
+      transactionType === 'pengantaran'
+        ? 'pengantaran'
+        : 'pengambilan';
+
+
+    const yakin =
+      confirm(
+        `Simpan transaksi ${label}?`
+      );
+
+
+    if (!yakin) {
+
+      return;
+
+    }
+
+
+    // ======================================================
+    // BUTTON
+    // ======================================================
+
+    saveButton.disabled = true;
+
+    saveButton.textContent =
+      'Menyimpan...';
+
+
+    // ======================================================
+    // REQUEST
+    // ======================================================
+
+    try {
+
+      const response =
+        await fetch(
+          '/api/serah-terima',
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body:
+              JSON.stringify({
+
+                ruangan:
+                  namaRuangan,
+
+                tanggal:
+                  tanggal.value,
+
+                jenis_transaksi:
+                  transactionType,
+
+                detail:
+                  detail
+
+              })
+
+          }
+        );
+
+
+      const result =
+        await response.json();
+
+
+      if (
+        !response.ok
+      ) {
+
+        throw new Error(
+          result.error ||
+          'Gagal menyimpan transaksi.'
+        );
+
+      }
+
+
+      // ==================================================
+      // BERHASIL
+      // ==================================================
+
+      showMessage(
+        transactionType === 'pengantaran'
+          ? 'Transaksi pengantaran berhasil dibuat.'
+          : 'Transaksi pengambilan berhasil dibuat. Silakan lakukan konfirmasi dan tanda tangan.',
+        'success'
+      );
+
+
+      // ==================================================
+      // REDIRECT
+      // ==================================================
+
+      setTimeout(() => {
+
+        if (
+          transactionType === 'pengambilan'
+        ) {
+
+          window.location.href =
+            '/konfirmasi.html';
+
+        } else {
+
+          window.location.href =
+            '/riwayat.html';
+
+        }
+
+      }, 1200);
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      showMessage(
+        error.message ||
+        'Terjadi kesalahan saat menyimpan transaksi.',
+        'error'
+      );
+
+
+      saveButton.disabled =
+        false;
+
+      saveButton.textContent =
+        'Simpan Transaksi';
+
+    }
+
+  }
+
+
+  // ========================================================
+  // ESCAPE HTML
+  // ========================================================
+
+  function escapeHtml(value) {
+
+    return String(value ?? '')
+
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+
+      .replace(
+        /</g,
+        '&lt;'
+      )
+
+      .replace(
+        />/g,
+        '&gt;'
+      )
+
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+
+      .replace(
+        /'/g,
+        '&#039;'
+      );
+
+  }
+
+
+  // ========================================================
+  // BACK BUTTON
+  // ========================================================
+
+  function setupBackButton() {
+
+    const backButton =
+      document.getElementById(
+        'backButton'
+      );
+
+
+    const cancelButton =
+      document.getElementById(
+        'cancelButton'
+      );
+
+
+    function goBack() {
+
+      if (
+        currentUser?.role === 'user'
+      ) {
+
+        window.location.href =
+          '/user-dashboard.html';
+
+      } else {
+
+        window.location.href =
+          '/laundry-dashboard.html';
+
+      }
+
+    }
+
+
+    backButton.addEventListener(
+      'click',
+      event => {
+
+        event.preventDefault();
+
+        goBack();
+
+      }
+    );
+
+
+    cancelButton.addEventListener(
+      'click',
+      goBack
+    );
+
+  }
+
+
+  // ========================================================
+  // INIT
+  // ========================================================
+
+  async function init() {
+
+    try {
+
+      setTanggalHariIni();
+
+      setupBackButton();
+
+      await loadUser();
+
+      await loadLinen();
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      showMessage(
+        error.message ||
+        'Gagal memuat halaman.',
+        'error'
+      );
+
+
+      loading.textContent =
+        'Gagal memuat data linen.';
+
+    }
+
+  }
+
+
+  // ========================================================
+  // EVENT
+  // ========================================================
+
+  saveButton.addEventListener(
+    'click',
+    saveTransaction
+  );
+
+
+  // ========================================================
+  // START
+  // ========================================================
+
+  init();
+
 </script>
 
+
 </body>
+
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Konfirmasi Serah Terima — Web Linen</title>
+  <title>Penerimaan Linen — Web Linen</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,7 @@
   >
 
   <style>
+
     :root{
       --bg:#F5F7F6;
       --surface:#FFFFFF;
@@ -45,9 +46,12 @@
     body{
       margin:0;
       min-height:100vh;
+
       background:var(--bg);
       color:var(--ink);
+
       font-family:'Public Sans',system-ui,sans-serif;
+
       padding:28px 18px 50px;
     }
 
@@ -65,13 +69,14 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:15px;
+
       margin-bottom:25px;
     }
 
     .back-link{
       color:var(--ink-soft);
       text-decoration:none;
+
       font-size:13px;
       font-weight:600;
     }
@@ -83,11 +88,15 @@
     .logout-link{
       color:var(--ink-soft);
       text-decoration:none;
+
       font-size:13px;
       font-weight:600;
+
       padding:8px 13px;
+
       border:1px solid var(--line);
       border-radius:8px;
+
       background:var(--surface);
     }
 
@@ -104,24 +113,31 @@
       margin-bottom:25px;
     }
 
-    .brand .unit{
+    .unit{
       display:block;
+
       color:var(--teal);
+
       font-size:13px;
       font-weight:700;
+
       margin-bottom:5px;
     }
 
     h1{
       margin:0;
+
       font-family:'Source Serif 4',Georgia,serif;
+
       font-size:30px;
       font-weight:600;
     }
 
     .subtitle{
       color:var(--ink-soft);
+
       font-size:14px;
+
       margin:8px 0 0;
     }
 
@@ -131,23 +147,33 @@
 
     .message{
       display:none;
+
       padding:12px 14px;
+
       border-radius:8px;
+
       font-size:13px;
+
       margin-bottom:18px;
     }
 
     .message.success{
       display:block;
+
       background:var(--teal-tint);
+
       border:1px solid #CDE5DE;
+
       color:#24645C;
     }
 
     .message.error{
       display:block;
+
       background:var(--red-tint);
+
       border:1px solid #EFC7C0;
+
       color:var(--red);
     }
 
@@ -157,57 +183,71 @@
 
     .empty{
       background:var(--surface);
+
       border:1px solid var(--line);
+
       border-radius:var(--radius);
+
       padding:35px 20px;
+
       text-align:center;
+
       color:var(--ink-soft);
+
       font-size:14px;
     }
 
-    .loading{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-
     /* =========================
-       TRANSACTION CARD
+       CARD
     ========================= */
 
     .transaction-card{
       background:var(--surface);
+
       border:1px solid var(--line);
+
       border-radius:var(--radius);
+
       margin-bottom:20px;
+
       overflow:hidden;
     }
 
     .transaction-header{
       padding:18px 20px;
+
       border-bottom:1px solid var(--line);
 
       display:flex;
+
       justify-content:space-between;
+
       align-items:flex-start;
+
       gap:15px;
     }
 
     .transaction-title{
       margin:0;
-      font-size:16px;
+
+      font-size:17px;
+
       font-weight:800;
     }
 
     .transaction-meta{
       margin-top:6px;
+
       color:var(--ink-soft);
+
       font-size:12px;
+
       line-height:1.6;
     }
 
     .badge{
       display:inline-flex;
+
       align-items:center;
 
       padding:6px 10px;
@@ -215,54 +255,51 @@
       border-radius:999px;
 
       font-size:11px;
+
       font-weight:700;
 
       white-space:nowrap;
     }
 
-    .badge-pengantaran{
-      background:var(--blue-tint);
-      color:var(--blue);
-    }
-
     .badge-pengambilan{
       background:var(--orange-tint);
+
       color:var(--orange);
     }
+
+    /* =========================
+       BODY
+    ========================= */
 
     .transaction-body{
       padding:20px;
     }
 
-    /* =========================
-       INFO BOX
-    ========================= */
-
     .info-box{
-      border-radius:9px;
-      padding:13px 15px;
-      margin-bottom:18px;
-    }
-
-    .info-box.pengantaran{
-      background:var(--blue-tint);
-      border:1px solid #D1E1F0;
-    }
-
-    .info-box.pengambilan{
       background:var(--orange-tint);
+
       border:1px solid #F0D8B5;
+
+      border-radius:9px;
+
+      padding:14px 15px;
+
+      margin-bottom:18px;
     }
 
     .info-box strong{
       display:block;
+
       font-size:13px;
+
       margin-bottom:4px;
     }
 
     .info-box span{
-      font-size:12px;
       color:var(--ink-soft);
+
+      font-size:12px;
+
       line-height:1.5;
     }
 
@@ -274,6 +311,7 @@
       overflow-x:auto;
 
       border:1px solid var(--line);
+
       border-radius:9px;
 
       margin-bottom:20px;
@@ -281,6 +319,7 @@
 
     table{
       width:100%;
+
       border-collapse:collapse;
 
       min-width:600px;
@@ -292,9 +331,9 @@
 
       border-bottom:1px solid var(--line);
 
-      text-align:left;
-
       font-size:13px;
+
+      text-align:left;
     }
 
     th{
@@ -303,6 +342,7 @@
       color:var(--ink-soft);
 
       font-size:11px;
+
       font-weight:700;
     }
 
@@ -315,8 +355,9 @@
     }
 
     .number{
-      font-weight:700;
       text-align:center;
+
+      font-weight:700;
     }
 
     .total-row{
@@ -328,46 +369,45 @@
     ========================= */
 
     .section-title{
-      font-size:14px;
-      font-weight:800;
-
       margin:0 0 14px;
-    }
 
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr;
+      font-size:14px;
 
-      gap:15px;
-
-      margin-bottom:18px;
+      font-weight:800;
     }
 
     .field{
       display:flex;
+
       flex-direction:column;
+
       gap:7px;
+
+      margin-bottom:15px;
     }
 
     label{
-      font-size:12px;
-      font-weight:700;
-
       color:var(--ink-soft);
+
+      font-size:12px;
+
+      font-weight:700;
     }
 
     input{
       width:100%;
 
-      border:1px solid var(--line);
-      border-radius:8px;
-
       padding:11px 12px;
 
-      font:inherit;
-      font-size:14px;
+      border:1px solid var(--line);
+
+      border-radius:8px;
 
       outline:none;
+
+      font:inherit;
+
+      font-size:14px;
     }
 
     input:focus{
@@ -382,13 +422,15 @@
     ========================= */
 
     .signature-wrapper{
+      overflow:hidden;
+
       border:1px solid var(--line);
 
       border-radius:9px;
 
-      overflow:hidden;
-
       background:#fff;
+
+      margin-bottom:18px;
     }
 
     .signature-label{
@@ -398,9 +440,9 @@
 
       border-bottom:1px solid var(--line);
 
-      font-size:11px;
-
       color:var(--ink-soft);
+
+      font-size:11px;
 
       font-weight:700;
     }
@@ -409,6 +451,7 @@
       display:block;
 
       width:100%;
+
       height:180px;
 
       background:white;
@@ -445,15 +488,13 @@
     }
 
     /* =========================
-       ACTION
+       BUTTON
     ========================= */
 
     .actions{
       display:flex;
 
       justify-content:flex-end;
-
-      gap:10px;
     }
 
     button{
@@ -507,7 +548,7 @@
       }
 
       .actions{
-        flex-direction:column;
+        width:100%;
       }
 
       .actions button{
@@ -535,7 +576,7 @@
   <div class="topbar">
 
     <a
-      href="/user-dashboard.html"
+      href="/laundry-dashboard.html"
       class="back-link"
     >
       ← Kembali ke Dashboard
@@ -558,15 +599,15 @@
   <div class="brand">
 
     <span class="unit">
-      Ruangan
+      Laundry
     </span>
 
     <h1>
-      Konfirmasi Serah Terima
+      Penerimaan Linen Kotor
     </h1>
 
     <p class="subtitle">
-      Periksa linen sebelum memberikan tanda tangan.
+      Periksa linen yang diserahkan dari ruangan sebelum memberikan tanda tangan.
     </p>
 
   </div>
@@ -588,7 +629,7 @@
 
   <div id="transactions-container">
 
-    <div class="empty loading">
+    <div class="empty">
       Memuat transaksi...
     </div>
 
@@ -613,13 +654,6 @@
     document.getElementById(
       'message'
     );
-
-
-  // ==========================================================
-  // SIGNATURE
-  // ==========================================================
-
-  const signatures = {};
 
 
   // ==========================================================
@@ -682,10 +716,8 @@
       return '-';
     }
 
-
     const date =
       new Date(value);
-
 
     if(
       Number.isNaN(
@@ -696,7 +728,6 @@
       return value;
 
     }
-
 
     return date.toLocaleDateString(
       'id-ID',
@@ -711,139 +742,36 @@
 
 
   // ==========================================================
-  // GET DETAIL
+  // LOAD DETAIL
   // ==========================================================
 
-  function getDetails(transaction){
-
-    return (
-      transaction.detail ||
-      transaction.details ||
-      transaction.items ||
-      []
-    );
-
-  }
-
-
-  // ==========================================================
-  // AMBIL DETAIL TRANSAKSI
-  // ==========================================================
-
-  async function loadTransactionDetail(
+  async function getTransactionDetail(
     transaction
   ){
 
-    try{
-
-      const res =
-        await fetch(
-          `/api/serah-terima/${transaction.id}`
-        );
-
-
-      if(!res.ok){
-
-        console.warn(
-          `Detail transaksi #${transaction.id} gagal diambil.`
-        );
-
-        return transaction;
-
-      }
-
-
-      const result =
-        await res.json();
-
-
-      if(
-        result &&
-        typeof result === 'object'
-      ){
-
-        return {
-          ...transaction,
-          ...result
-        };
-
-      }
-
-
-      return transaction;
-
-    }catch(error){
-
-      console.error(
-        `Gagal mengambil detail transaksi #${transaction.id}:`,
-        error
+    const res =
+      await fetch(
+        `/api/serah-terima/${transaction.id}`
       );
 
-      return transaction;
 
-    }
+    if(!res.ok){
 
-  }
-
-
-  // ==========================================================
-  // FILTER TRANSAKSI YANG BENAR-BENAR BUTUH TINDAKAN USER
-  // ==========================================================
-
-  function needsUserConfirmation(
-    transaction
-  ){
-
-    if(
-      transaction.status !==
-      'menunggu_konfirmasi'
-    ){
-
-      return false;
-
-    }
-
-
-    const jenisTransaksi =
-      String(
-        transaction.jenis_transaksi ||
-        'pengantaran'
-      ).toLowerCase();
-
-
-    // --------------------------------------------------------
-    // PENGAMBILAN
-    //
-    // User harus tanda tangan sebagai PENYERAH.
-    //
-    // Kalau tanda_tangan_penyerah sudah ada,
-    // tugas user sudah selesai.
-    // --------------------------------------------------------
-
-    if(
-      jenisTransaksi ===
-      'pengambilan'
-    ){
-
-      return !Boolean(
-        transaction.tanda_tangan_penyerah
+      throw new Error(
+        `Gagal mengambil detail transaksi #${transaction.id}`
       );
 
     }
 
 
-    // --------------------------------------------------------
-    // PENGANTARAN
-    //
-    // User harus tanda tangan sebagai PENERIMA.
-    //
-    // Kalau tanda_tangan sudah ada,
-    // tugas user sudah selesai.
-    // --------------------------------------------------------
+    const detail =
+      await res.json();
 
-    return !Boolean(
-      transaction.tanda_tangan
-    );
+
+    return {
+      ...transaction,
+      ...detail
+    };
 
   }
 
@@ -858,16 +786,57 @@
 
 
     container.innerHTML = `
-      <div class="empty loading">
+
+      <div class="empty">
         Memuat transaksi...
       </div>
+
     `;
 
 
     try{
 
       // ------------------------------------------------------
-      // 1. AMBIL DAFTAR TRANSAKSI
+      // CEK AKUN
+      // ------------------------------------------------------
+
+      const meRes =
+        await fetch(
+          '/api/me'
+        );
+
+
+      if(!meRes.ok){
+
+        throw new Error(
+          'Gagal memuat informasi akun.'
+        );
+
+      }
+
+
+      const me =
+        await meRes.json();
+
+
+      if(
+        !me.user ||
+        (
+          me.user.role !== 'laundry' &&
+          me.user.role !== 'admin'
+        )
+      ){
+
+        window.location.href =
+          '/login.html';
+
+        return;
+
+      }
+
+
+      // ------------------------------------------------------
+      // AMBIL SEMUA TRANSAKSI
       // ------------------------------------------------------
 
       const res =
@@ -879,7 +848,7 @@
       if(!res.ok){
 
         throw new Error(
-          'Gagal mengambil data transaksi.'
+          'Gagal mengambil transaksi.'
         );
 
       }
@@ -896,17 +865,51 @@
 
 
       // ------------------------------------------------------
-      // 2. FILTER TRANSAKSI USER
+      // HANYA PENGAMBILAN
+      // YANG SUDAH DITANDATANGANI RUANGAN
+      // TAPI BELUM DITERIMA LAUNDRY
       // ------------------------------------------------------
 
       const pending =
         rows.filter(
-          needsUserConfirmation
+          item => {
+
+            const jenis =
+              String(
+                item.jenis_transaksi ||
+                ''
+              ).toLowerCase();
+
+
+            const isPengambilan =
+              jenis ===
+              'pengambilan';
+
+
+            const sudahDiserahkan =
+              Boolean(
+                item.tanda_tangan_penyerah
+              );
+
+
+            const belumDiterimaLaundry =
+              !Boolean(
+                item.tanda_tangan_penerima_laundry
+              );
+
+
+            return (
+              isPengambilan &&
+              sudahDiserahkan &&
+              belumDiterimaLaundry
+            );
+
+          }
         );
 
 
       // ------------------------------------------------------
-      // 3. TIDAK ADA TRANSAKSI
+      // TIDAK ADA
       // ------------------------------------------------------
 
       if(
@@ -914,9 +917,14 @@
       ){
 
         container.innerHTML = `
+
           <div class="empty">
-            Tidak ada transaksi yang menunggu konfirmasi.
+
+            Tidak ada linen kotor yang menunggu
+            penerimaan Laundry.
+
           </div>
+
         `;
 
         return;
@@ -925,71 +933,38 @@
 
 
       // ------------------------------------------------------
-      // 4. AMBIL DETAIL SEMUA TRANSAKSI
+      // AMBIL DETAIL
       // ------------------------------------------------------
 
-      const detailedTransactions =
+      const detailed =
         await Promise.all(
           pending.map(
-            transaction =>
-              loadTransactionDetail(
-                transaction
-              )
+            getTransactionDetail
           )
         );
 
 
-      // ------------------------------------------------------
-      // 5. FILTER ULANG SETELAH DETAIL DIAMBIL
-      //
-      // Ini penting karena tanda tangan bisa saja
-      // hanya tersedia pada endpoint detail.
-      // ------------------------------------------------------
-
-      const stillNeedsConfirmation =
-        detailedTransactions.filter(
-          needsUserConfirmation
-        );
-
-
-      if(
-        stillNeedsConfirmation.length === 0
-      ){
-
-        container.innerHTML = `
-          <div class="empty">
-            Tidak ada transaksi yang menunggu konfirmasi.
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      // ------------------------------------------------------
-      // 6. RENDER
-      // ------------------------------------------------------
-
       renderTransactions(
-        stillNeedsConfirmation
+        detailed
       );
 
 
-    }catch(err){
+    }catch(error){
 
-      console.error(err);
+      console.error(error);
 
 
       container.innerHTML = `
+
         <div class="empty">
           Gagal memuat transaksi.
         </div>
+
       `;
 
 
       showMessage(
-        err.message ||
+        error.message ||
         'Gagal memuat transaksi.'
       );
 
@@ -1052,30 +1027,11 @@
       'transaction-card';
 
 
-    const jenisTransaksi =
-      String(
-        transaction.jenis_transaksi ||
-        'pengantaran'
-      ).toLowerCase();
-
-
-    const isPengambilan =
-      jenisTransaksi ===
-      'pengambilan';
-
-
-    // --------------------------------------------------------
-    // DETAIL
-    // --------------------------------------------------------
-
     const details =
-      getDetails(
-        transaction
-      );
-
-
-    let totalDiantar =
-      0;
+      transaction.detail ||
+      transaction.details ||
+      transaction.items ||
+      [];
 
 
     let totalInfeksius =
@@ -1090,31 +1046,12 @@
       '';
 
 
-    // --------------------------------------------------------
-    // LOOP DETAIL
-    // --------------------------------------------------------
-
     details.forEach(
       item => {
-
-        /*
-          FIELD YANG BENAR:
-
-          jenis_linen_nama
-
-          Contoh:
-          "Handuk Besar"
-        */
 
         const namaLinen =
           item.jenis_linen_nama ||
           '-';
-
-
-        const diantar =
-          Number(
-            item.jumlah_kotor
-          ) || 0;
 
 
         const infeksius =
@@ -1129,10 +1066,6 @@
           ) || 0;
 
 
-        totalDiantar +=
-          diantar;
-
-
         totalInfeksius +=
           infeksius;
 
@@ -1141,230 +1074,62 @@
           nonInfeksius;
 
 
-        // ----------------------------------------------------
-        // PENGAMBILAN
-        // ----------------------------------------------------
+        rowsHtml += `
 
-        if(isPengambilan){
-
-          rowsHtml += `
-
-            <tr>
-
-              <td>
-
-                <div class="linen-name">
-                  ${escapeHtml(
-                    namaLinen
-                  )}
-                </div>
-
-              </td>
-
-
-              <td class="number">
-                ${infeksius}
-              </td>
-
-
-              <td class="number">
-                ${nonInfeksius}
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-
-
-        // ----------------------------------------------------
-        // PENGANTARAN
-        // ----------------------------------------------------
-
-        else{
-
-          rowsHtml += `
-
-            <tr>
-
-              <td>
-
-                <div class="linen-name">
-                  ${escapeHtml(
-                    namaLinen
-                  )}
-                </div>
-
-              </td>
-
-
-              <td class="number">
-                ${diantar}
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-
-      }
-    );
-
-
-    // --------------------------------------------------------
-    // JIKA DETAIL KOSONG
-    // --------------------------------------------------------
-
-    if(!rowsHtml){
-
-      rowsHtml =
-        isPengambilan
-
-          ? `
-            <tr>
-
-              <td colspan="3">
-                Tidak ada detail linen.
-              </td>
-
-            </tr>
-          `
-
-          : `
-            <tr>
-
-              <td colspan="2">
-                Tidak ada detail linen.
-              </td>
-
-            </tr>
-          `;
-
-    }
-
-
-    // ========================================================
-    // TEXT
-    // ========================================================
-
-    const badgeClass =
-      isPengambilan
-        ? 'badge-pengambilan'
-        : 'badge-pengantaran';
-
-
-    const badgeText =
-      isPengambilan
-        ? 'Pengambilan'
-        : 'Pengantaran';
-
-
-    const infoClass =
-      isPengambilan
-        ? 'pengambilan'
-        : 'pengantaran';
-
-
-    const title =
-      isPengambilan
-        ? 'Pengambilan Linen Kotor'
-        : 'Pengantaran Linen Bersih';
-
-
-    const infoText =
-      isPengambilan
-
-        ? 'Periksa jumlah linen kotor yang akan diserahkan kepada Laundry. Jika sudah sesuai, isi nama dan berikan tanda tangan sebagai pihak yang menyerahkan linen.'
-
-        : 'Periksa jumlah linen bersih yang diterima dari Laundry. Jika sudah sesuai, isi nama dan berikan tanda tangan sebagai pihak yang menerima linen.';
-
-
-    const sectionTitle =
-      isPengambilan
-        ? 'Konfirmasi Penyerahan'
-        : 'Konfirmasi Penerimaan';
-
-
-    const nameLabel =
-      isPengambilan
-        ? 'Nama Penyerah'
-        : 'Nama Penerima';
-
-
-    const namePlaceholder =
-      isPengambilan
-        ? 'Masukkan nama petugas yang menyerahkan'
-        : 'Masukkan nama petugas yang menerima';
-
-
-    const signatureLabel =
-      isPengambilan
-        ? 'TTD petugas ruangan yang menyerahkan linen'
-        : 'TTD petugas ruangan yang menerima linen';
-
-
-    const buttonText =
-      isPengambilan
-        ? 'Konfirmasi Penyerahan'
-        : 'Konfirmasi Penerimaan';
-
-
-    // ========================================================
-    // TOTAL
-    // ========================================================
-
-    const totalRowHtml =
-      isPengambilan
-
-        ? `
-
-          <tr class="total-row">
+          <tr>
 
             <td>
-              <strong>
-                Total
-              </strong>
+
+              <div class="linen-name">
+
+                ${escapeHtml(
+                  namaLinen
+                )}
+
+              </div>
+
             </td>
 
 
             <td class="number">
-              ${totalInfeksius}
+
+              ${infeksius}
+
             </td>
 
 
             <td class="number">
-              ${totalNonInfeksius}
-            </td>
 
-          </tr>
+              ${nonInfeksius}
 
-        `
-
-        : `
-
-          <tr class="total-row">
-
-            <td>
-              <strong>
-                Total
-              </strong>
-            </td>
-
-
-            <td class="number">
-              ${totalDiantar}
             </td>
 
           </tr>
 
         `;
 
+      }
+    );
 
-    // ========================================================
-    // CARD HTML
-    // ========================================================
+
+    if(!rowsHtml){
+
+      rowsHtml = `
+
+        <tr>
+
+          <td colspan="3">
+
+            Tidak ada detail linen.
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+
 
     card.innerHTML = `
 
@@ -1373,9 +1138,11 @@
         <div>
 
           <h2 class="transaction-title">
+
             Transaksi #${escapeHtml(
               transaction.id
             )}
+
           </h2>
 
 
@@ -1384,19 +1151,25 @@
             Ruangan:
 
             <strong>
+
               ${escapeHtml(
                 transaction.ruangan
               )}
+
             </strong>
 
+
             &nbsp; • &nbsp;
+
 
             Tanggal:
 
             <strong>
+
               ${formatDate(
                 transaction.tanggal
               )}
+
             </strong>
 
           </div>
@@ -1404,8 +1177,10 @@
         </div>
 
 
-        <span class="badge ${badgeClass}">
-          ${badgeText}
+        <span class="badge badge-pengambilan">
+
+          Pengambilan
+
         </span>
 
       </div>
@@ -1414,19 +1189,27 @@
       <div class="transaction-body">
 
 
-        <div class="info-box ${infoClass}">
+        <div class="info-box">
 
           <strong>
-            ${title}
+
+            Penerimaan Linen Kotor
+
           </strong>
 
 
           <span>
-            ${infoText}
+
+            Periksa jumlah linen yang diserahkan
+            oleh ruangan. Jika sudah sesuai,
+            isi nama penerima dan berikan tanda tangan.
+
           </span>
 
         </div>
 
+
+        <!-- TABLE -->
 
         <div class="table-wrap">
 
@@ -1434,45 +1217,21 @@
 
             <thead>
 
-              ${
-                isPengambilan
+              <tr>
 
-                  ? `
+                <th>
+                  Jenis Linen
+                </th>
 
-                    <tr>
+                <th>
+                  Infeksius
+                </th>
 
-                      <th>
-                        Jenis Linen
-                      </th>
+                <th>
+                  Non-infeksius
+                </th>
 
-                      <th>
-                        Infeksius
-                      </th>
-
-                      <th>
-                        Non-infeksius
-                      </th>
-
-                    </tr>
-
-                  `
-
-                  : `
-
-                    <tr>
-
-                      <th>
-                        Jenis Linen
-                      </th>
-
-                      <th>
-                        Diantar
-                      </th>
-
-                    </tr>
-
-                  `
-              }
+              </tr>
 
             </thead>
 
@@ -1481,7 +1240,32 @@
 
               ${rowsHtml}
 
-              ${totalRowHtml}
+
+              <tr class="total-row">
+
+                <td>
+
+                  <strong>
+                    Total
+                  </strong>
+
+                </td>
+
+
+                <td class="number">
+
+                  ${totalInfeksius}
+
+                </td>
+
+
+                <td class="number">
+
+                  ${totalNonInfeksius}
+
+                </td>
+
+              </tr>
 
             </tbody>
 
@@ -1490,79 +1274,82 @@
         </div>
 
 
+        <!-- CONFIRMATION -->
+
         <h3 class="section-title">
-          ${sectionTitle}
+
+          Konfirmasi Penerimaan Laundry
+
         </h3>
 
 
-        <div class="form-grid">
+        <div class="field">
+
+          <label
+            for="nama-${transaction.id}"
+          >
+            Nama Penerima Laundry
+          </label>
 
 
-          <!-- NAMA -->
-
-          <div class="field">
-
-            <label
-              for="nama-${transaction.id}"
-            >
-              ${nameLabel}
-            </label>
-
-
-            <input
-              type="text"
-              id="nama-${transaction.id}"
-              placeholder="${namePlaceholder}"
-              autocomplete="off"
-            >
-
-          </div>
-
-
-          <!-- TTD -->
-
-          <div>
-
-            <label>
-              Tanda Tangan
-            </label>
-
-
-            <div class="signature-wrapper">
-
-
-              <div class="signature-label">
-                ${signatureLabel}
-              </div>
-
-
-              <canvas
-                id="signature-${transaction.id}"
-              ></canvas>
-
-
-              <div class="signature-actions">
-
-                <button
-                  type="button"
-                  class="btn-clear"
-                  onclick="clearSignature(
-                    ${transaction.id}
-                  )"
-                >
-                  Hapus Tanda Tangan
-                </button>
-
-              </div>
-
-
-            </div>
-
-          </div>
-
+          <input
+            type="text"
+            id="nama-${transaction.id}"
+            placeholder="Masukkan nama petugas Laundry"
+            autocomplete="off"
+          >
 
         </div>
 
+
+        <!-- SIGNATURE -->
+
+        <div>
+
+          <label>
+            Tanda Tangan Penerima Laundry
+          </label>
+
+
+          <div class="signature-wrapper">
+
+
+            <div class="signature-label">
+
+              TTD petugas Laundry yang menerima
+              linen kotor
+
+            </div>
+
+
+            <canvas
+              id="signature-${transaction.id}"
+            ></canvas>
+
+
+            <div class="signature-actions">
+
+              <button
+                type="button"
+                class="btn-clear"
+                onclick="clearSignature(
+                  ${transaction.id}
+                )"
+              >
+
+                Hapus Tanda Tangan
+
+              </button>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+
+        <!-- BUTTON -->
 
         <div class="actions">
 
@@ -1570,12 +1357,13 @@
             type="button"
             class="btn-primary"
             id="submit-${transaction.id}"
-            onclick="konfirmasiTransaksi(
-              ${transaction.id},
-              '${jenisTransaksi}'
+            onclick="konfirmasiPenerimaanLaundry(
+              ${transaction.id}
             )"
           >
-            ${buttonText}
+
+            Konfirmasi Penerimaan
+
           </button>
 
         </div>
@@ -1618,59 +1406,52 @@
       false;
 
 
-    function resizeCanvas(){
-
-      const ratio =
-        Math.max(
-          window.devicePixelRatio || 1,
-          1
-        );
-
-
-      const rect =
-        canvas.getBoundingClientRect();
-
-
-      canvas.width =
-        rect.width * ratio;
-
-
-      canvas.height =
-        rect.height * ratio;
-
-
-      ctx.setTransform(
-        ratio,
-        0,
-        0,
-        ratio,
-        0,
-        0
+    const ratio =
+      Math.max(
+        window.devicePixelRatio || 1,
+        1
       );
 
 
-      ctx.lineWidth =
-        2;
+    const rect =
+      canvas.getBoundingClientRect();
 
 
-      ctx.lineCap =
-        'round';
+    canvas.width =
+      rect.width * ratio;
 
 
-      ctx.lineJoin =
-        'round';
+    canvas.height =
+      rect.height * ratio;
 
 
-      ctx.strokeStyle =
-        '#1C2B33';
+    ctx.setTransform(
+      ratio,
+      0,
+      0,
+      ratio,
+      0,
+      0
+    );
 
-    }
+
+    ctx.lineWidth =
+      2;
 
 
-    resizeCanvas();
+    ctx.lineCap =
+      'round';
 
 
-    function getPosition(event){
+    ctx.lineJoin =
+      'round';
+
+
+    ctx.strokeStyle =
+      '#1C2B33';
+
+
+    function position(event){
 
       const rect =
         canvas.getBoundingClientRect();
@@ -1705,7 +1486,7 @@
 
 
         const pos =
-          getPosition(event);
+          position(event);
 
 
         ctx.beginPath();
@@ -1730,7 +1511,7 @@
 
 
         const pos =
-          getPosition(event);
+          position(event);
 
 
         ctx.lineTo(
@@ -1760,7 +1541,6 @@
           );
 
         }catch(error){}
-
 
       }
     );
@@ -1867,20 +1647,14 @@
 
 
   // ==========================================================
-  // KONFIRMASI TRANSAKSI
+  // KONFIRMASI PENERIMAAN LAUNDRY
   // ==========================================================
 
-  async function konfirmasiTransaksi(
-    transactionId,
-    jenisTransaksi
+  async function konfirmasiPenerimaanLaundry(
+    transactionId
   ){
 
     clearMessage();
-
-
-    const isPengambilan =
-      jenisTransaksi ===
-      'pengambilan';
 
 
     const namaInput =
@@ -1889,15 +1663,15 @@
       );
 
 
-    const button =
-      document.getElementById(
-        `submit-${transactionId}`
-      );
-
-
     const canvas =
       document.getElementById(
         `signature-${transactionId}`
+      );
+
+
+    const button =
+      document.getElementById(
+        `submit-${transactionId}`
       );
 
 
@@ -1914,13 +1688,7 @@
     if(!nama){
 
       showMessage(
-
-        isPengambilan
-
-          ? 'Nama penyerah wajib diisi.'
-
-          : 'Nama penerima wajib diisi.'
-
+        'Nama penerima Laundry wajib diisi.'
       );
 
 
@@ -1942,15 +1710,8 @@
     ){
 
       showMessage(
-
-        isPengambilan
-
-          ? 'Tanda tangan penyerah wajib diisi.'
-
-          : 'Tanda tangan penerima wajib diisi.'
-
+        'Tanda tangan penerima Laundry wajib diisi.'
       );
-
 
       return;
 
@@ -1963,46 +1724,6 @@
       );
 
 
-    // --------------------------------------------------------
-    // ENDPOINT
-    // --------------------------------------------------------
-
-    const endpoint =
-      isPengambilan
-
-        ? `/api/serah-terima/${transactionId}/konfirmasi-penyerahan`
-
-        : `/api/serah-terima/${transactionId}/konfirmasi-penerimaan`;
-
-
-    // --------------------------------------------------------
-    // BODY
-    // --------------------------------------------------------
-
-    const body =
-      isPengambilan
-
-        ? {
-
-            nama_penyerah:
-              nama,
-
-            tanda_tangan_penyerah:
-              tandaTangan
-
-          }
-
-        : {
-
-            nama_penerima:
-              nama,
-
-            tanda_tangan:
-              tandaTangan
-
-          };
-
-
     try{
 
       button.disabled =
@@ -2013,10 +1734,17 @@
         'Menyimpan...';
 
 
+      // ------------------------------------------------------
+      // KIRIM KE BACKEND
+      // ------------------------------------------------------
+
       const res =
         await fetch(
-          endpoint,
+
+          `/api/serah-terima/${transactionId}/konfirmasi-penerimaan-laundry`,
+
           {
+
             method:'PUT',
 
             headers:{
@@ -2025,11 +1753,18 @@
             },
 
             body:
-              JSON.stringify(
-                body
-              )
+              JSON.stringify({
+
+                nama_penerima_laundry:
+                  nama,
+
+                tanda_tangan_penerima_laundry:
+                  tandaTangan
+
+              })
 
           }
+
         );
 
 
@@ -2043,8 +1778,10 @@
       if(!res.ok){
 
         throw new Error(
+
           result.error ||
-          'Gagal melakukan konfirmasi.'
+          'Gagal mengonfirmasi penerimaan Laundry.'
+
         );
 
       }
@@ -2056,11 +1793,7 @@
 
       showMessage(
 
-        isPengambilan
-
-          ? 'Penyerahan berhasil dikonfirmasi. Transaksi selanjutnya menunggu penerimaan dari Laundry.'
-
-          : 'Penerimaan berhasil dikonfirmasi. Transaksi selanjutnya menunggu tanda tangan dari Laundry.',
+        'Penerimaan Laundry berhasil dikonfirmasi. Linen masuk ke Proses Laundry.',
 
         'success'
 
@@ -2081,14 +1814,16 @@
       );
 
 
-    }catch(err){
+    }catch(error){
 
-      console.error(err);
+      console.error(error);
 
 
       showMessage(
-        err.message ||
+
+        error.message ||
         'Gagal melakukan konfirmasi.'
+
       );
 
 
@@ -2097,12 +1832,7 @@
 
 
       button.textContent =
-
-        isPengambilan
-
-          ? 'Konfirmasi Penyerahan'
-
-          : 'Konfirmasi Penerimaan';
+        'Konfirmasi Penerimaan';
 
     }
 

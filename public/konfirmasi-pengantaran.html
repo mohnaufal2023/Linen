@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Konfirmasi Pengantaran — Web Linen</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+
+<style>
+
+  :root{
+    --bg:#F5F7F6;
+    --surface:#FFFFFF;
+    --ink:#1C2B33;
+    --ink-soft:#5B6B70;
+    --line:#DCE3E1;
+
+    --teal:#00b1b7;
+    --teal-dark:#008F94;
+    --teal-tint:#E7F2EE;
+
+    --red:#B34A3E;
+    --red-tint:#FBEAE7;
+
+    --orange:#B66A19;
+    --orange-tint:#FFF4E4;
+
+    --radius:12px;
+  }
+
+  *{
+    box-sizing:border-box;
+  }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Public Sans',system-ui,sans-serif;
+    padding:28px 18px 50px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:1000px;
+    margin:0 auto;
+  }
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+  }
+
+  .back-link{
+    color:var(--ink-soft);
+    text-decoration:none;
+    font-size:13px;
+    font-weight:600;
+  }
+
+  .back-link:hover{
+    color:var(--teal-dark);
+  }
+
+  .logout-link{
+    color:var(--ink-soft);
+    text-decoration:none;
+    font-size:13px;
+    font-weight:600;
+    padding:8px 13px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:white;
+  }
+
+  .logout-link:hover{
+    color:var(--red);
+    background:var(--red-tint);
+  }
+
+  .brand{
+    margin-bottom:25px;
+  }
+
+  .brand .unit{
+    display:block;
+    color:var(--teal);
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:5px;
+  }
+
+  h1{
+    margin:0;
+    font-family:'Source Serif 4',Georgia,serif;
+    font-size:30px;
+    font-weight:600;
+  }
+
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin:8px 0 0;
+  }
+
+  .message{
+    display:none;
+    padding:12px 14px;
+    border-radius:8px;
+    font-size:13px;
+    margin-bottom:18px;
+  }
+
+  .message.success{
+    display:block;
+    background:var(--teal-tint);
+    border:1px solid #CDE5DE;
+    color:#24645C;
+  }
+
+  .message.error{
+    display:block;
+    background:var(--red-tint);
+    border:1px solid #EFC7C0;
+    color:var(--red);
+  }
+
+  .empty{
+    background:white;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:35px 20px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+
+  .card{
+    background:white;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-bottom:20px;
+    overflow:hidden;
+  }
+
+  .card-header{
+    padding:18px 20px;
+    border-bottom:1px solid var(--line);
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:15px;
+  }
+
+  .card-title{
+    margin:0;
+    font-size:16px;
+    font-weight:800;
+  }
+
+  .meta{
+    margin-top:6px;
+    color:var(--ink-soft);
+    font-size:12px;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:999px;
+    background:var(--orange-tint);
+    color:var(--orange);
+    font-size:11px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+
+  .card-body{
+    padding:20px;
+  }
+
+  .info-box{
+    background:var(--teal-tint);
+    border:1px solid #CDE5DE;
+    border-radius:9px;
+    padding:13px 15px;
+    margin-bottom:18px;
+  }
+
+  .info-box strong{
+    display:block;
+    font-size:13px;
+    margin-bottom:4px;
+  }
+
+  .info-box span{
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--line);
+    border-radius:9px;
+    margin-bottom:20px;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:600px;
+  }
+
+  th,
+  td{
+    padding:11px 12px;
+    border-bottom:1px solid var(--line);
+    text-align:left;
+    font-size:13px;
+  }
+
+  th{
+    background:#F8FAF9;
+    color:var(--ink-soft);
+    font-size:11px;
+    font-weight:700;
+  }
+
+  tbody tr:last-child td{
+    border-bottom:none;
+  }
+
+  .linen-name{
+    font-weight:700;
+  }
+
+  .number{
+    font-weight:700;
+  }
+
+  .section-title{
+    margin:0 0 14px;
+    font-size:14px;
+    font-weight:800;
+  }
+
+  .receiver-box{
+    background:#F8FAF9;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:13px 15px;
+    margin-bottom:20px;
+  }
+
+  .receiver-box .label{
+    color:var(--ink-soft);
+    font-size:11px;
+    font-weight:700;
+    margin-bottom:5px;
+  }
+
+  .receiver-box .name{
+    font-size:14px;
+    font-weight:700;
+  }
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    margin-bottom:18px;
+  }
+
+  .field label{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink-soft);
+  }
+
+  .required{
+    color:var(--red);
+  }
+
+  .field input{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:11px 12px;
+    font:inherit;
+    font-size:14px;
+    outline:none;
+    color:var(--ink);
+  }
+
+  .field input:focus{
+    border-color:var(--teal);
+    box-shadow:0 0 0 3px rgba(0,177,183,.10);
+  }
+
+  .signature-wrapper{
+    border:1px solid var(--line);
+    border-radius:9px;
+    overflow:hidden;
+    background:white;
+  }
+
+  .signature-label{
+    padding:10px 12px;
+    background:#F8FAF9;
+    border-bottom:1px solid var(--line);
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+  }
+
+  canvas{
+    display:block;
+    width:100%;
+    height:180px;
+    background:white;
+    cursor:crosshair;
+    touch-action:none;
+  }
+
+  .signature-actions{
+    display:flex;
+    justify-content:flex-end;
+    padding:8px 10px;
+    border-top:1px solid var(--line);
+  }
+
+  .btn-clear{
+    border:none;
+    background:transparent;
+    color:var(--red);
+    font:inherit;
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:18px;
+  }
+
+  button{
+    border:none;
+    border-radius:8px;
+    padding:11px 18px;
+    font:inherit;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .btn-primary{
+    background:var(--teal);
+    color:white;
+  }
+
+  .btn-primary:hover{
+    background:var(--teal-dark);
+  }
+
+  .btn-primary:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+  }
+
+  @media(max-width:700px){
+
+    body{
+      padding:20px 14px 40px;
+    }
+
+    h1{
+      font-size:26px;
+    }
+
+    .card-header{
+      flex-direction:column;
+    }
+
+    .actions{
+      flex-direction:column;
+    }
+
+    .actions button{
+      width:100%;
+    }
+
+    canvas{
+      height:160px;
+    }
+
+  }
+
+</style>
+</head>
+
+
+<body>
+
+<div class="wrap">
+
+
+  <!-- TOP BAR -->
+
+  <div class="topbar">
+
+    <a
+      href="/laundry-dashboard.html"
+      class="back-link"
+    >
+      ← Kembali ke Dashboard
+    </a>
+
+    <a
+      href="/logout"
+      class="logout-link"
+    >
+      Keluar
+    </a>
+
+  </div>
+
+
+  <!-- HEADER -->
+
+  <div class="brand">
+
+    <span class="unit">
+      INSTALASI LAUNDRY
+    </span>
+
+    <h1>
+      Konfirmasi Pengantaran
+    </h1>
+
+    <p class="subtitle">
+      Berikan tanda tangan sebagai petugas Laundry yang mengantarkan linen.
+    </p>
+
+  </div>
+
+
+  <div
+    id="message"
+    class="message"
+  ></div>
+
+
+  <!-- TRANSACTIONS -->
+
+  <div id="container">
+
+    <div class="empty">
+      Memuat transaksi...
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<script>
+
+
+// ==========================================================
+// ELEMENT
+// ==========================================================
+
+const container =
+  document.getElementById('container');
+
+const messageBox =
+  document.getElementById('message');
+
+
+// ==========================================================
+// MESSAGE
+// ==========================================================
+
+function showMessage(
+  text,
+  type = 'error'
+){
+
+  messageBox.textContent =
+    text;
+
+  messageBox.className =
+    `message ${type}`;
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+
+}
+
+
+function clearMessage(){
+
+  messageBox.textContent = '';
+
+  messageBox.className =
+    'message';
+
+}
+
+
+// ==========================================================
+// ESCAPE HTML
+// ==========================================================
+
+function escapeHtml(value){
+
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+
+}
+
+
+// ==========================================================
+// DATE
+// ==========================================================
+
+function formatDate(value){
+
+  if(!value){
+    return '-';
+  }
+
+  const date =
+    new Date(value);
+
+  if(Number.isNaN(date.getTime())){
+    return value;
+  }
+
+  return date.toLocaleDateString(
+    'id-ID',
+    {
+      day:'2-digit',
+      month:'long',
+      year:'numeric'
+    }
+  );
+
+}
+
+
+// ==========================================================
+// LOAD TRANSACTIONS
+// ==========================================================
+
+async function loadTransactions(){
+
+  try{
+
+    const res =
+      await fetch(
+        '/api/serah-terima'
+      );
+
+
+    if(!res.ok){
+
+      throw new Error(
+        'Gagal mengambil transaksi.'
+      );
+
+    }
+
+
+    const result =
+      await res.json();
+
+
+    const rows =
+      Array.isArray(result)
+        ? result
+        : result.data || [];
+
+
+    /*
+      Hanya tampilkan:
+
+      - jenis transaksi pengantaran
+      - status menunggu_konfirmasi
+      - sudah diterima oleh ruangan
+      - belum ada TTD pengantar
+    */
+
+    const pending =
+      rows.filter(item => {
+
+        const jenis =
+          item.jenis_transaksi ||
+          'pengantaran';
+
+
+        const sudahDiterima =
+          !!item.diterima_oleh_user_id ||
+          !!item.tanda_tangan;
+
+
+        const belumDitandatangani =
+          !item.tanda_tangan_pengantar;
+
+
+        return (
+          jenis === 'pengantaran'
+          &&
+          item.status ===
+            'menunggu_konfirmasi'
+          &&
+          sudahDiterima
+          &&
+          belumDitandatangani
+        );
+
+      });
+
+
+    if(pending.length === 0){
+
+      container.innerHTML = `
+        <div class="empty">
+          Tidak ada pengantaran yang menunggu tanda tangan Laundry.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    renderTransactions(
+      pending
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    container.innerHTML = `
+      <div class="empty">
+        Gagal memuat transaksi.
+      </div>
+    `;
+
+    showMessage(
+      error.message
+    );
+
+  }
+
+}
+
+
+// ==========================================================
+// RENDER TRANSACTIONS
+// ==========================================================
+
+function renderTransactions(
+  transactions
+){
+
+  container.innerHTML = '';
+
+
+  transactions.forEach(
+    transaction => {
+
+      const card =
+        createCard(
+          transaction
+        );
+
+      container.appendChild(
+        card
+      );
+
+      setupCanvas(
+        transaction.id
+      );
+
+    }
+  );
+
+}
+
+
+// ==========================================================
+// CREATE CARD
+// ==========================================================
+
+function createCard(
+  transaction
+){
+
+  const card =
+    document.createElement(
+      'div'
+    );
+
+  card.className =
+    'card';
+
+
+  const details =
+    transaction.detail ||
+    transaction.details ||
+    transaction.items ||
+    [];
+
+
+  let total = 0;
+
+  let rowsHtml = '';
+
+
+  details.forEach(item => {
+
+    const jumlah =
+      Number(
+        item.jumlah_kotor
+      ) || 0;
+
+
+    total += jumlah;
+
+
+    rowsHtml += `
+
+      <tr>
+
+        <td>
+
+          <div class="linen-name">
+            ${escapeHtml(
+              item.nama ||
+              item.jenis_linen ||
+              item.nama_linen ||
+              '-'
+            )}
+          </div>
+
+        </td>
+
+        <td class="number">
+          ${jumlah}
+        </td>
+
+      </tr>
+
+    `;
+
+  });
+
+
+  if(!rowsHtml){
+
+    rowsHtml = `
+
+      <tr>
+
+        <td colspan="2">
+          Tidak ada detail linen.
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+
+  const namaPenerima =
+    transaction.nama_penerima ||
+    '-';
+
+
+  card.innerHTML = `
+
+    <div class="card-header">
+
+      <div>
+
+        <h2 class="card-title">
+          Transaksi #${escapeHtml(
+            transaction.id
+          )}
+        </h2>
+
+        <div class="meta">
+
+          Ruangan:
+          <strong>
+            ${escapeHtml(
+              transaction.ruangan
+            )}
+          </strong>
+
+          &nbsp; • &nbsp;
+
+          Tanggal:
+          <strong>
+            ${formatDate(
+              transaction.tanggal
+            )}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <span class="badge">
+        Menunggu TTD Laundry
+      </span>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+      <div class="info-box">
+
+        <strong>
+          Penerimaan Ruangan Sudah Dikonfirmasi
+        </strong>
+
+        <span>
+          Ruangan sudah menerima linen dan memberikan
+          tanda tangan. Silakan isi nama petugas Laundry
+          yang mengantar dan berikan tanda tangan.
+        </span>
+
+      </div>
+
+
+      <!-- TABEL LINEN -->
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Jenis Linen
+              </th>
+
+              <th>
+                Diantar
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${rowsHtml}
+
+            <tr>
+
+              <td>
+                <strong>
+                  Total
+                </strong>
+              </td>
+
+              <td class="number">
+                ${total}
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <!-- PENERIMA -->
+
+      <div class="receiver-box">
+
+        <div class="label">
+          Diterima oleh
+        </div>
+
+        <div class="name">
+          ${escapeHtml(
+            namaPenerima
+          )}
+        </div>
+
+      </div>
+
+
+      <!-- TTD PENGANTAR -->
+
+      <h3 class="section-title">
+        Tanda Tangan Pengantar
+      </h3>
+
+
+      <div class="info-box">
+
+        <strong>
+          TTD Petugas Laundry yang Mengantarkan Linen
+        </strong>
+
+        <span>
+          Silakan isi nama petugas yang mengantarkan linen,
+          lalu berikan tanda tangan.
+        </span>
+
+      </div>
+
+
+      <!-- NAMA PETUGAS -->
+
+      <div class="field">
+
+        <label
+          for="nama-pengantar-${transaction.id}"
+        >
+
+          Nama Petugas Laundry
+
+          <span class="required">
+            *
+          </span>
+
+        </label>
+
+        <input
+          type="text"
+          id="nama-pengantar-${transaction.id}"
+          placeholder="Masukkan nama petugas Laundry"
+          autocomplete="off"
+        >
+
+      </div>
+
+
+      <!-- CANVAS -->
+
+      <div class="field">
+
+        <label>
+
+          Tanda Tangan Pengantar
+
+          <span class="required">
+            *
+          </span>
+
+        </label>
+
+
+        <div class="signature-wrapper">
+
+          <div class="signature-label">
+            TTD petugas Laundry yang mengantarkan linen
+          </div>
+
+
+          <canvas
+            id="canvas-${transaction.id}"
+          ></canvas>
+
+
+          <div class="signature-actions">
+
+            <button
+              type="button"
+              class="btn-clear"
+              onclick="clearCanvas(${transaction.id})"
+            >
+              Hapus Tanda Tangan
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BUTTON -->
+
+      <div class="actions">
+
+        <button
+          type="button"
+          class="btn-primary"
+          id="button-${transaction.id}"
+          onclick="konfirmasiPengantaran(${transaction.id})"
+        >
+          Simpan TTD Pengantar
+        </button>
+
+      </div>
+
+
+    </div>
+
+  `;
+
+
+  return card;
+
+}
+
+
+// ==========================================================
+// SETUP CANVAS
+// ==========================================================
+
+function setupCanvas(
+  transactionId
+){
+
+  const canvas =
+    document.getElementById(
+      `canvas-${transactionId}`
+    );
+
+
+  if(!canvas){
+    return;
+  }
+
+
+  const ctx =
+    canvas.getContext('2d');
+
+
+  let drawing = false;
+
+
+  function resize(){
+
+    const ratio =
+      Math.max(
+        window.devicePixelRatio || 1,
+        1
+      );
+
+
+    const rect =
+      canvas.getBoundingClientRect();
+
+
+    canvas.width =
+      rect.width * ratio;
+
+    canvas.height =
+      rect.height * ratio;
+
+
+    ctx.setTransform(
+      ratio,
+      0,
+      0,
+      ratio,
+      0,
+      0
+    );
+
+
+    ctx.lineWidth = 2;
+
+    ctx.lineCap = 'round';
+
+    ctx.lineJoin = 'round';
+
+  }
+
+
+  resize();
+
+
+  window.addEventListener(
+    'resize',
+    resize
+  );
+
+
+  function position(event){
+
+    const rect =
+      canvas.getBoundingClientRect();
+
+
+    return {
+
+      x:
+        event.clientX -
+        rect.left,
+
+      y:
+        event.clientY -
+        rect.top
+
+    };
+
+  }
+
+
+  canvas.addEventListener(
+    'pointerdown',
+    event => {
+
+      drawing = true;
+
+
+      canvas.setPointerCapture(
+        event.pointerId
+      );
+
+
+      const pos =
+        position(event);
+
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        pos.x,
+        pos.y
+      );
+
+    }
+  );
+
+
+  canvas.addEventListener(
+    'pointermove',
+    event => {
+
+      if(!drawing){
+        return;
+      }
+
+
+      const pos =
+        position(event);
+
+
+      ctx.lineTo(
+        pos.x,
+        pos.y
+      );
+
+      ctx.stroke();
+
+    }
+  );
+
+
+  canvas.addEventListener(
+    'pointerup',
+    event => {
+
+      drawing = false;
+
+
+      try{
+
+        canvas.releasePointerCapture(
+          event.pointerId
+        );
+
+      }catch(error){}
+
+    }
+  );
+
+
+  canvas.addEventListener(
+    'pointercancel',
+    () => {
+
+      drawing = false;
+
+    }
+  );
+
+}
+
+
+// ==========================================================
+// CHECK SIGNATURE
+// ==========================================================
+
+function hasSignature(
+  transactionId
+){
+
+  const canvas =
+    document.getElementById(
+      `canvas-${transactionId}`
+    );
+
+
+  if(!canvas){
+    return false;
+  }
+
+
+  const ctx =
+    canvas.getContext('2d');
+
+
+  const data =
+    ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+  for(
+    let i = 3;
+    i < data.data.length;
+    i += 4
+  ){
+
+    if(
+      data.data[i] > 0
+    ){
+
+      return true;
+
+    }
+
+  }
+
+
+  return false;
+
+}
+
+
+// ==========================================================
+// CLEAR CANVAS
+// ==========================================================
+
+function clearCanvas(
+  transactionId
+){
+
+  const canvas =
+    document.getElementById(
+      `canvas-${transactionId}`
+    );
+
+
+  if(!canvas){
+    return;
+  }
+
+
+  const ctx =
+    canvas.getContext('2d');
+
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+}
+
+
+// ==========================================================
+// KONFIRMASI PENGANTAR
+// ==========================================================
+
+async function konfirmasiPengantaran(
+  transactionId
+){
+
+  clearMessage();
+
+
+  // --------------------------------------------------------
+  // NAMA PETUGAS
+  // --------------------------------------------------------
+
+  const namaInput =
+    document.getElementById(
+      `nama-pengantar-${transactionId}`
+    );
+
+
+  const namaPengantar =
+    namaInput
+      ? namaInput.value.trim()
+      : '';
+
+
+  if(!namaPengantar){
+
+    showMessage(
+      'Nama petugas Laundry wajib diisi.'
+    );
+
+    namaInput?.focus();
+
+    return;
+
+  }
+
+
+  // --------------------------------------------------------
+  // CEK TTD
+  // --------------------------------------------------------
+
+  if(
+    !hasSignature(
+      transactionId
+    )
+  ){
+
+    showMessage(
+      'Tanda tangan pengantar wajib diisi.'
+    );
+
+    return;
+
+  }
+
+
+  const canvas =
+    document.getElementById(
+      `canvas-${transactionId}`
+    );
+
+
+  const tandaTangan =
+    canvas.toDataURL(
+      'image/png'
+    );
+
+
+  const button =
+    document.getElementById(
+      `button-${transactionId}`
+    );
+
+
+  try{
+
+    button.disabled = true;
+
+    button.textContent =
+      'Menyimpan...';
+
+
+    const res =
+      await fetch(
+        `/api/serah-terima/${transactionId}/konfirmasi-pengantaran`,
+        {
+          method:'PUT',
+
+          headers:{
+            'Content-Type':
+              'application/json'
+          },
+
+          body:JSON.stringify({
+
+            nama_pengantar:
+              namaPengantar,
+
+            tanda_tangan_pengantar:
+              tandaTangan
+
+          })
+
+        }
+      );
+
+
+    const result =
+      await res.json();
+
+
+    if(!res.ok){
+
+      throw new Error(
+        result.error ||
+        'Gagal menyimpan tanda tangan.'
+      );
+
+    }
+
+
+    showMessage(
+      `Transaksi #${transactionId} berhasil diselesaikan.`,
+      'success'
+    );
+
+
+    setTimeout(
+      () => {
+
+        loadTransactions();
+
+      },
+      1200
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    showMessage(
+      error.message ||
+      'Gagal menyimpan tanda tangan.'
+    );
+
+
+    button.disabled = false;
+
+    button.textContent =
+      'Simpan TTD Pengantar';
+
+  }
+
+}
+
+
+// ==========================================================
+// START
+// ==========================================================
+
+loadTransactions();
+
+</script>
+
+</body>
+</html>

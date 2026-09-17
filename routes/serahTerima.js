@@ -6,6 +6,7 @@ const db = require('../config/db');
 // ============================================================
 // HELPER AKSES USER
 // ============================================================
+
 async function getAccessInfo(req) {
 
   const user = req.session?.user;
@@ -16,56 +17,80 @@ async function getAccessInfo(req) {
     };
   }
 
-  // ==================================
+
+  // ==========================================================
   // ADMIN
-  // ==================================
+  // ==========================================================
+
   if (user.role === 'admin') {
+
     return {
       role: 'admin',
-      userId: null,
+      userId: user.id || null,
       ruangan_id: null,
       ruangan_nama: null
     };
+
   }
 
-  // ==================================
+
+  // ==========================================================
   // LAUNDRY
-  // ==================================
+  // ==========================================================
+
   if (user.role === 'laundry') {
+
     return {
       role: 'laundry',
       userId: user.id,
       ruangan_id: null,
       ruangan_nama: null
     };
+
   }
 
-  // ==================================
+
+  // ==========================================================
   // USER RUANGAN
-  // ==================================
+  // ==========================================================
+
   if (user.role === 'user') {
 
     if (!user.ruangan_id) {
+
       return {
-        error: 'Akun user belum terhubung dengan ruangan'
+        error:
+          'Akun user belum terhubung dengan ruangan'
       };
+
     }
+
 
     try {
 
-      const [rows] = await db.query(
-        `SELECT id, nama
-         FROM ruangan
-         WHERE id = ?
-         LIMIT 1`,
-        [user.ruangan_id]
-      );
+      const [rows] =
+        await db.query(
+          `
+          SELECT
+            id,
+            nama
+          FROM ruangan
+          WHERE id = ?
+          LIMIT 1
+          `,
+          [user.ruangan_id]
+        );
+
 
       if (rows.length === 0) {
+
         return {
-          error: 'Ruangan akun user tidak ditemukan'
+          error:
+            'Ruangan akun user tidak ditemukan'
         };
+
       }
+
 
       return {
         role: 'user',
@@ -73,6 +98,7 @@ async function getAccessInfo(req) {
         ruangan_id: rows[0].id,
         ruangan_nama: rows[0].nama
       };
+
 
     } catch (err) {
 
@@ -82,24 +108,113 @@ async function getAccessInfo(req) {
       );
 
       return {
-        error: 'Gagal memeriksa ruangan user'
+        error:
+          'Gagal memeriksa ruangan user'
       };
+
     }
+
   }
 
+
   return {
-    error: 'Role akun tidak dikenali'
+    error:
+      'Role akun tidak dikenali'
   };
+
+}
+
+
+// ============================================================
+// HELPER: CEK TRANSAKSI SUDAH SELESAI
+// ============================================================
+
+async function updateStatusIfComplete(
+  connection,
+  id
+) {
+
+  const [rows] =
+    await connection.query(
+      `
+      SELECT
+        id,
+        jenis_transaksi,
+        status,
+        tanda_tangan,
+        tanda_tangan_pengantar,
+        tanda_tangan_penyerah,
+        tanda_tangan_penerima_laundry
+      FROM serah_terima
+      WHERE id = ?
+      LIMIT 1
+      FOR UPDATE
+      `,
+      [id]
+    );
+
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+
+  const transaksi =
+    rows[0];
+
+
+  // ==========================================================
+  // PENGANTARAN
+  // ==========================================================
+
+  if (
+    transaksi.jenis_transaksi ===
+    'pengantaran'
+  ) {
+
+    const penerimaSudahTtd =
+      !!transaksi.tanda_tangan;
+
+    const pengantarSudahTtd =
+      !!transaksi.tanda_tangan_pengantar;
+
+
+    if (
+      penerimaSudahTtd &&
+      pengantarSudahTtd
+    ) {
+
+      await connection.query(
+        `
+        UPDATE serah_terima
+        SET status = 'selesai'
+        WHERE id = ?
+        `,
+        [id]
+      );
+
+
+      transaksi.status =
+        'selesai';
+
+    }
+
+  }
+
+
+  return transaksi;
+
 }
 
 
 // ============================================================
 // GET SEMUA TRANSAKSI
 // ============================================================
-// ADMIN   : semua
-// LAUNDRY : semua
-// USER    : hanya ruangan sendiri
+// ADMIN   : semua transaksi
+// LAUNDRY : semua transaksi
+// USER    : hanya transaksi ruangan sendiri
 // ============================================================
+
 router.get('/', async (req, res) => {
 
   try {
@@ -107,28 +222,51 @@ router.get('/', async (req, res) => {
     const access =
       await getAccessInfo(req);
 
+
     if (access.error) {
+
       return res.status(403).json({
         error: access.error
       });
+
     }
+
 
     let query = `
       SELECT
+
         st.id,
         st.ruangan,
         st.tanggal,
+        st.jenis_transaksi,
         st.status,
         st.created_at,
+
         st.dibuat_oleh_user_id,
+
         st.nama_penerima,
+        st.tanda_tangan,
         st.diterima_oleh_user_id,
         st.diterima_at,
+
+        st.nama_pengantar,
+        st.tanda_tangan_pengantar,
+        st.diantar_oleh_user_id,
+        st.diantar_at,
+
+        st.nama_penyerah,
+        st.tanda_tangan_penyerah,
+        st.diserahkan_oleh_user_id,
+        st.diserahkan_at,
+
+        st.tanda_tangan_penerima_laundry,
+        st.diterima_laundry_oleh_user_id,
+        st.diterima_laundry_at,
 
         COALESCE(
           SUM(d.jumlah_kotor),
           0
-        ) AS total_kotor,
+        ) AS total_diantar,
 
         COALESCE(
           SUM(d.jumlah_diambil_infeksius),
@@ -146,7 +284,7 @@ router.get('/', async (req, res) => {
             d.jumlah_diambil_non_infeksius
           ),
           0
-        ) AS total_bersih
+        ) AS total_pengambilan
 
       FROM serah_terima st
 
@@ -154,12 +292,14 @@ router.get('/', async (req, res) => {
         ON d.serah_terima_id = st.id
     `;
 
+
     const params = [];
 
 
-    // ==================================
-    // USER HANYA MELIHAT RUANGAN SENDIRI
-    // ==================================
+    // ========================================================
+    // USER HANYA MELIHAT RUANGANNYA
+    // ========================================================
+
     if (access.role === 'user') {
 
       query += `
@@ -169,20 +309,41 @@ router.get('/', async (req, res) => {
       params.push(
         access.ruangan_nama
       );
+
     }
 
 
     query += `
+
       GROUP BY
+
         st.id,
         st.ruangan,
         st.tanggal,
+        st.jenis_transaksi,
         st.status,
         st.created_at,
+
         st.dibuat_oleh_user_id,
+
         st.nama_penerima,
+        st.tanda_tangan,
         st.diterima_oleh_user_id,
-        st.diterima_at
+        st.diterima_at,
+
+        st.nama_pengantar,
+        st.tanda_tangan_pengantar,
+        st.diantar_oleh_user_id,
+        st.diantar_at,
+
+        st.nama_penyerah,
+        st.tanda_tangan_penyerah,
+        st.diserahkan_oleh_user_id,
+        st.diserahkan_at,
+
+        st.tanda_tangan_penerima_laundry,
+        st.diterima_laundry_oleh_user_id,
+        st.diterima_laundry_at
 
       ORDER BY
         st.created_at DESC
@@ -196,29 +357,35 @@ router.get('/', async (req, res) => {
       );
 
 
-    res.json(rows);
+    return res.json(rows);
 
 
   } catch (err) {
 
-    console.error(err);
+    console.error(
+      'Error GET serah-terima:',
+      err
+    );
 
-    res.status(500).json({
-      error: 'Gagal mengambil data riwayat'
+
+    return res.status(500).json({
+      error:
+        'Gagal mengambil data transaksi'
     });
 
   }
+
 });
 
 
 // ============================================================
 // GET DETAIL TRANSAKSI
 // ============================================================
+
 router.get('/:id', async (req, res) => {
 
-  const {
-    id
-  } = req.params;
+  const { id } =
+    req.params;
 
 
   try {
@@ -238,16 +405,34 @@ router.get('/:id', async (req, res) => {
 
     let headerQuery = `
       SELECT
+
         id,
         ruangan,
         tanggal,
+        jenis_transaksi,
         status,
         created_at,
+
         dibuat_oleh_user_id,
+
         nama_penerima,
         tanda_tangan,
         diterima_oleh_user_id,
-        diterima_at
+        diterima_at,
+
+        nama_pengantar,
+        tanda_tangan_pengantar,
+        diantar_oleh_user_id,
+        diantar_at,
+
+        nama_penyerah,
+        tanda_tangan_penyerah,
+        diserahkan_oleh_user_id,
+        diserahkan_at,
+
+        tanda_tangan_penerima_laundry,
+        diterima_laundry_oleh_user_id,
+        diterima_laundry_at
 
       FROM serah_terima
 
@@ -255,12 +440,15 @@ router.get('/:id', async (req, res) => {
     `;
 
 
-    const headerParams = [id];
+    const headerParams = [
+      id
+    ];
 
 
-    // ==================================
-    // USER HANYA BOLEH MELIHAT RUANGAN SENDIRI
-    // ==================================
+    // ========================================================
+    // USER HANYA BOLEH MELIHAT RUANGANNYA
+    // ========================================================
+
     if (access.role === 'user') {
 
       headerQuery += `
@@ -270,6 +458,7 @@ router.get('/:id', async (req, res) => {
       headerParams.push(
         access.ruangan_nama
       );
+
     }
 
 
@@ -292,393 +481,154 @@ router.get('/:id', async (req, res) => {
 
     const [detailRows] =
       await db.query(
-        `SELECT
+        `
+        SELECT
+
           d.id,
+          d.serah_terima_id,
           d.jenis_linen_id,
+
           l.nama AS jenis_linen_nama,
 
           d.jumlah_kotor,
 
-          d.jumlah_diambil_infeksius,
+          d.jumlah_bersih,
 
+          d.jumlah_diambil_infeksius,
           d.jumlah_diambil_non_infeksius,
 
-          d.verifikasi_infeksius,
+          d.jumlah_verifikasi_infeksius,
+          d.jumlah_verifikasi_non_infeksius,
 
+          d.verifikasi_infeksius,
           d.verifikasi_pengambilan,
 
-          d.keterangan
+          d.keterangan,
+          d.keterangan_rusak
 
-         FROM serah_terima_detail d
+        FROM serah_terima_detail d
 
-         JOIN jenis_linen l
-           ON l.id = d.jenis_linen_id
+        JOIN jenis_linen l
+          ON l.id = d.jenis_linen_id
 
-         WHERE d.serah_terima_id = ?
+        WHERE d.serah_terima_id = ?
 
-         ORDER BY l.urutan ASC`,
+        ORDER BY
+          l.urutan ASC,
+          d.id ASC
+        `,
         [id]
       );
 
 
-    res.json({
+    return res.json({
+
       ...headerRows[0],
-      detail: detailRows
+
+      detail:
+        detailRows
+
     });
 
 
   } catch (err) {
 
-    console.error(err);
+    console.error(
+      'Error GET detail serah-terima:',
+      err
+    );
 
-    res.status(500).json({
-      error: 'Gagal mengambil detail transaksi'
+
+    return res.status(500).json({
+      error:
+        'Gagal mengambil detail transaksi'
     });
 
   }
+
 });
 
 
 // ============================================================
-// VERIFIKASI PENGAMBILAN
+// POST TRANSAKSI BARU
 // ============================================================
-// ADMIN   : boleh
-// LAUNDRY : boleh
-// USER    : tidak boleh
 //
-// Jika ada linen yang diambil:
+// PENGANTARAN
+// - dibuat admin/laundry
+// - jumlah_kotor = linen bersih yang diantar
+// - stok Laundry berkurang
 //
-// 1. verifikasi_pengambilan = 1
-// 2. otomatis dibuatkan proses_laundry
-// 3. status proses_laundry = menunggu_cuci
-//
-// Hanya dibuat satu kali untuk setiap detail transaksi.
+// PENGAMBILAN
+// - dibuat user ruangan
+// - jumlah_diambil_infeksius ATAU
+//   jumlah_diambil_non_infeksius
+// - hanya boleh satu kategori
+// - stok Laundry tidak langsung bertambah
 // ============================================================
-router.put(
-  '/detail/:detailId/verifikasi',
-  async (req, res) => {
 
-    const {
-      detailId
-    } = req.params;
-
-
-    // ========================================================
-    // CEK LOGIN DAN ROLE
-    // ========================================================
-    const access =
-      await getAccessInfo(req);
-
-
-    if (access.error) {
-
-      return res.status(403).json({
-        error: access.error
-      });
-
-    }
-
-
-    // ========================================================
-    // USER RUANGAN TIDAK BOLEH VERIFIKASI
-    // ========================================================
-    if (
-      access.role !== 'admin' &&
-      access.role !== 'laundry'
-    ) {
-
-      return res.status(403).json({
-        error:
-          'Hanya Laundry atau Admin yang dapat melakukan verifikasi'
-      });
-
-    }
-
-
-    // ========================================================
-    // GUNAKAN CONNECTION KHUSUS
-    // Agar verifikasi + proses laundry menjadi satu transaksi
-    // ========================================================
-    const connection =
-      await db.getConnection();
-
-
-    try {
-
-      await connection.beginTransaction();
-
-
-      // ======================================================
-      // AMBIL DATA DETAIL
-      // ======================================================
-      const [rows] =
-        await connection.query(
-          `
-          SELECT
-            d.id,
-            d.jenis_linen_id,
-            d.jumlah_diambil_infeksius,
-            d.jumlah_diambil_non_infeksius,
-            d.verifikasi_pengambilan,
-            st.id AS serah_terima_id,
-            st.ruangan,
-            l.nama AS jenis_linen_nama
-
-          FROM serah_terima_detail d
-
-          JOIN serah_terima st
-            ON st.id = d.serah_terima_id
-
-          JOIN jenis_linen l
-            ON l.id = d.jenis_linen_id
-
-          WHERE d.id = ?
-
-          LIMIT 1
-
-          FOR UPDATE
-          `,
-          [detailId]
-        );
-
-
-      // ======================================================
-      // DETAIL TIDAK DITEMUKAN
-      // ======================================================
-      if (rows.length === 0) {
-
-        await connection.rollback();
-
-        return res.status(404).json({
-          error:
-            'Detail transaksi tidak ditemukan'
-        });
-
-      }
-
-
-      const item =
-        rows[0];
-
-
-      // ======================================================
-      // CEK JUMLAH PENGAMBILAN
-      // ======================================================
-      const jumlahInfeksius =
-        Number(
-          item.jumlah_diambil_infeksius
-        ) || 0;
-
-
-      const jumlahNonInfeksius =
-        Number(
-          item.jumlah_diambil_non_infeksius
-        ) || 0;
-
-
-      const jumlahTotal =
-        jumlahInfeksius +
-        jumlahNonInfeksius;
-
-
-      // ======================================================
-      // TIDAK ADA LINEN YANG DIAMBIL
-      // ======================================================
-      if (jumlahTotal <= 0) {
-
-        await connection.rollback();
-
-        return res.status(400).json({
-          error:
-            'Tidak perlu verifikasi karena tidak ada linen yang diambil'
-        });
-
-      }
-
-
-      // ======================================================
-      // SUDAH DIVERIFIKASI
-      // ======================================================
-      if (
-        Number(item.verifikasi_pengambilan) === 1
-      ) {
-
-        await connection.rollback();
-
-        return res.status(400).json({
-          error:
-            'Pengambilan untuk linen ini sudah diverifikasi'
-        });
-
-      }
-
-
-      // ======================================================
-      // CEK APAKAH SUDAH ADA PROSES LAUNDRY
-      // ======================================================
-      const [existingProcess] =
-        await connection.query(
-          `
-          SELECT
-            id,
-            status
-
-          FROM proses_laundry
-
-          WHERE serah_terima_detail_id = ?
-
-          LIMIT 1
-          `,
-          [detailId]
-        );
-
-
-      if (existingProcess.length > 0) {
-
-        await connection.rollback();
-
-        return res.status(400).json({
-          error:
-            'Linen ini sudah masuk ke proses Laundry'
-        });
-
-      }
-
-
-      // ======================================================
-      // 1. UBAH STATUS VERIFIKASI
-      // ======================================================
-      await connection.query(
-        `
-        UPDATE serah_terima_detail
-
-        SET
-          verifikasi_pengambilan = 1
-
-        WHERE id = ?
-        `,
-        [detailId]
-      );
-
-
-      // ======================================================
-      // 2. BUAT PROSES LAUNDRY
-      // ======================================================
-      await connection.query(
-        `
-        INSERT INTO proses_laundry
-        (
-          serah_terima_detail_id,
-          jenis_linen_id,
-          jumlah_infeksius,
-          jumlah_non_infeksius,
-          jumlah_total,
-          status
-        )
-
-        VALUES (?, ?, ?, ?, ?, 'menunggu_cuci')
-        `,
-        [
-          detailId,
-          item.jenis_linen_id,
-          jumlahInfeksius,
-          jumlahNonInfeksius,
-          jumlahTotal
-        ]
-      );
-
-
-      // ======================================================
-      // COMMIT
-      // ======================================================
-      await connection.commit();
-
-
-      // ======================================================
-      // RESPONSE
-      // ======================================================
-      res.json({
-
-        message:
-          'Pengambilan berhasil diverifikasi dan linen masuk ke proses Laundry',
-
-        proses:
-          'menunggu_cuci',
-
-        jenis_linen:
-          item.jenis_linen_nama,
-
-        jumlah_infeksius:
-          jumlahInfeksius,
-
-        jumlah_non_infeksius:
-          jumlahNonInfeksius,
-
-        jumlah_total:
-          jumlahTotal
-
-      });
-
-
-    } catch (err) {
-
-      // ======================================================
-      // ROLLBACK JIKA GAGAL
-      // ======================================================
-      await connection.rollback();
-
-
-      console.error(
-        'Error verifikasi + proses Laundry:',
-        err
-      );
-
-
-      res.status(500).json({
-        error:
-          'Gagal melakukan verifikasi dan membuat proses Laundry'
-      });
-
-
-    } finally {
-
-      connection.release();
-
-    }
-
-  }
-);
-
-
-// ============================================================
-// UPDATE TRANSAKSI
-// ============================================================
-// ADMIN   : boleh edit
-// LAUNDRY : boleh edit
-// USER    : tidak boleh edit
-// ============================================================
-router.put('/:id', async (req, res) => {
-
-  const {
-    id
-  } = req.params;
-
+router.post('/', async (req, res) => {
 
   const {
     ruangan,
     tanggal,
+    jenis_transaksi = 'pengantaran',
     detail
   } = req.body;
 
 
-  if (!tanggal) {
+  // ==========================================================
+  // VALIDASI RUANGAN
+  // ==========================================================
+
+  if (
+    !ruangan ||
+    !ruangan.trim()
+  ) {
 
     return res.status(400).json({
-      error: 'Tanggal wajib diisi'
+      error:
+        'Ruangan wajib diisi'
     });
 
   }
 
+
+  // ==========================================================
+  // VALIDASI TANGGAL
+  // ==========================================================
+
+  if (!tanggal) {
+
+    return res.status(400).json({
+      error:
+        'Tanggal wajib diisi'
+    });
+
+  }
+
+
+  // ==========================================================
+  // VALIDASI JENIS TRANSAKSI
+  // ==========================================================
+
+  if (
+    ![
+      'pengantaran',
+      'pengambilan'
+    ].includes(jenis_transaksi)
+  ) {
+
+    return res.status(400).json({
+      error:
+        'Jenis transaksi tidak valid'
+    });
+
+  }
+
+
+  // ==========================================================
+  // VALIDASI DETAIL
+  // ==========================================================
 
   if (
     !Array.isArray(detail) ||
@@ -693,448 +643,559 @@ router.put('/:id', async (req, res) => {
   }
 
 
-  const access =
-    await getAccessInfo(req);
-
-
-  if (access.error) {
-
-    return res.status(403).json({
-      error: access.error
-    });
-
-  }
-
-
-  // ==================================
-  // USER TIDAK BOLEH EDIT
-  // ==================================
-  if (
-    access.role !== 'admin' &&
-    access.role !== 'laundry'
-  ) {
-
-    return res.status(403).json({
-      error:
-        'User ruangan tidak dapat mengedit transaksi'
-    });
-
-  }
-
-
-  if (!ruangan || !ruangan.trim()) {
-
-    return res.status(400).json({
-      error:
-        'Ruangan wajib diisi'
-    });
-
-  }
-
-
-  const connection =
-    await db.getConnection();
-
-
   try {
 
-    const [existingRows] =
-      await connection.query(
-        `SELECT
-          id,
-          status
-
-         FROM serah_terima
-
-         WHERE id = ?
-
-         LIMIT 1`,
-        [id]
-      );
+    const access =
+      await getAccessInfo(req);
 
 
-    if (existingRows.length === 0) {
+    if (access.error) {
 
-      connection.release();
-
-      return res.status(404).json({
-        error:
-          'Transaksi tidak ditemukan'
+      return res.status(403).json({
+        error: access.error
       });
 
     }
 
-    // ======================================================
-// CEGAH EDIT JIKA SUDAH MASUK PROSES LAUNDRY
-// ======================================================
-const [existingProcess] = await connection.query(`
-  SELECT p.id, p.status
-  FROM proses_laundry p
-  JOIN serah_terima_detail d
-    ON d.id = p.serah_terima_detail_id
-  WHERE d.serah_terima_id = ?
-  LIMIT 1
-`, [id]);
 
-if (existingProcess.length > 0) {
+    // ========================================================
+    // CEK SIAPA YANG BOLEH MEMBUAT
+    // ========================================================
 
-  connection.release();
-
-  return res.status(400).json({
-    error:
-      'Transaksi tidak dapat diedit karena linen sudah masuk ke proses Laundry'
-  });
-
-}
-    // ==================================
-    // CEGAH EDIT TRANSAKSI SELESAI
-    // ==================================
     if (
-      existingRows[0].status === 'selesai'
+      jenis_transaksi ===
+      'pengantaran'
     ) {
 
-      connection.release();
+      if (
+        access.role !== 'admin' &&
+        access.role !== 'laundry'
+      ) {
 
-      return res.status(400).json({
-        error:
-          'Transaksi yang sudah selesai tidak dapat diedit'
-      });
+        return res.status(403).json({
+          error:
+            'Pengantaran hanya dapat dibuat oleh Laundry atau Admin'
+        });
+
+      }
 
     }
 
 
-    await connection.beginTransaction();
+    if (
+      jenis_transaksi ===
+      'pengambilan'
+    ) {
 
+      if (
+        access.role !== 'user'
+      ) {
 
-    // ======================================================
-    // AMBIL DETAIL LAMA UNTUK MENGEMBALIKAN STOK
-    // ======================================================
-    const [oldDetails] =
-      await connection.query(
-        `
-        SELECT
-          jenis_linen_id,
-          jumlah_kotor
+        return res.status(403).json({
+          error:
+            'Pengambilan hanya dapat dibuat oleh user ruangan'
+        });
 
-        FROM serah_terima_detail
-
-        WHERE serah_terima_id = ?
-
-        FOR UPDATE
-        `,
-        [id]
-      );
-
-
-    // ======================================================
-    // KUNCI STOK LINEN LAMA
-    // DAN KEMBALIKAN JUMLAH YANG DULU DIKELUARKAN
-    // ======================================================
-    for (const oldItem of oldDetails) {
-
-      const jumlahLama =
-        Number(oldItem.jumlah_kotor) || 0;
-
-
-      if (jumlahLama <= 0) {
-        continue;
       }
 
 
-      await connection.query(
-        `
-        UPDATE jenis_linen
+      // User tidak boleh menentukan ruangan lain
+      if (
+        ruangan.trim() !==
+        access.ruangan_nama
+      ) {
 
-        SET jumlah_stok =
-          jumlah_stok + ?
+        return res.status(403).json({
+          error:
+            'User hanya dapat membuat pengambilan untuk ruangannya sendiri'
+        });
 
-        WHERE id = ?
-        `,
-        [
-          jumlahLama,
-          oldItem.jenis_linen_id
-        ]
-      );
+      }
 
     }
 
 
-    // ======================================================
-    // VALIDASI DETAIL BARU
-    // ======================================================
-    const detailValid = [];
+    const connection =
+      await db.getConnection();
 
 
-    for (const item of detail) {
+    try {
 
-      const jenisLinenId =
-        Number(item.jenis_linen_id);
+      await connection.beginTransaction();
 
-      const jumlahKotor =
-        Number(item.jumlah_kotor) || 0;
 
-      const jumlahInfeksius =
-        Number(item.jumlah_diambil_infeksius) || 0;
+      // ======================================================
+      // VALIDASI DETAIL
+      // ======================================================
 
-      const jumlahNonInfeksius =
-        Number(item.jumlah_diambil_non_infeksius) || 0;
+      const detailValid = [];
 
+
+      for (
+        const item of detail
+      ) {
+
+        const jenisLinenId =
+          Number(
+            item.jenis_linen_id
+          );
+
+
+        const jumlahKotor =
+          Number(
+            item.jumlah_kotor
+          ) || 0;
+
+
+        const jumlahInfeksius =
+          Number(
+            item.jumlah_diambil_infeksius
+          ) || 0;
+
+
+        const jumlahNonInfeksius =
+          Number(
+            item.jumlah_diambil_non_infeksius
+          ) || 0;
+
+
+        // ====================================================
+        // ID LINEN
+        // ====================================================
+
+        if (
+          !Number.isInteger(
+            jenisLinenId
+          ) ||
+          jenisLinenId <= 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Jenis linen tidak valid'
+          });
+
+        }
+
+
+        // ====================================================
+        // JUMLAH TIDAK BOLEH NEGATIF
+        // ====================================================
+
+        if (
+          jumlahKotor < 0 ||
+          jumlahInfeksius < 0 ||
+          jumlahNonInfeksius < 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Jumlah linen tidak boleh negatif'
+          });
+
+        }
+
+
+        // ====================================================
+        // PENGANTARAN
+        // ====================================================
+
+        if (
+          jenis_transaksi ===
+          'pengantaran'
+        ) {
+
+          // Pengantaran tidak boleh berisi
+          // pengambilan linen kotor
+
+          if (
+            jumlahInfeksius > 0 ||
+            jumlahNonInfeksius > 0
+          ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+              error:
+                'Transaksi pengantaran hanya boleh berisi linen yang diantar'
+            });
+
+          }
+
+        }
+
+
+        // ====================================================
+        // PENGAMBILAN
+        // ====================================================
+
+        if (
+          jenis_transaksi ===
+          'pengambilan'
+        ) {
+
+          // Pengambilan tidak boleh menggunakan jumlah_kotor
+
+          if (
+            jumlahKotor > 0
+          ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+              error:
+                'Transaksi pengambilan tidak boleh menggunakan jumlah diantar'
+            });
+
+          }
+
+
+          
+
+          
+
+        }
+
+
+        // ====================================================
+        // SEMUA NOL
+        // ====================================================
+
+        if (
+          jumlahKotor === 0 &&
+          jumlahInfeksius === 0 &&
+          jumlahNonInfeksius === 0
+        ) {
+
+          continue;
+
+        }
+
+
+        detailValid.push({
+
+          jenis_linen_id:
+            jenisLinenId,
+
+          jumlah_kotor:
+            jumlahKotor,
+
+          jumlah_diambil_infeksius:
+            jumlahInfeksius,
+
+          jumlah_diambil_non_infeksius:
+            jumlahNonInfeksius,
+
+          keterangan:
+            item.keterangan
+              ? String(
+                  item.keterangan
+                ).trim()
+              : null
+
+        });
+
+      }
+
+
+      // ======================================================
+      // MINIMAL SATU DETAIL
+      // ======================================================
 
       if (
-        !Number.isInteger(jenisLinenId) ||
-        jenisLinenId <= 0
+        detailValid.length === 0
       ) {
 
         await connection.rollback();
 
         return res.status(400).json({
           error:
-            'Jenis linen tidak valid'
+            'Minimal satu jenis linen harus memiliki jumlah'
         });
 
       }
 
 
-      if (
-        jumlahKotor < 0 ||
-        jumlahInfeksius < 0 ||
-        jumlahNonInfeksius < 0
-      ) {
-
-        await connection.rollback();
-
-        return res.status(400).json({
-          error:
-            'Jumlah linen tidak boleh negatif'
-        });
-
-      }
-
+      // ======================================================
+      // CEK STOK
+      // KHUSUS PENGANTARAN
+      // ======================================================
 
       if (
-        jumlahKotor === 0 &&
-        jumlahInfeksius === 0 &&
-        jumlahNonInfeksius === 0
+        jenis_transaksi ===
+        'pengantaran'
       ) {
-        continue;
+
+        for (
+          const item of detailValid
+        ) {
+
+          if (
+            item.jumlah_kotor <= 0
+          ) {
+            continue;
+          }
+
+
+          const [stokRows] =
+            await connection.query(
+              `
+              SELECT
+
+                id,
+                nama,
+                jumlah_stok
+
+              FROM jenis_linen
+
+              WHERE id = ?
+
+              LIMIT 1
+
+              FOR UPDATE
+              `,
+              [
+                item.jenis_linen_id
+              ]
+            );
+
+
+          if (
+            stokRows.length === 0
+          ) {
+
+            await connection.rollback();
+
+            return res.status(404).json({
+              error:
+                `Jenis linen dengan ID ${item.jenis_linen_id} tidak ditemukan`
+            });
+
+          }
+
+
+          const stok =
+            Number(
+              stokRows[0].jumlah_stok
+            );
+
+
+          const namaLinen =
+            stokRows[0].nama;
+
+
+          if (
+            stok <
+            item.jumlah_kotor
+          ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+              error:
+                `Stok ${namaLinen} tidak mencukupi. ` +
+                `Stok tersedia: ${stok}, ` +
+                `jumlah yang akan diantar: ${item.jumlah_kotor}.`
+            });
+
+          }
+
+
+          // Kurangi stok Laundry
+
+          await connection.query(
+            `
+            UPDATE jenis_linen
+
+            SET
+              jumlah_stok =
+                jumlah_stok - ?
+
+            WHERE id = ?
+            `,
+            [
+              item.jumlah_kotor,
+              item.jenis_linen_id
+            ]
+          );
+
+        }
+
       }
 
 
-      detailValid.push({
-        jenis_linen_id:
-          jenisLinenId,
+      // ======================================================
+      // INSERT HEADER
+      // ======================================================
 
-        jumlah_kotor:
-          jumlahKotor,
-
-        jumlah_diambil_infeksius:
-          jumlahInfeksius,
-
-        jumlah_diambil_non_infeksius:
-          jumlahNonInfeksius,
-
-        keterangan:
-          item.keterangan || null
-      });
-
-    }
-
-
-    if (detailValid.length === 0) {
-
-      await connection.rollback();
-
-      return res.status(400).json({
-        error:
-          'Minimal satu jenis linen harus memiliki jumlah'
-      });
-
-    }
-
-
-    // ======================================================
-    // CEK STOK UNTUK DETAIL BARU
-    // DAN KURANGI STOK
-    // ======================================================
-    for (const item of detailValid) {
-
-      if (item.jumlah_kotor <= 0) {
-        continue;
-      }
-
-
-      const [stokRows] =
+      const [headerResult] =
         await connection.query(
           `
-          SELECT
-            id,
-            nama,
-            jumlah_stok
+          INSERT INTO serah_terima
+          (
+            ruangan,
+            tanggal,
+            jenis_transaksi,
+            status,
+            dibuat_oleh_user_id
+          )
 
-          FROM jenis_linen
-
-          WHERE id = ?
-
-          LIMIT 1
-
-          FOR UPDATE
+          VALUES (
+            ?,
+            ?,
+            ?,
+            'menunggu_konfirmasi',
+            ?
+          )
           `,
-          [item.jenis_linen_id]
+          [
+            ruangan.trim(),
+            tanggal,
+            jenis_transaksi,
+            access.userId
+          ]
         );
 
 
-      if (stokRows.length === 0) {
-
-        await connection.rollback();
-
-        return res.status(404).json({
-          error:
-            `Jenis linen dengan ID ${item.jenis_linen_id} tidak ditemukan`
-        });
-
-      }
+      const serahTerimaId =
+        headerResult.insertId;
 
 
-      const stok =
-        Number(stokRows[0].jumlah_stok);
+      // ======================================================
+      // INSERT DETAIL
+      // ======================================================
 
-      const namaLinen =
-        stokRows[0].nama;
-
-
-      if (
-        stok < item.jumlah_kotor
+      for (
+        const item of detailValid
       ) {
 
-        await connection.rollback();
+        await connection.query(
+          `
+          INSERT INTO serah_terima_detail
+          (
+            serah_terima_id,
+            jenis_linen_id,
 
-        return res.status(400).json({
-          error:
-            `Stok ${namaLinen} tidak mencukupi. ` +
-            `Stok tersedia: ${stok}, ` +
-            `jumlah yang akan diantar: ${item.jumlah_kotor}.`
-        });
+            jumlah_kotor,
+            jumlah_bersih,
+
+            jumlah_diambil_infeksius,
+            jumlah_diambil_non_infeksius,
+
+            jumlah_verifikasi_infeksius,
+            jumlah_verifikasi_non_infeksius,
+
+            verifikasi_infeksius,
+            verifikasi_pengambilan,
+
+            keterangan
+          )
+
+          VALUES (
+            ?,
+            ?,
+
+            ?,
+            0,
+
+            ?,
+            ?,
+
+            0,
+            0,
+
+            0,
+            0,
+
+            ?
+          )
+          `,
+          [
+
+            serahTerimaId,
+
+            item.jenis_linen_id,
+
+            item.jumlah_kotor,
+
+            item.jumlah_diambil_infeksius,
+
+            item.jumlah_diambil_non_infeksius,
+
+            item.keterangan
+
+          ]
+        );
 
       }
 
 
-      await connection.query(
-        `
-        UPDATE jenis_linen
+      // ======================================================
+      // COMMIT
+      // ======================================================
 
-        SET jumlah_stok =
-          jumlah_stok - ?
+      await connection.commit();
 
-        WHERE id = ?
-        `,
-        [
-          item.jumlah_kotor,
-          item.jenis_linen_id
-        ]
+
+      return res.status(201).json({
+
+        message:
+          'Transaksi berhasil dibuat',
+
+        id:
+          serahTerimaId,
+
+        ruangan:
+          ruangan.trim(),
+
+        jenis_transaksi:
+          jenis_transaksi,
+
+        status:
+          'menunggu_konfirmasi'
+
+      });
+
+
+    } catch (err) {
+
+      await connection.rollback();
+
+      console.error(
+        'Error transaksi baru:',
+        err
       );
 
-    }
+
+      return res.status(500).json({
+        error:
+          'Gagal menyimpan transaksi'
+      });
 
 
-    // ======================================================
-    // UPDATE HEADER
-    // ======================================================
-    await connection.query(
-      `
-      UPDATE serah_terima
+    } finally {
 
-      SET
-        ruangan = ?,
-        tanggal = ?
-
-      WHERE id = ?
-      `,
-      [
-        ruangan.trim(),
-        tanggal,
-        id
-      ]
-    );
-
-
-    // ======================================================
-    // HAPUS DETAIL LAMA
-    // ======================================================
-    await connection.query(
-      `
-      DELETE FROM serah_terima_detail
-
-      WHERE serah_terima_id = ?
-      `,
-      [id]
-    );
-
-
-    // ======================================================
-    // INSERT DETAIL BARU
-    // ======================================================
-    for (const item of detailValid) {
-
-      const perluVerifikasi =
-        item.jumlah_diambil_infeksius > 0 ||
-        item.jumlah_diambil_non_infeksius > 0;
-
-
-      await connection.query(
-        `
-        INSERT INTO serah_terima_detail
-        (
-          serah_terima_id,
-          jenis_linen_id,
-          jumlah_kotor,
-          jumlah_diambil_infeksius,
-          jumlah_diambil_non_infeksius,
-          verifikasi_infeksius,
-          verifikasi_pengambilan,
-          keterangan
-        )
-
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `,
-        [
-          id,
-          item.jenis_linen_id,
-          item.jumlah_kotor,
-          item.jumlah_diambil_infeksius,
-          item.jumlah_diambil_non_infeksius,
-          0,
-          perluVerifikasi ? 0 : 0,
-          item.keterangan
-        ]
-      );
+      connection.release();
 
     }
-
-
-    await connection.commit();
-
-
-    res.json({
-      message:
-        'Transaksi berhasil diperbarui'
-    });
 
 
   } catch (err) {
 
-    await connection.rollback();
+    console.error(
+      'Error proses transaksi:',
+      err
+    );
 
-    console.error(err);
 
-    res.status(500).json({
+    return res.status(500).json({
       error:
-        'Gagal memperbarui transaksi'
+        'Gagal memproses transaksi'
     });
-
-
-  } finally {
-
-    connection.release();
 
   }
 
@@ -1142,266 +1203,1596 @@ if (existingProcess.length > 0) {
 
 
 // ============================================================
-// DELETE TRANSAKSI
+// KONFIRMASI PENERIMAAN PENGANTARAN
 // ============================================================
-// ADMIN   : boleh
-// LAUNDRY : boleh
-// USER    : tidak boleh
+//
+// USER RUANGAN
+//
+// User mengisi:
+// - nama_penerima
+// - tanda_tangan
+//
+// Status BELUM langsung selesai.
+// Menunggu TTD petugas Laundry.
 // ============================================================
-router.delete('/:id', async (req, res) => {
+
+router.put(
+  '/:id/konfirmasi-penerimaan',
+  async (req, res) => {
+
+    const {
+      id
+    } = req.params;
+
+
+    const {
+      nama_penerima,
+      tanda_tangan
+    } = req.body;
+
+
+    // ==========================================================
+    // VALIDASI
+    // ==========================================================
+
+    if (
+      !nama_penerima ||
+      !nama_penerima.trim()
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Nama penerima wajib diisi'
+      });
+
+    }
+
+
+    if (!tanda_tangan) {
+
+      return res.status(400).json({
+        error:
+          'Tanda tangan penerima wajib diisi'
+      });
+
+    }
+
+
+    try {
+
+      const access =
+        await getAccessInfo(req);
+
+
+      if (access.error) {
+
+        return res.status(403).json({
+          error: access.error
+        });
+
+      }
+
+
+      // ========================================================
+      // HANYA USER
+      // ========================================================
+
+      if (
+        access.role !== 'user'
+      ) {
+
+        return res.status(403).json({
+          error:
+            'Hanya user ruangan yang dapat melakukan konfirmasi penerimaan'
+        });
+
+      }
+
+
+      const connection =
+        await db.getConnection();
+
+
+      try {
+
+        await connection.beginTransaction();
+
+
+        // ======================================================
+        // AMBIL TRANSAKSI
+        // ======================================================
+
+        const [rows] =
+          await connection.query(
+            `
+            SELECT
+
+              id,
+              ruangan,
+              jenis_transaksi,
+              status,
+
+              nama_penerima,
+              tanda_tangan,
+
+              tanda_tangan_pengantar
+
+            FROM serah_terima
+
+            WHERE id = ?
+
+            AND ruangan = ?
+
+            LIMIT 1
+
+            FOR UPDATE
+            `,
+            [
+              id,
+              access.ruangan_nama
+            ]
+          );
+
+
+        if (
+          rows.length === 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(404).json({
+            error:
+              'Transaksi tidak ditemukan atau bukan milik ruangan Anda'
+          });
+
+        }
+
+
+        const transaksi =
+          rows[0];
+
+
+        // ======================================================
+        // HARUS PENGANTARAN
+        // ======================================================
+
+        if (
+          transaksi.jenis_transaksi !==
+          'pengantaran'
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Transaksi ini bukan transaksi pengantaran'
+          });
+
+        }
+
+
+        // ======================================================
+        // STATUS
+        // ======================================================
+
+        if (
+          transaksi.status ===
+          'selesai'
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Transaksi ini sudah selesai'
+          });
+
+        }
+
+
+        // ======================================================
+        // JIKA SUDAH TTD
+        // ======================================================
+
+        if (
+          transaksi.tanda_tangan
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Penerimaan sudah dikonfirmasi'
+          });
+
+        }
+
+
+        // ======================================================
+        // SIMPAN TTD RUANGAN
+        // ======================================================
+
+        await connection.query(
+          `
+          UPDATE serah_terima
+
+          SET
+
+            nama_penerima = ?,
+
+            tanda_tangan = ?,
+
+            diterima_oleh_user_id = ?,
+
+            diterima_at = NOW()
+
+          WHERE id = ?
+          `,
+          [
+
+            nama_penerima.trim(),
+
+            tanda_tangan,
+
+            access.userId,
+
+            id
+
+          ]
+        );
+
+
+        // ======================================================
+        // CEK STATUS
+        // ======================================================
+
+        await updateStatusIfComplete(
+          connection,
+          id
+        );
+
+
+        await connection.commit();
+
+
+        return res.json({
+
+          success: true,
+
+          message:
+            'Penerimaan berhasil dikonfirmasi. Menunggu tanda tangan pengantar Laundry.',
+
+          status:
+            'menunggu_konfirmasi'
+
+        });
+
+
+      } catch (err) {
+
+        await connection.rollback();
+
+        throw err;
+
+      } finally {
+
+        connection.release();
+
+      }
+
+
+    } catch (err) {
+
+      console.error(
+        'Error konfirmasi penerimaan:',
+        err
+      );
+
+
+      return res.status(500).json({
+        error:
+          'Gagal melakukan konfirmasi penerimaan'
+      });
+
+    }
+
+  }
+);
+
+
+// ============================================================
+// LEGACY KONFIRMASI
+// ============================================================
+//
+// Dipertahankan supaya frontend lama tidak langsung rusak.
+// Sekarang diarahkan ke endpoint yang benar.
+// ============================================================
+
+router.put(
+  '/:id/konfirmasi',
+  async (req, res) => {
+
+    const {
+      id
+    } = req.params;
+
+
+    const {
+      nama_penerima,
+      tanda_tangan
+    } = req.body;
+
+
+    if (
+      !nama_penerima ||
+      !nama_penerima.trim()
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Nama penerima wajib diisi'
+      });
+
+    }
+
+
+    if (!tanda_tangan) {
+
+      return res.status(400).json({
+        error:
+          'Tanda tangan penerima wajib diisi'
+      });
+
+    }
+
+
+    req.body.nama_penerima =
+      nama_penerima;
+
+    req.body.tanda_tangan =
+      tanda_tangan;
+
+
+    try {
+
+      const access =
+        await getAccessInfo(req);
+
+
+      if (access.error) {
+
+        return res.status(403).json({
+          error: access.error
+        });
+
+      }
+
+
+      if (
+        access.role !== 'user'
+      ) {
+
+        return res.status(403).json({
+          error:
+            'Hanya user ruangan yang dapat melakukan konfirmasi'
+        });
+
+      }
+
+
+      const connection =
+        await db.getConnection();
+
+
+      try {
+
+        await connection.beginTransaction();
+
+
+        const [rows] =
+          await connection.query(
+            `
+            SELECT
+
+              id,
+              ruangan,
+              jenis_transaksi,
+              status,
+              tanda_tangan
+
+            FROM serah_terima
+
+            WHERE id = ?
+
+            AND ruangan = ?
+
+            LIMIT 1
+
+            FOR UPDATE
+            `,
+            [
+              id,
+              access.ruangan_nama
+            ]
+          );
+
+
+        if (
+          rows.length === 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(404).json({
+            error:
+              'Transaksi tidak ditemukan atau bukan milik ruangan Anda'
+          });
+
+        }
+
+
+        const transaksi =
+          rows[0];
+
+
+        if (
+          transaksi.jenis_transaksi !==
+          'pengantaran'
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Transaksi ini bukan transaksi pengantaran'
+          });
+
+        }
+
+
+        if (
+          transaksi.tanda_tangan
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Penerimaan sudah dikonfirmasi'
+          });
+
+        }
+
+
+        await connection.query(
+          `
+          UPDATE serah_terima
+
+          SET
+
+            nama_penerima = ?,
+
+            tanda_tangan = ?,
+
+            diterima_oleh_user_id = ?,
+
+            diterima_at = NOW()
+
+          WHERE id = ?
+          `,
+          [
+
+            nama_penerima.trim(),
+
+            tanda_tangan,
+
+            access.userId,
+
+            id
+
+          ]
+        );
+
+
+        await connection.commit();
+
+
+        return res.json({
+
+          success: true,
+
+          message:
+            'Penerimaan berhasil dikonfirmasi',
+
+          status:
+            'menunggu_konfirmasi'
+
+        });
+
+
+      } catch (err) {
+
+        await connection.rollback();
+
+        throw err;
+
+      } finally {
+
+        connection.release();
+
+      }
+
+
+    } catch (err) {
+
+      console.error(
+        'Error legacy konfirmasi:',
+        err
+      );
+
+
+      return res.status(500).json({
+        error:
+          'Gagal melakukan konfirmasi penerimaan'
+      });
+
+    }
+
+  }
+);
+
+
+// ============================================================
+// KONFIRMASI PENGANTARAN OLEH LAUNDRY
+// ============================================================
+//
+// Laundry mengisi:
+// - nama_pengantar
+// - tanda_tangan_pengantar
+//
+// Sistem juga mencatat:
+// - diantar_oleh_user_id
+// - diantar_at
+//
+// Setelah TTD Laundry + TTD ruangan ada:
+// status = selesai
+// ============================================================
+
+router.put(
+  '/:id/konfirmasi-pengantaran',
+  async (req, res) => {
+
+    const {
+      id
+    } = req.params;
+
+
+    const {
+      nama_pengantar,
+      tanda_tangan_pengantar
+    } = req.body;
+
+
+    // ==========================================================
+    // VALIDASI NAMA
+    // ==========================================================
+
+    if (
+      !nama_pengantar ||
+      !nama_pengantar.trim()
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Nama petugas Laundry wajib diisi'
+      });
+
+    }
+
+
+    // ==========================================================
+    // VALIDASI TTD
+    // ==========================================================
+
+    if (
+      !tanda_tangan_pengantar
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Tanda tangan pengantar wajib diisi'
+      });
+
+    }
+
+
+    try {
+
+      const access =
+        await getAccessInfo(req);
+
+
+      if (access.error) {
+
+        return res.status(403).json({
+          error: access.error
+        });
+
+      }
+
+
+      // ========================================================
+      // HANYA ADMIN / LAUNDRY
+      // ========================================================
+
+      if (
+        access.role !== 'admin' &&
+        access.role !== 'laundry'
+      ) {
+
+        return res.status(403).json({
+          error:
+            'Hanya Laundry atau Admin yang dapat memberikan tanda tangan pengantar'
+        });
+
+      }
+
+
+      const connection =
+        await db.getConnection();
+
+
+      try {
+
+        await connection.beginTransaction();
+
+
+        // ======================================================
+        // AMBIL TRANSAKSI
+        // ======================================================
+
+        const [rows] =
+          await connection.query(
+            `
+            SELECT
+
+              id,
+              ruangan,
+              jenis_transaksi,
+              status,
+
+              tanda_tangan,
+              tanda_tangan_pengantar,
+
+              nama_penerima,
+              diterima_oleh_user_id
+
+            FROM serah_terima
+
+            WHERE id = ?
+
+            LIMIT 1
+
+            FOR UPDATE
+            `,
+            [id]
+          );
+
+
+        if (
+          rows.length === 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(404).json({
+            error:
+              'Transaksi tidak ditemukan'
+          });
+
+        }
+
+
+        const transaksi =
+          rows[0];
+
+
+        // ======================================================
+        // HARUS PENGANTARAN
+        // ======================================================
+
+        if (
+          transaksi.jenis_transaksi !==
+          'pengantaran'
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Transaksi ini bukan transaksi pengantaran'
+          });
+
+        }
+
+
+        // ======================================================
+        // CEK STATUS
+        // ======================================================
+
+        if (
+          transaksi.status ===
+          'selesai'
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Transaksi ini sudah selesai'
+          });
+
+        }
+
+
+        // ======================================================
+        // RUANGAN HARUS SUDAH TTD
+        // ======================================================
+
+        if (
+          !transaksi.tanda_tangan ||
+          !transaksi.diterima_oleh_user_id
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Ruangan belum melakukan konfirmasi penerimaan'
+          });
+
+        }
+
+
+        // ======================================================
+        // CEGAH TTD GANDA
+        // ======================================================
+
+        if (
+          transaksi.tanda_tangan_pengantar
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Tanda tangan pengantar sudah diberikan'
+          });
+
+        }
+
+
+        // ======================================================
+        // SIMPAN TTD PENGANTAR
+        // ======================================================
+
+        await connection.query(
+          `
+          UPDATE serah_terima
+
+          SET
+
+            nama_pengantar = ?,
+
+            tanda_tangan_pengantar = ?,
+
+            diantar_oleh_user_id = ?,
+
+            diantar_at = NOW()
+
+          WHERE id = ?
+          `,
+          [
+
+            nama_pengantar.trim(),
+
+            tanda_tangan_pengantar,
+
+            access.userId,
+
+            id
+
+          ]
+        );
+
+
+        // ======================================================
+        // KARENA KEDUA PIHAK SUDAH TTD,
+        // TRANSAKSI MENJADI SELESAI
+        // ======================================================
+
+        await connection.query(
+          `
+          UPDATE serah_terima
+
+          SET status = 'selesai'
+
+          WHERE id = ?
+          `,
+          [id]
+        );
+
+
+        await connection.commit();
+
+
+        return res.json({
+
+          success: true,
+
+          message:
+            'Tanda tangan pengantar berhasil disimpan. Transaksi selesai.',
+
+          id:
+            Number(id),
+
+          status:
+            'selesai'
+
+        });
+
+
+      } catch (err) {
+
+        await connection.rollback();
+
+        throw err;
+
+      } finally {
+
+        connection.release();
+
+      }
+
+
+    } catch (err) {
+
+      console.error(
+        'Error konfirmasi pengantaran:',
+        err
+      );
+
+
+      return res.status(500).json({
+        error:
+          'Gagal menyimpan tanda tangan pengantar'
+      });
+
+    }
+
+  }
+);
+
+
+// ============================================================
+// KONFIRMASI PENYERAHAN PENGAMBILAN
+// ============================================================
+//
+// USER RUANGAN
+//
+// User mengisi:
+// - nama_penyerah
+// - tanda_tangan_penyerah
+//
+// Setelah itu menunggu TTD Laundry.
+// ============================================================
+
+router.put(
+  '/:id/konfirmasi-penyerahan',
+  async (req, res) => {
+
+    const {
+      id
+    } = req.params;
+
+
+    const {
+      nama_penyerah,
+      tanda_tangan_penyerah
+    } = req.body;
+
+
+    if (
+      !nama_penyerah ||
+      !nama_penyerah.trim()
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Nama penyerah wajib diisi'
+      });
+
+    }
+
+
+    if (
+      !tanda_tangan_penyerah
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Tanda tangan penyerah wajib diisi'
+      });
+
+    }
+
+
+    try {
+
+      const access =
+        await getAccessInfo(req);
+
+
+      if (access.error) {
+
+        return res.status(403).json({
+          error: access.error
+        });
+
+      }
+
+
+      if (
+        access.role !== 'user'
+      ) {
+
+        return res.status(403).json({
+          error:
+            'Hanya user ruangan yang dapat menyerahkan linen'
+        });
+
+      }
+
+
+      const connection =
+        await db.getConnection();
+
+
+      try {
+
+        await connection.beginTransaction();
+
+
+        const [rows] =
+          await connection.query(
+            `
+            SELECT
+
+              id,
+              ruangan,
+              jenis_transaksi,
+              status,
+
+              nama_penyerah,
+              tanda_tangan_penyerah,
+
+              tanda_tangan_penerima_laundry
+
+            FROM serah_terima
+
+            WHERE id = ?
+
+            AND ruangan = ?
+
+            LIMIT 1
+
+            FOR UPDATE
+            `,
+            [
+              id,
+              access.ruangan_nama
+            ]
+          );
+
+
+        if (
+          rows.length === 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(404).json({
+            error:
+              'Transaksi tidak ditemukan atau bukan milik ruangan Anda'
+          });
+
+        }
+
+
+        const transaksi =
+          rows[0];
+
+
+        // ====================================================
+        // HARUS PENGAMBILAN
+        // ====================================================
+
+        if (
+          transaksi.jenis_transaksi !==
+          'pengambilan'
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Transaksi ini bukan transaksi pengambilan'
+          });
+
+        }
+
+
+        // ====================================================
+        // CEGAH SELESAI
+        // ====================================================
+
+        if (
+          transaksi.status ===
+          'selesai'
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Transaksi sudah selesai'
+          });
+
+        }
+
+
+        // ====================================================
+        // CEGAH TTD GANDA
+        // ====================================================
+
+        if (
+          transaksi.tanda_tangan_penyerah
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Tanda tangan penyerah sudah diberikan'
+          });
+
+        }
+
+
+        // ====================================================
+        // SIMPAN TTD USER
+        // ====================================================
+
+        await connection.query(
+          `
+          UPDATE serah_terima
+
+          SET
+
+            nama_penyerah = ?,
+
+            tanda_tangan_penyerah = ?,
+
+            diserahkan_oleh_user_id = ?,
+
+            diserahkan_at = NOW()
+
+          WHERE id = ?
+          `,
+          [
+
+            nama_penyerah.trim(),
+
+            tanda_tangan_penyerah,
+
+            access.userId,
+
+            id
+
+          ]
+        );
+
+
+        await connection.commit();
+
+
+        return res.json({
+
+          success: true,
+
+          message:
+            'Penyerahan linen berhasil dikonfirmasi. Menunggu penerimaan Laundry.',
+
+          status:
+            'menunggu_konfirmasi'
+
+        });
+
+
+      } catch (err) {
+
+        await connection.rollback();
+
+        throw err;
+
+      } finally {
+
+        connection.release();
+
+      }
+
+
+    } catch (err) {
+
+      console.error(
+        'Error konfirmasi penyerahan:',
+        err
+      );
+
+
+      return res.status(500).json({
+        error:
+          'Gagal menyimpan penyerahan linen'
+      });
+
+    }
+
+  }
+);
+
+
+// ============================================================
+// KONFIRMASI PENERIMAAN PENGAMBILAN OLEH LAUNDRY
+// ============================================================
+//
+// Laundry:
+// - menerima linen kotor
+// - memberikan TTD
+// - transaksi pengambilan menjadi selesai
+// - otomatis membuat proses_laundry
+//
+// Data awal:
+// jumlah_diambil_infeksius
+// jumlah_diambil_non_infeksius
+//
+// Disimpan di proses_laundry sebagai data awal.
+// ============================================================
+
+router.put(
+  '/:id/konfirmasi-penerimaan-laundry',
+  async (req, res) => {
+
+    const {
+      id
+    } = req.params;
+
+
+    const {
+      tanda_tangan_penerima_laundry
+    } = req.body;
+
+
+    if (
+      !tanda_tangan_penerima_laundry
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Tanda tangan penerima Laundry wajib diisi'
+      });
+
+    }
+
+
+    try {
+
+      const access =
+        await getAccessInfo(req);
+
+
+      if (access.error) {
+
+        return res.status(403).json({
+          error: access.error
+        });
+
+      }
+
+
+      if (
+        access.role !== 'admin' &&
+        access.role !== 'laundry'
+      ) {
+
+        return res.status(403).json({
+          error:
+            'Hanya Laundry atau Admin yang dapat menerima linen'
+        });
+
+      }
+
+
+      const connection =
+        await db.getConnection();
+
+
+      try {
+
+        await connection.beginTransaction();
+
+
+        // ======================================================
+        // AMBIL HEADER
+        // ======================================================
+
+        const [headerRows] =
+          await connection.query(
+            `
+            SELECT
+
+              id,
+              ruangan,
+              jenis_transaksi,
+              status,
+
+              nama_penyerah,
+              tanda_tangan_penyerah,
+
+              tanda_tangan_penerima_laundry
+
+            FROM serah_terima
+
+            WHERE id = ?
+
+            LIMIT 1
+
+            FOR UPDATE
+            `,
+            [id]
+          );
+
+
+        if (
+          headerRows.length === 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(404).json({
+            error:
+              'Transaksi tidak ditemukan'
+          });
+
+        }
+
+
+        const transaksi =
+          headerRows[0];
+
+
+        // ======================================================
+        // HARUS PENGAMBILAN
+        // ======================================================
+
+        if (
+          transaksi.jenis_transaksi !==
+          'pengambilan'
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Transaksi ini bukan transaksi pengambilan'
+          });
+
+        }
+
+
+        // ======================================================
+        // USER HARUS SUDAH MENYERAHKAN
+        // ======================================================
+
+        if (
+          !transaksi.tanda_tangan_penyerah
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Ruangan belum melakukan tanda tangan penyerahan'
+          });
+
+        }
+
+
+        // ======================================================
+        // CEGAH TTD GANDA
+        // ======================================================
+
+        if (
+          transaksi.tanda_tangan_penerima_laundry
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Tanda tangan penerima Laundry sudah diberikan'
+          });
+
+        }
+
+
+        // ======================================================
+        // AMBIL DETAIL
+        // ======================================================
+
+        const [detailRows] =
+          await connection.query(
+            `
+            SELECT
+
+              d.id,
+              d.jenis_linen_id,
+
+              d.jumlah_diambil_infeksius,
+              d.jumlah_diambil_non_infeksius,
+
+              d.jumlah_verifikasi_infeksius,
+              d.jumlah_verifikasi_non_infeksius
+
+            FROM serah_terima_detail d
+
+            WHERE d.serah_terima_id = ?
+
+            FOR UPDATE
+            `,
+            [id]
+          );
+
+
+        if (
+          detailRows.length === 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(400).json({
+            error:
+              'Detail pengambilan tidak ditemukan'
+          });
+
+        }
+
+
+        // ======================================================
+        // SIMPAN TTD LAUNDRY
+        // ======================================================
+
+        await connection.query(
+          `
+          UPDATE serah_terima
+
+          SET
+
+            tanda_tangan_penerima_laundry = ?,
+
+            diterima_laundry_oleh_user_id = ?,
+
+            diterima_laundry_at = NOW(),
+
+            status = 'selesai'
+
+          WHERE id = ?
+          `,
+          [
+
+            tanda_tangan_penerima_laundry,
+
+            access.userId,
+
+            id
+
+          ]
+        );
+
+
+        // ======================================================
+        // BUAT PROSES LAUNDRY
+        // ======================================================
+
+        for (
+          const item of detailRows
+        ) {
+
+          const jumlahInfeksius =
+            Number(
+              item.jumlah_diambil_infeksius
+            ) || 0;
+
+
+          const jumlahNonInfeksius =
+            Number(
+              item.jumlah_diambil_non_infeksius
+            ) || 0;
+
+
+          const jumlahTotal =
+            jumlahInfeksius +
+            jumlahNonInfeksius;
+
+
+          if (
+            jumlahTotal <= 0
+          ) {
+
+            continue;
+
+          }
+
+
+          // Cek apakah sudah ada proses
+
+          const [existingProcess] =
+            await connection.query(
+              `
+              SELECT
+                id
+              FROM proses_laundry
+
+              WHERE serah_terima_detail_id = ?
+
+              LIMIT 1
+              `,
+              [
+                item.id
+              ]
+            );
+
+
+          if (
+            existingProcess.length > 0
+          ) {
+
+            continue;
+
+          }
+
+
+          await connection.query(
+            `
+            INSERT INTO proses_laundry
+            (
+              serah_terima_detail_id,
+              jenis_linen_id,
+
+              jumlah_infeksius,
+              jumlah_non_infeksius,
+              jumlah_total,
+
+              jumlah_verifikasi_infeksius,
+              jumlah_verifikasi_non_infeksius,
+
+              status
+
+            )
+
+            VALUES (
+              ?,
+              ?,
+
+              ?,
+              ?,
+              ?,
+
+              0,
+              0,
+
+              'menunggu_cuci'
+            )
+            `,
+            [
+
+              item.id,
+
+              item.jenis_linen_id,
+
+              jumlahInfeksius,
+
+              jumlahNonInfeksius,
+
+              jumlahTotal
+
+            ]
+          );
+
+        }
+
+
+        // ======================================================
+        // COMMIT
+        // ======================================================
+
+        await connection.commit();
+
+
+        return res.json({
+
+          success: true,
+
+          message:
+            'Penerimaan Laundry berhasil. Linen masuk ke proses Laundry.',
+
+          status:
+            'selesai'
+
+        });
+
+
+      } catch (err) {
+
+        await connection.rollback();
+
+        throw err;
+
+      } finally {
+
+        connection.release();
+
+      }
+
+
+    } catch (err) {
+
+      console.error(
+        'Error penerimaan Laundry:',
+        err
+      );
+
+
+      return res.status(500).json({
+        error:
+          'Gagal menyimpan penerimaan Laundry'
+      });
+
+    }
+
+  }
+);
+
+
+// ============================================================
+// UPDATE TRANSAKSI
+// ============================================================
+//
+// Hanya untuk PENGANTARAN.
+//
+// Hanya Admin/Laundry.
+//
+// Tidak boleh diedit jika:
+// - selesai
+// - sudah ada TTD
+// - sudah masuk proses Laundry
+// ============================================================
+
+router.put('/:id', async (req, res) => {
 
   const {
     id
   } = req.params;
 
-
-  const access =
-    await getAccessInfo(req);
-
-
-  if (access.error) {
-
-    return res.status(403).json({
-      error: access.error
-    });
-
-  }
-
-
-  if (
-    access.role !== 'admin' &&
-    access.role !== 'laundry'
-  ) {
-
-    return res.status(403).json({
-      error:
-        'User ruangan tidak dapat menghapus transaksi'
-    });
-
-  }
-
-
-  const connection =
-    await db.getConnection();
-
-
-  try {
-
-    // ======================================================
-    // AMBIL TRANSAKSI DAN STATUS
-    // ======================================================
-    const [transactionRows] =
-      await connection.query(
-        `
-        SELECT
-          id,
-          status
-
-        FROM serah_terima
-
-        WHERE id = ?
-
-        LIMIT 1
-        `,
-        [id]
-      );
-
-
-    if (transactionRows.length === 0) {
-
-      connection.release();
-
-      return res.status(404).json({
-        error:
-          'Transaksi tidak ditemukan'
-      });
-
-    }
-
-    // ======================================================
-// CEGAH HAPUS JIKA SUDAH MASUK PROSES LAUNDRY
-// ======================================================
-const [existingProcess] = await connection.query(`
-  SELECT p.id, p.status
-  FROM proses_laundry p
-  JOIN serah_terima_detail d
-    ON d.id = p.serah_terima_detail_id
-  WHERE d.serah_terima_id = ?
-  LIMIT 1
-`, [id]);
-
-if (existingProcess.length > 0) {
-
-  connection.release();
-
-  return res.status(400).json({
-    error:
-      'Transaksi tidak dapat dihapus karena linen sudah masuk ke proses Laundry'
-  });
-
-}
-
-
-    // ======================================================
-    // TIDAK BOLEH HAPUS TRANSAKSI YANG SUDAH SELESAI
-    // ======================================================
-    if (
-      transactionRows[0].status === 'selesai'
-    ) {
-
-      connection.release();
-
-      return res.status(400).json({
-        error:
-          'Transaksi yang sudah selesai tidak dapat dihapus'
-      });
-
-    }
-
-
-    await connection.beginTransaction();
-
-
-    // ======================================================
-    // AMBIL DETAIL LAMA
-    // ======================================================
-    const [detailRows] =
-      await connection.query(
-        `
-        SELECT
-          jenis_linen_id,
-          jumlah_kotor
-
-        FROM serah_terima_detail
-
-        WHERE serah_terima_id = ?
-
-        FOR UPDATE
-        `,
-        [id]
-      );
-
-
-    // ======================================================
-    // KEMBALIKAN STOK
-    // Karena transaksi dihapus,
-    // linen yang sebelumnya diantar kembali dianggap
-    // tersedia lagi di Laundry.
-    // ======================================================
-    for (const item of detailRows) {
-
-      const jumlahKotor =
-        Number(item.jumlah_kotor) || 0;
-
-
-      if (jumlahKotor <= 0) {
-        continue;
-      }
-
-
-      await connection.query(
-        `
-        UPDATE jenis_linen
-
-        SET jumlah_stok =
-          jumlah_stok + ?
-
-        WHERE id = ?
-        `,
-        [
-          jumlahKotor,
-          item.jenis_linen_id
-        ]
-      );
-
-    }
-
-
-    // ======================================================
-    // HAPUS DETAIL
-    // ======================================================
-    await connection.query(
-      `
-      DELETE FROM serah_terima_detail
-
-      WHERE serah_terima_id = ?
-      `,
-      [id]
-    );
-
-
-    // ======================================================
-    // HAPUS HEADER
-    // ======================================================
-    const [result] =
-      await connection.query(
-        `
-        DELETE FROM serah_terima
-
-        WHERE id = ?
-        `,
-        [id]
-      );
-
-
-    if (result.affectedRows === 0) {
-
-      await connection.rollback();
-
-      return res.status(404).json({
-        error:
-          'Transaksi tidak ditemukan'
-      });
-
-    }
-
-
-    await connection.commit();
-
-
-    res.json({
-      message:
-        'Transaksi berhasil dihapus dan stok Laundry dikembalikan'
-    });
-
-
-  } catch (err) {
-
-    await connection.rollback();
-
-    console.error(err);
-
-    res.status(500).json({
-      error:
-        'Gagal menghapus transaksi'
-    });
-
-
-  } finally {
-
-    connection.release();
-
-  }
-
-});
-
-
-// ============================================================
-// POST TRANSAKSI BARU
-// ============================================================
-// ADMIN   : boleh
-// LAUNDRY : boleh
-// USER    : TIDAK BOLEH
-//
-// Saat transaksi dibuat:
-// - jumlah_kotor (DIANTAR) mengurangi stok Laundry
-// - jumlah_diambil_infeksius tidak menambah stok
-// - jumlah_diambil_non_infeksius tidak menambah stok
-//
-// Pengurangan stok dan pembuatan transaksi dilakukan
-// dalam SATU transaksi MySQL.
-// ============================================================
-router.post('/', async (req, res) => {
 
   const {
     ruangan,
@@ -1410,10 +2801,10 @@ router.post('/', async (req, res) => {
   } = req.body;
 
 
-  // ==========================================================
-  // VALIDASI DASAR
-  // ==========================================================
-  if (!ruangan || !ruangan.trim()) {
+  if (
+    !ruangan ||
+    !ruangan.trim()
+  ) {
 
     return res.status(400).json({
       error:
@@ -1448,9 +2839,6 @@ router.post('/', async (req, res) => {
 
   try {
 
-    // ========================================================
-    // CEK ROLE
-    // ========================================================
     const access =
       await getAccessInfo(req);
 
@@ -1458,14 +2846,12 @@ router.post('/', async (req, res) => {
     if (access.error) {
 
       return res.status(403).json({
-        error:
-          access.error
+        error: access.error
       });
 
     }
 
 
-    // User ruangan tidak boleh membuat transaksi
     if (
       access.role !== 'admin' &&
       access.role !== 'laundry'
@@ -1473,53 +2859,254 @@ router.post('/', async (req, res) => {
 
       return res.status(403).json({
         error:
-          'Hanya Laundry atau Admin yang dapat membuat transaksi'
+          'User ruangan tidak dapat mengedit transaksi'
       });
 
     }
 
 
-    // ========================================================
-    // AMBIL CONNECTION KHUSUS
-    // ========================================================
     const connection =
       await db.getConnection();
 
 
     try {
 
-      // ======================================================
-      // MULAI TRANSAKSI DATABASE
-      // ======================================================
       await connection.beginTransaction();
 
 
       // ======================================================
-      // VALIDASI DAN KUMPULKAN DETAIL VALID
+      // AMBIL TRANSAKSI
       // ======================================================
+
+      const [existingRows] =
+        await connection.query(
+          `
+          SELECT
+
+            id,
+            jenis_transaksi,
+            status,
+
+            tanda_tangan,
+            tanda_tangan_pengantar
+
+          FROM serah_terima
+
+          WHERE id = ?
+
+          LIMIT 1
+
+          FOR UPDATE
+          `,
+          [id]
+        );
+
+
+      if (
+        existingRows.length === 0
+      ) {
+
+        await connection.rollback();
+
+        return res.status(404).json({
+          error:
+            'Transaksi tidak ditemukan'
+        });
+
+      }
+
+
+      const transaksi =
+        existingRows[0];
+
+
+      // ======================================================
+      // HARUS PENGANTARAN
+      // ======================================================
+
+      if (
+        transaksi.jenis_transaksi !==
+        'pengantaran'
+      ) {
+
+        await connection.rollback();
+
+        return res.status(400).json({
+          error:
+            'Hanya transaksi pengantaran yang dapat diedit'
+        });
+
+      }
+
+
+      // ======================================================
+      // TIDAK BOLEH JIKA SUDAH SELESAI
+      // ======================================================
+
+      if (
+        transaksi.status ===
+        'selesai'
+      ) {
+
+        await connection.rollback();
+
+        return res.status(400).json({
+          error:
+            'Transaksi yang sudah selesai tidak dapat diedit'
+        });
+
+      }
+
+
+      // ======================================================
+      // TIDAK BOLEH JIKA SUDAH ADA TTD
+      // ======================================================
+
+      if (
+        transaksi.tanda_tangan ||
+        transaksi.tanda_tangan_pengantar
+      ) {
+
+        await connection.rollback();
+
+        return res.status(400).json({
+          error:
+            'Transaksi tidak dapat diedit karena sudah ada tanda tangan'
+        });
+
+      }
+
+
+      // ======================================================
+      // CEK PROSES LAUNDRY
+      // ======================================================
+
+      const [existingProcess] =
+        await connection.query(
+          `
+          SELECT
+            p.id
+
+          FROM proses_laundry p
+
+          JOIN serah_terima_detail d
+            ON d.id =
+              p.serah_terima_detail_id
+
+          WHERE d.serah_terima_id = ?
+
+          LIMIT 1
+          `,
+          [id]
+        );
+
+
+      if (
+        existingProcess.length > 0
+      ) {
+
+        await connection.rollback();
+
+        return res.status(400).json({
+          error:
+            'Transaksi tidak dapat diedit karena sudah masuk proses Laundry'
+        });
+
+      }
+
+
+      // ======================================================
+      // AMBIL DETAIL LAMA
+      // ======================================================
+
+      const [oldDetails] =
+        await connection.query(
+          `
+          SELECT
+
+            jenis_linen_id,
+            jumlah_kotor
+
+          FROM serah_terima_detail
+
+          WHERE serah_terima_id = ?
+
+          FOR UPDATE
+          `,
+          [id]
+        );
+
+
+      // ======================================================
+      // KEMBALIKAN STOK LAMA
+      // ======================================================
+
+      for (
+        const oldItem of oldDetails
+      ) {
+
+        const jumlahLama =
+          Number(
+            oldItem.jumlah_kotor
+          ) || 0;
+
+
+        if (
+          jumlahLama <= 0
+        ) {
+          continue;
+        }
+
+
+        await connection.query(
+          `
+          UPDATE jenis_linen
+
+          SET
+            jumlah_stok =
+              jumlah_stok + ?
+
+          WHERE id = ?
+          `,
+          [
+
+            jumlahLama,
+
+            oldItem.jenis_linen_id
+
+          ]
+        );
+
+      }
+
+
+      // ======================================================
+      // VALIDASI DETAIL BARU
+      // ======================================================
+
       const detailValid = [];
 
 
-      for (const item of detail) {
+      for (
+        const item of detail
+      ) {
 
         const jenisLinenId =
-          Number(item.jenis_linen_id);
+          Number(
+            item.jenis_linen_id
+          );
+
 
         const jumlahKotor =
-          Number(item.jumlah_kotor) || 0;
-
-        const jumlahInfeksius =
-          Number(item.jumlah_diambil_infeksius) || 0;
-
-        const jumlahNonInfeksius =
-          Number(item.jumlah_diambil_non_infeksius) || 0;
+          Number(
+            item.jumlah_kotor
+          ) || 0;
 
 
-        // ================================================
-        // ID JENIS LINEN WAJIB VALID
-        // ================================================
         if (
-          !Number.isInteger(jenisLinenId) ||
+          !Number.isInteger(
+            jenisLinenId
+          ) ||
           jenisLinenId <= 0
         ) {
 
@@ -1533,13 +3120,8 @@ router.post('/', async (req, res) => {
         }
 
 
-        // ================================================
-        // JUMLAH TIDAK BOLEH NEGATIF
-        // ================================================
         if (
-          jumlahKotor < 0 ||
-          jumlahInfeksius < 0 ||
-          jumlahNonInfeksius < 0
+          jumlahKotor < 0
         ) {
 
           await connection.rollback();
@@ -1552,13 +3134,8 @@ router.post('/', async (req, res) => {
         }
 
 
-        // ================================================
-        // SEMUA KOSONG
-        // ================================================
         if (
-          jumlahKotor === 0 &&
-          jumlahInfeksius === 0 &&
-          jumlahNonInfeksius === 0
+          jumlahKotor === 0
         ) {
 
           continue;
@@ -1574,58 +3151,45 @@ router.post('/', async (req, res) => {
           jumlah_kotor:
             jumlahKotor,
 
-          jumlah_diambil_infeksius:
-            jumlahInfeksius,
-
-          jumlah_diambil_non_infeksius:
-            jumlahNonInfeksius,
-
           keterangan:
-            item.keterangan || null
+            item.keterangan
+              ? String(
+                  item.keterangan
+                ).trim()
+              : null
 
         });
 
       }
 
 
-      // ======================================================
-      // HARUS ADA MINIMAL SATU DETAIL
-      // ======================================================
-      if (detailValid.length === 0) {
+      if (
+        detailValid.length === 0
+      ) {
 
         await connection.rollback();
 
         return res.status(400).json({
           error:
-            'Minimal satu jenis linen harus memiliki jumlah'
+            'Minimal satu jenis linen harus memiliki jumlah diantar'
         });
 
       }
 
 
       // ======================================================
-      // CEK STOK DAN KURANGI STOK
+      // CEK STOK BARU
       // ======================================================
+
       for (
         const item of detailValid
       ) {
 
-        // Kalau tidak ada linen yang diantar,
-        // tidak perlu cek/kurangi stok.
-        if (
-          item.jumlah_kotor <= 0
-        ) {
-          continue;
-        }
-
-
-        // ================================================
-        // KUNCI BARIS STOK
-        // ================================================
         const [stokRows] =
           await connection.query(
             `
             SELECT
+
               id,
               nama,
               jumlah_stok
@@ -1644,9 +3208,6 @@ router.post('/', async (req, res) => {
           );
 
 
-        // ================================================
-        // JENIS LINEN TIDAK DITEMUKAN
-        // ================================================
         if (
           stokRows.length === 0
         ) {
@@ -1666,46 +3227,44 @@ router.post('/', async (req, res) => {
             stokRows[0].jumlah_stok
           );
 
+
         const namaLinen =
           stokRows[0].nama;
 
 
-        // ================================================
-        // CEK STOK CUKUP
-        // ================================================
         if (
-          stok < item.jumlah_kotor
+          stok <
+          item.jumlah_kotor
         ) {
 
           await connection.rollback();
 
           return res.status(400).json({
-
             error:
               `Stok ${namaLinen} tidak mencukupi. ` +
               `Stok tersedia: ${stok}, ` +
               `jumlah yang akan diantar: ${item.jumlah_kotor}.`
-
           });
 
         }
 
 
-        // ================================================
-        // KURANGI STOK
-        // ================================================
         await connection.query(
           `
           UPDATE jenis_linen
 
-          SET jumlah_stok =
-            jumlah_stok - ?
+          SET
+            jumlah_stok =
+              jumlah_stok - ?
 
           WHERE id = ?
           `,
           [
+
             item.jumlah_kotor,
+
             item.jenis_linen_id
+
           ]
         );
 
@@ -1713,49 +3272,54 @@ router.post('/', async (req, res) => {
 
 
       // ======================================================
-      // INSERT HEADER
+      // UPDATE HEADER
       // ======================================================
-      const [headerResult] =
-        await connection.query(
-          `
-          INSERT INTO serah_terima
-          (
-            ruangan,
-            tanggal,
-            status,
-            dibuat_oleh_user_id
-          )
 
-          VALUES (
-            ?,
-            ?,
-            'menunggu_konfirmasi',
-            ?
-          )
-          `,
-          [
-            ruangan.trim(),
-            tanggal,
-            access.userId
-          ]
-        );
+      await connection.query(
+        `
+        UPDATE serah_terima
 
+        SET
 
-      const serahTerimaId =
-        headerResult.insertId;
+          ruangan = ?,
+
+          tanggal = ?
+
+        WHERE id = ?
+        `,
+        [
+
+          ruangan.trim(),
+
+          tanggal,
+
+          id
+
+        ]
+      );
 
 
       // ======================================================
-      // INSERT DETAIL
+      // HAPUS DETAIL LAMA
       // ======================================================
+
+      await connection.query(
+        `
+        DELETE FROM serah_terima_detail
+
+        WHERE serah_terima_id = ?
+        `,
+        [id]
+      );
+
+
+      // ======================================================
+      // INSERT DETAIL BARU
+      // ======================================================
+
       for (
         const item of detailValid
       ) {
-
-        const perluVerifikasi =
-          item.jumlah_diambil_infeksius > 0 ||
-          item.jumlah_diambil_non_infeksius > 0;
-
 
         await connection.query(
           `
@@ -1763,72 +3327,75 @@ router.post('/', async (req, res) => {
           (
             serah_terima_id,
             jenis_linen_id,
+
             jumlah_kotor,
+            jumlah_bersih,
+
             jumlah_diambil_infeksius,
             jumlah_diambil_non_infeksius,
+
+            jumlah_verifikasi_infeksius,
+            jumlah_verifikasi_non_infeksius,
+
             verifikasi_infeksius,
             verifikasi_pengambilan,
+
             keterangan
           )
 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (
+            ?,
+            ?,
+
+            ?,
+            0,
+
+            0,
+            0,
+
+            0,
+            0,
+
+            0,
+            0,
+
+            ?
+          )
           `,
           [
-            serahTerimaId,
+
+            id,
+
             item.jenis_linen_id,
+
             item.jumlah_kotor,
-            item.jumlah_diambil_infeksius,
-            item.jumlah_diambil_non_infeksius,
-            0,
-            perluVerifikasi ? 0 : 0,
+
             item.keterangan
+
           ]
         );
 
       }
 
 
-      // ======================================================
-      // SEMUA BERHASIL
-      // ======================================================
       await connection.commit();
 
 
-      return res.status(201).json({
+      return res.json({
+
+        success: true,
 
         message:
-          'Data serah terima berhasil disimpan dan stok Laundry berhasil diperbarui',
-
-        id:
-          serahTerimaId,
-
-        ruangan:
-          ruangan.trim(),
-
-        status:
-          'menunggu_konfirmasi'
+          'Transaksi berhasil diperbarui'
 
       });
 
 
     } catch (err) {
 
-      // ======================================================
-      // GAGAL → SEMUA PERUBAHAN DIBATALKAN
-      // ======================================================
       await connection.rollback();
 
-      console.error(
-        'Error transaksi + stok:',
-        err
-      );
-
-
-      return res.status(500).json({
-        error:
-          'Gagal menyimpan data serah terima dan memperbarui stok'
-      });
-
+      throw err;
 
     } finally {
 
@@ -1840,14 +3407,14 @@ router.post('/', async (req, res) => {
   } catch (err) {
 
     console.error(
-      'Error memproses transaksi:',
+      'Error update transaksi:',
       err
     );
 
 
     return res.status(500).json({
       error:
-        'Gagal memproses transaksi'
+        'Gagal memperbarui transaksi'
     });
 
   }
@@ -1856,50 +3423,18 @@ router.post('/', async (req, res) => {
 
 
 // ============================================================
-// KONFIRMASI PENERIMAAN
+// DELETE TRANSAKSI
 // ============================================================
-// HANYA USER RUANGAN
 //
-// User mengisi:
-// - nama penerima
-// - tanda tangan
-//
-// Lalu status menjadi selesai.
+// Hanya pengantaran.
+// Stok dikembalikan.
 // ============================================================
-router.put('/:id/konfirmasi', async (req, res) => {
+
+router.delete('/:id', async (req, res) => {
 
   const {
     id
   } = req.params;
-
-
-  const {
-    nama_penerima,
-    tanda_tangan
-  } = req.body;
-
-
-  if (
-    !nama_penerima ||
-    !nama_penerima.trim()
-  ) {
-
-    return res.status(400).json({
-      error:
-        'Nama penerima wajib diisi'
-    });
-
-  }
-
-
-  if (!tanda_tangan) {
-
-    return res.status(400).json({
-      error:
-        'Tanda tangan wajib diisi'
-    });
-
-  }
 
 
   try {
@@ -1911,123 +3446,273 @@ router.put('/:id/konfirmasi', async (req, res) => {
     if (access.error) {
 
       return res.status(403).json({
-        error:
-          access.error
+        error: access.error
       });
 
     }
 
 
-    // ==================================
-    // HANYA USER RUANGAN
-    // ==================================
     if (
-      access.role !== 'user'
+      access.role !== 'admin' &&
+      access.role !== 'laundry'
     ) {
 
       return res.status(403).json({
         error:
-          'Hanya user ruangan yang dapat melakukan konfirmasi'
+          'User ruangan tidak dapat menghapus transaksi'
       });
 
     }
 
 
-    const [rows] =
-      await db.query(
-        `SELECT
-          id,
-          ruangan,
-          status
+    const connection =
+      await db.getConnection();
 
-         FROM serah_terima
 
-         WHERE id = ?
+    try {
 
-         AND ruangan = ?
+      await connection.beginTransaction();
 
-         LIMIT 1`,
-        [
-          id,
-          access.ruangan_nama
-        ]
+
+      // ======================================================
+      // AMBIL TRANSAKSI
+      // ======================================================
+
+      const [transactionRows] =
+        await connection.query(
+          `
+          SELECT
+
+            id,
+            jenis_transaksi,
+            status,
+
+            tanda_tangan,
+            tanda_tangan_pengantar
+
+          FROM serah_terima
+
+          WHERE id = ?
+
+          LIMIT 1
+
+          FOR UPDATE
+          `,
+          [id]
+        );
+
+
+      if (
+        transactionRows.length === 0
+      ) {
+
+        await connection.rollback();
+
+        return res.status(404).json({
+          error:
+            'Transaksi tidak ditemukan'
+        });
+
+      }
+
+
+      const transaksi =
+        transactionRows[0];
+
+
+      // ======================================================
+      // HARUS PENGANTARAN
+      // ======================================================
+
+      if (
+        transaksi.jenis_transaksi !==
+        'pengantaran'
+      ) {
+
+        await connection.rollback();
+
+        return res.status(400).json({
+          error:
+            'Hanya transaksi pengantaran yang dapat dihapus'
+        });
+
+      }
+
+
+      // ======================================================
+      // TIDAK BOLEH HAPUS JIKA SUDAH ADA TTD
+      // ======================================================
+
+      if (
+        transaksi.tanda_tangan ||
+        transaksi.tanda_tangan_pengantar
+      ) {
+
+        await connection.rollback();
+
+        return res.status(400).json({
+          error:
+            'Transaksi tidak dapat dihapus karena sudah ada tanda tangan'
+        });
+
+      }
+
+
+      // ======================================================
+      // AMBIL DETAIL
+      // ======================================================
+
+      const [detailRows] =
+        await connection.query(
+          `
+          SELECT
+
+            jenis_linen_id,
+            jumlah_kotor
+
+          FROM serah_terima_detail
+
+          WHERE serah_terima_id = ?
+
+          FOR UPDATE
+          `,
+          [id]
+        );
+
+
+      // ======================================================
+      // KEMBALIKAN STOK
+      // ======================================================
+
+      for (
+        const item of detailRows
+      ) {
+
+        const jumlah =
+          Number(
+            item.jumlah_kotor
+          ) || 0;
+
+
+        if (
+          jumlah <= 0
+        ) {
+          continue;
+        }
+
+
+        await connection.query(
+          `
+          UPDATE jenis_linen
+
+          SET
+
+            jumlah_stok =
+              jumlah_stok + ?
+
+          WHERE id = ?
+          `,
+          [
+
+            jumlah,
+
+            item.jenis_linen_id
+
+          ]
+        );
+
+      }
+
+
+      // ======================================================
+      // HAPUS DETAIL
+      // ======================================================
+
+      await connection.query(
+        `
+        DELETE FROM serah_terima_detail
+
+        WHERE serah_terima_id = ?
+        `,
+        [id]
       );
 
 
-    if (
-      rows.length === 0
-    ) {
+      // ======================================================
+      // HAPUS HEADER
+      // ======================================================
 
-      return res.status(404).json({
-        error:
-          'Transaksi tidak ditemukan atau bukan milik ruangan Anda'
+      const [result] =
+        await connection.query(
+          `
+          DELETE FROM serah_terima
+
+          WHERE id = ?
+          `,
+          [id]
+        );
+
+
+      if (
+        result.affectedRows === 0
+      ) {
+
+        await connection.rollback();
+
+        return res.status(404).json({
+          error:
+            'Transaksi tidak ditemukan'
+        });
+
+      }
+
+
+      await connection.commit();
+
+
+      return res.json({
+
+        success: true,
+
+        message:
+          'Transaksi berhasil dihapus dan stok Laundry dikembalikan'
+
       });
 
-    }
 
+    } catch (err) {
 
-    const transaksi =
-      rows[0];
+      await connection.rollback();
 
+      throw err;
 
-    // ==================================
-    // SUDAH SELESAI
-    // ==================================
-    if (
-      transaksi.status === 'selesai'
-    ) {
+    } finally {
 
-      return res.status(400).json({
-        error:
-          'Transaksi ini sudah dikonfirmasi'
-      });
+      connection.release();
 
     }
-
-
-    await db.query(
-      `
-      UPDATE serah_terima
-
-      SET
-        status = 'selesai',
-        nama_penerima = ?,
-        tanda_tangan = ?,
-        diterima_oleh_user_id = ?,
-        diterima_at = NOW()
-
-      WHERE id = ?
-      `,
-      [
-        nama_penerima.trim(),
-        tanda_tangan,
-        access.userId,
-        id
-      ]
-    );
-
-
-    res.json({
-      message:
-        'Penerimaan berhasil dikonfirmasi',
-
-      status:
-        'selesai'
-    });
 
 
   } catch (err) {
 
-    console.error(err);
+    console.error(
+      'Error delete transaksi:',
+      err
+    );
 
-    res.status(500).json({
+
+    return res.status(500).json({
       error:
-        'Gagal melakukan konfirmasi penerimaan'
+        'Gagal menghapus transaksi'
     });
 
   }
 
 });
 
+
+// ============================================================
+// EXPORT ROUTER
+// ============================================================
 
 module.exports = router;
