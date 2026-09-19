@@ -302,6 +302,46 @@
     color: var(--green);
   }
 
+  .trx-jenis{
+    display: inline-flex;
+    align-items: center;
+    margin-top: 7px;
+    padding: 4px 7px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .trx-jenis.pengantaran{
+    background: var(--teal-tint);
+    color: var(--teal-deep);
+  }
+
+  .trx-jenis.pengambilan{
+    background: var(--amber-tint);
+    color: var(--amber);
+  }
+
+  .jenis-transaksi-detail{
+    display: inline-flex;
+    align-items: center;
+    margin-top: 8px;
+    padding: 5px 9px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .jenis-transaksi-detail.pengantaran{
+    background: var(--teal-tint);
+    color: var(--teal-deep);
+  }
+
+  .jenis-transaksi-detail.pengambilan{
+    background: var(--amber-tint);
+    color: var(--amber);
+  }
+
   .empty-state{
     padding: 30px 16px;
     text-align: center;
@@ -748,34 +788,16 @@
   </div>
 
   <div
-    class="total-bar"
-    id="total-bar"
-  >
+  class="total-bar"
+  id="total-bar"
+>
+  <span class="jumlah-trx">
+    <strong id="jumlah-trx">0</strong>
+    transaksi
+  </span>
+</div>
 
-    <span class="jumlah-trx">
-      <strong id="jumlah-trx">0</strong>
-      transaksi
-    </span>
-
-    <span>
-      <span class="dot-kotor">●</span>
-      Total diantar
-      <strong id="grand-total-kotor">0</strong>
-    </span>
-
-    <span>
-      <span class="dot-infeksius">●</span>
-      Total infeksius
-      <strong id="grand-total-infeksius">0</strong>
-    </span>
-
-    <span>
-      <span class="dot-noninfeksius">●</span>
-      Total non-infeksius
-      <strong id="grand-total-noninfeksius">0</strong>
-    </span>
-
-  </div>
+  
 
   <div class="layout">
 
@@ -942,6 +964,15 @@
         minute: '2-digit'
       }
     );
+  }
+
+
+  function labelJenisTransaksi(jenis){
+    if(jenis === 'pengambilan'){
+      return '🧺 Pengambilan';
+    }
+
+    return '📦 Pengantaran';
   }
 
 
@@ -1172,51 +1203,13 @@
       );
 
 
-    /* =============================
-       HITUNG TOTAL
-    ============================= */
-
-    let grandKotor = 0;
-
-    let grandInfeksius = 0;
-
-    let grandNonInfeksius = 0;
-
-
-    hasil.forEach(trx => {
-
-      grandKotor +=
-        Number(trx.total_kotor) || 0;
-
-      grandInfeksius +=
-        Number(trx.total_infeksius) || 0;
-
-      grandNonInfeksius +=
-        Number(
-          trx.total_non_infeksius
-        ) || 0;
-    });
+    
 
 
     document.getElementById(
-      'jumlah-trx'
-    ).textContent =
-      hasil.length;
-
-    document.getElementById(
-      'grand-total-kotor'
-    ).textContent =
-      grandKotor;
-
-    document.getElementById(
-      'grand-total-infeksius'
-    ).textContent =
-      grandInfeksius;
-
-    document.getElementById(
-      'grand-total-noninfeksius'
-    ).textContent =
-      grandNonInfeksius;
+  'jumlah-trx'
+).textContent =
+  hasil.length;
 
 
     /* =============================
@@ -1273,6 +1266,10 @@
         <div class="meta">
           ${formatTanggal(trx.tanggal)}
           · dicatat ${formatWaktu(trx.created_at)}
+        </div>
+
+        <div class="trx-jenis ${trx.jenis_transaksi === 'pengambilan' ? 'pengambilan' : 'pengantaran'}">
+          ${labelJenisTransaksi(trx.jenis_transaksi)}
         </div>
 
         <div class="trx-status ${status}">
@@ -1436,15 +1433,6 @@
         userLogin.role === 'laundry'
       );
 
-
-    const bolehVerifikasi =
-      userLogin &&
-      (
-        userLogin.role === 'admin' ||
-        userLogin.role === 'laundry'
-      );
-
-
     const baris =
       trx.detail.map(
         item => {
@@ -1460,72 +1448,7 @@
           totalNonInfeksius +=
             Number(
               item.jumlah_diambil_non_infeksius
-            ) || 0;
-
-
-          const adaPengambilan =
-            Number(
-              item.jumlah_diambil_infeksius
-            ) > 0 ||
-            Number(
-              item.jumlah_diambil_non_infeksius
-            ) > 0;
-
-
-          let selVerif =
-            '<span class="verif-kosong">—</span>';
-
-
-          if(adaPengambilan){
-
-            const sudah =
-              Number(
-                item.verifikasi_pengambilan
-              ) === 1;
-
-
-            if(bolehVerifikasi){
-
-              if(sudah){
-
-                selVerif = `
-                  <span class="badge-verif sudah">
-                    ✓ Terverifikasi
-                  </span>
-                `;
-
-              }else{
-
-                selVerif = `
-                  <button
-                    class="badge-verif belum"
-                    data-detail-id="${item.id}"
-                  >
-                    ⚠ Belum diverifikasi
-                  </button>
-                `;
-              }
-
-            }else{
-
-              selVerif = `
-                <span
-                  class="badge-verif ${
-                    sudah ? 'sudah' : 'belum'
-                  }"
-                >
-                  ${
-                    sudah
-                      ? '✓ Terverifikasi'
-                      : '⚠ Belum diverifikasi'
-                  }
-                </span>
-              `;
-            }
-          }
-
-
-          return `
+            ) || 0;          return `
             <tr>
 
               <td>
@@ -1543,16 +1466,6 @@
               <td class="col-noninfeksius">
                 ${item.jumlah_diambil_non_infeksius}
               </td>
-
-              <td
-                style="
-                  text-align:center;
-                  white-space:nowrap;
-                "
-              >
-                ${selVerif}
-              </td>
-
               <td class="col-ket">
                 ${item.keterangan || '—'}
               </td>
@@ -1577,13 +1490,21 @@
         `
         : `
           <div class="status-badge menunggu">
-            ⚠ Menunggu Konfirmasi Ruangan
+            ${
+              trx.jenis_transaksi === 'pengambilan'
+                ? '⚠ Menunggu Konfirmasi Laundry'
+                : '⚠ Menunggu Konfirmasi Ruangan'
+            }
           </div>
         `;
 
 
+    const bolehUbahTransaksi =
+      bolehKelola &&
+      trx.status !== 'selesai';
+
     const actionsHtml =
-      bolehKelola
+      bolehUbahTransaksi
         ? `
           <div class="detail-actions">
 
@@ -1607,55 +1528,186 @@
 
 
     const penerimaHtml =
-      (
-        trx.nama_penerima ||
-        trx.tanda_tangan ||
-        trx.diterima_at
-      )
-      ? `
-        <div class="penerima-info">
+  (
+    trx.nama_penerima ||
+    trx.tanda_tangan ||
+    trx.diterima_at ||
+    trx.nama_penyerah ||
+    trx.tanda_tangan_penyerah ||
+    trx.diserahkan_at ||
+    trx.tanda_tangan_penerima_laundry ||
+    trx.diterima_laundry_at
+  )
+  ? `
+    <div class="penerima-info">
 
-          ${
-            trx.nama_penerima
-              ? `
-                <span class="nama-label">
-                  Diterima oleh:
-                  <strong>
-                    ${trx.nama_penerima}
-                  </strong>
-                </span>
-              `
-              : ''
-          }
+      ${
+        trx.jenis_transaksi === 'pengambilan'
+          ? `
 
-          ${
-            trx.diterima_at
-              ? `
-                <span class="diterima-waktu">
-                  Dikonfirmasi:
-                  ${formatTanggalWaktu(
-                    trx.diterima_at
-                  )}
-                </span>
-              `
-              : ''
-          }
+            ${
+              trx.nama_penyerah
+                ? `
+                  <div>
+                    <span class="nama-label">
+                      Diserahkan oleh:
+                      <strong>
+                        ${trx.nama_penyerah}
+                      </strong>
+                    </span>
+                  </div>
+                `
+                : ''
+            }
 
-          ${
-            trx.tanda_tangan
-              ? `
-                <img
-                  class="ttd-img"
-                  src="${trx.tanda_tangan}"
-                  alt="Tanda tangan penerima"
-                >
-              `
-              : ''
-          }
+            ${
+              trx.diserahkan_at
+                ? `
+                  <div class="diterima-waktu">
+                    Diserahkan:
+                    ${formatTanggalWaktu(
+                      trx.diserahkan_at
+                    )}
+                  </div>
+                `
+                : ''
+            }
 
-        </div>
-      `
-      : '';
+            ${
+              trx.tanda_tangan_penyerah
+                ? `
+                  <div>
+                    <span class="nama-label">
+                      Tanda tangan penyerah:
+                    </span>
+                    <br>
+                    <img
+                      class="ttd-img"
+                      src="${trx.tanda_tangan_penyerah}"
+                      alt="Tanda tangan penyerah"
+                    >
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              trx.tanda_tangan_penerima_laundry
+                ? `
+                  <div>
+                    <span class="nama-label">
+                      Tanda tangan penerima Laundry:
+                    </span>
+                    <br>
+                    <img
+                      class="ttd-img"
+                      src="${trx.tanda_tangan_penerima_laundry}"
+                      alt="Tanda tangan penerima Laundry"
+                    >
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              trx.diterima_laundry_at
+                ? `
+                  <div class="diterima-waktu">
+                    Diterima Laundry:
+                    ${formatTanggalWaktu(
+                      trx.diterima_laundry_at
+                    )}
+                  </div>
+                `
+                : ''
+            }
+
+          `
+          : `
+
+            ${
+              trx.nama_penerima
+                ? `
+                  <div>
+                    <span class="nama-label">
+                      Diterima oleh:
+                      <strong>
+                        ${trx.nama_penerima}
+                      </strong>
+                    </span>
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              trx.diterima_at
+                ? `
+                  <div class="diterima-waktu">
+                    Dikonfirmasi:
+                    ${formatTanggalWaktu(
+                      trx.diterima_at
+                    )}
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              trx.tanda_tangan
+                ? `
+                  <div>
+                    <span class="nama-label">
+                      Tanda tangan penerima:
+                    </span>
+                    <br>
+                    <img
+                      class="ttd-img"
+                      src="${trx.tanda_tangan}"
+                      alt="Tanda tangan penerima"
+                    >
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              trx.tanda_tangan_pengantar
+                ? `
+                  <div>
+                    <span class="nama-label">
+                      Tanda tangan pengantar Laundry:
+                    </span>
+                    <br>
+                    <img
+                      class="ttd-img"
+                      src="${trx.tanda_tangan_pengantar}"
+                      alt="Tanda tangan pengantar Laundry"
+                    >
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              trx.diantar_at
+                ? `
+                  <div class="diterima-waktu">
+                    Diantar:
+                    ${formatTanggalWaktu(
+                      trx.diantar_at
+                    )}
+                  </div>
+                `
+                : ''
+            }
+
+          `
+      }
+
+    </div>
+  `
+  : '';
 
 
     detailPanel.innerHTML = `
@@ -1672,6 +1724,14 @@
             ${formatTanggal(
               trx.tanggal
             )}
+          </div>
+
+          <div class="jenis-transaksi-detail ${
+            trx.jenis_transaksi === 'pengambilan'
+              ? 'pengambilan'
+              : 'pengantaran'
+          }">
+            ${labelJenisTransaksi(trx.jenis_transaksi)}
           </div>
 
           ${statusHtml}
@@ -1738,9 +1798,6 @@
               Non-Infeksius
             </th>
 
-            <th style="text-align:center;">
-              Verifikasi
-            </th>
 
             <th class="col-ket">
               Keterangan
@@ -1756,7 +1813,7 @@
             baris ||
             `
               <tr class="empty-detail">
-                <td colspan="6">
+                <td colspan="5">
                   Tidak ada rincian linen.
                 </td>
               </tr>
@@ -1777,7 +1834,7 @@
        BUTTON EDIT
     ============================= */
 
-    if(bolehKelola){
+    if(bolehUbahTransaksi){
 
       const btnEdit =
         document.getElementById(
@@ -1812,110 +1869,6 @@
           hapusTransaksi
         );
       }
-    }
-
-
-    /* =============================
-       BUTTON VERIFIKASI
-    ============================= */
-
-    if(bolehVerifikasi){
-
-      detailPanel
-        .querySelectorAll(
-          '.badge-verif.belum'
-        )
-        .forEach(
-          btn => {
-
-            btn.addEventListener(
-              'click',
-              () => {
-                verifikasiPengambilan(
-                  btn
-                );
-              }
-            );
-
-          }
-        );
-    }
-  }
-
-
-  /* =========================================================
-     VERIFIKASI PENGAMBILAN
-  ========================================================= */
-
-  async function verifikasiPengambilan(btn){
-
-    const detailId =
-      btn.dataset.detailId;
-
-    btn.disabled =
-      true;
-
-    btn.textContent =
-      'Memverifikasi...';
-
-    try{
-
-      const res =
-        await fetch(
-          `/api/serah-terima/detail/${detailId}/verifikasi`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-            body: JSON.stringify({
-              verifikasi_pengambilan: 1
-            })
-          }
-        );
-
-      const result =
-        await res.json();
-
-      if(!res.ok){
-
-        throw new Error(
-          result.error ||
-          'Gagal melakukan verifikasi'
-        );
-      }
-
-
-      const item =
-        trxAktif.detail.find(
-          d =>
-            d.id ===
-            Number(detailId)
-        );
-
-
-      if(item){
-
-        item.verifikasi_pengambilan =
-          1;
-      }
-
-
-      renderDetailLihat();
-
-    }catch(err){
-
-      alert(
-        err.message ||
-        'Terjadi kesalahan saat verifikasi.'
-      );
-
-      btn.disabled =
-        false;
-
-      btn.textContent =
-        '⚠ Belum diverifikasi';
     }
   }
 
@@ -2203,14 +2156,7 @@
             jumlah_diambil_non_infeksius:
               Number(
                 nonInfeksiusInput.value
-              ) || 0,
-
-            verifikasi_pengambilan:
-              item.verifikasi_pengambilan
-                ? 1
-                : 0,
-
-            keterangan:
+              ) || 0,            keterangan:
               ketInput.value.trim()
                 || null
           };

@@ -30,44 +30,118 @@ app.use(express.json());
 // ==========================================================
 // HAK AKSES HALAMAN BERDASARKAN ROLE
 // ==========================================================
+
 const pageAccess = {
 
-  // ==============================
+  // ========================================================
   // ADMIN
-  // ==============================
+  // ========================================================
+
   '/': ['admin'],
+
   '/index.html': ['admin'],
+
   '/kelola-linen.html': ['admin'],
-'/kelola-ruangan.html': ['admin'],
-'/kelola-user.html': ['admin'],
-'/stock-ruangan.html': ['admin'],
-'/stok-ruangan-user.html': ['user'],
-'/konfirmasi-pengantaran.html': ['admin', 'laundry'],
-'/konfirmasi-penerimaan-laundry.html': ['admin', 'laundry'],
 
-  // ==============================
+  '/kelola-ruangan.html': ['admin'],
+
+  '/kelola-user.html': ['admin'],
+
+  '/stock-ruangan.html': ['admin'],
+
+  '/stok-ruangan-user.html': ['admin', 'user'],
+
+
+  // ========================================================
   // ADMIN + LAUNDRY + USER
-  // ==============================
-  '/form.html': ['admin', 'laundry', 'user'],
+  // ========================================================
+  // Form sekarang digunakan untuk:
+  // - Admin/Laundry : Pengantaran
+  // - User          : Pengambilan
 
-  // ==============================
+  '/form.html': [
+    'admin',
+    'laundry',
+    'user'
+  ],
+
+
+  // ========================================================
   // ADMIN + LAUNDRY + USER
-  // ==============================
-  '/riwayat.html': ['admin', 'laundry', 'user'],
+  // ========================================================
 
-  // ==============================
-  // LAUNDRY
-  // ==============================
-  '/laundry-dashboard.html': ['laundry'],
-  '/stok-laundry.html': ['admin', 'laundry'],
-  '/proses-laundry.html': ['admin', 'laundry'],
-  '/riwayat-proses-laundry.html': ['admin', 'laundry'],
+  '/riwayat.html': [
+    'admin',
+    'laundry',
+    'user'
+  ],
 
-  // ==============================
+
+  // ========================================================
+  // ADMIN + LAUNDRY
+  // ========================================================
+
+  '/stok-laundry.html': [
+    'admin',
+    'laundry'
+  ],
+
+  '/proses-laundry.html': [
+    'admin',
+    'laundry'
+  ],
+
+  '/riwayat-proses-laundry.html': [
+    'admin',
+    'laundry'
+  ],
+
+
+  // ========================================================
+  // KONFIRMASI PENGANTARAN
+  // ========================================================
+  // Laundry/Admin memberikan TTD sebagai pengantar
+  // linen bersih.
+
+  '/konfirmasi-pengantaran.html': [
+    'admin',
+    'laundry'
+  ],
+
+
+  // ========================================================
+  // KONFIRMASI PENERIMAAN LAUNDRY
+  // ========================================================
+  // Laundry/Admin memberikan TTD sebagai penerima
+  // linen kotor dari ruangan.
+
+  '/konfirmasi-penerimaan-laundry.html': [
+    'admin',
+    'laundry'
+  ],
+
+
+  // ========================================================
+  // LAUNDRY DASHBOARD
+  // ========================================================
+
+  '/laundry-dashboard.html': [
+    'laundry'
+  ],
+
+
+  // ========================================================
   // USER RUANGAN
-  // ==============================
-  '/user-dashboard.html': ['user'],
-  '/konfirmasi.html': ['user']
+  // ========================================================
+
+  '/user-dashboard.html': [
+    'user'
+  ],
+
+  '/konfirmasi.html': [
+    'user'
+  ]
+
 };
 
 

@@ -3,11 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Stok Linen per Ruangan</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap"
+  rel="stylesheet"
+>
+
 <style>
+
   :root{
     --bg: #F5F7F6;
     --surface: #FFFFFF;
@@ -15,23 +23,33 @@
     --ink-soft: #5B6B70;
     --line: #DCE3E1;
     --line-soft: #EAEFED;
+
     --teal: #00b1b7;
     --teal-deep: #00b1b7;
     --teal-tint: #E7F2EE;
-    --amber: #B8722E;
-    --amber-tint: #FBF0E3;
+
     --danger: #B34A3E;
+
     --radius: 10px;
   }
 
-  *{ box-sizing: border-box; }
+  *{
+    box-sizing: border-box;
+  }
 
-  html, body{
+  html,
+  body{
     margin: 0;
     padding: 0;
+
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Public Sans', system-ui, sans-serif;
+
+    font-family:
+      'Public Sans',
+      system-ui,
+      sans-serif;
+
     -webkit-font-smoothing: antialiased;
   }
 
@@ -41,274 +59,1182 @@
   }
 
   .wrap{
-    max-width: 760px;
+    max-width: 900px;
     margin: 0 auto;
   }
+
+  /* ==============================
+     HEADER
+  ============================== */
 
   header{
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+
     gap: 16px;
+
     margin-bottom: 24px;
     padding-bottom: 20px;
+
     border-bottom: 1px solid var(--line);
   }
 
-  .brand{ display: flex; flex-direction: column; gap: 2px; }
+  .brand{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
   .brand .unit{
     font-size: 13px;
     font-weight: 600;
+
     color: var(--teal-deep);
+
     letter-spacing: 0.02em;
   }
+
   h1{
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family:
+      'Source Serif 4',
+      Georgia,
+      serif;
+
     font-weight: 600;
-    font-size: 26px;
+    font-size: 30px;
+
     margin: 2px 0 0;
+  }
+
+  .header-right{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .role-badge{
+    padding: 7px 11px;
+
+    background: #EAF7F7;
+
+    border: 1px solid #C7E8E9;
+
+    border-radius: 7px;
+
+    color: #07868b;
+
+    font-size: 12px;
+    font-weight: 700;
   }
 
   a.nav-link{
     font-size: 13px;
     font-weight: 600;
+
     color: var(--teal-deep);
+
     text-decoration: none;
+
     padding: 7px 13px;
+
     border: 1px solid var(--line);
     border-radius: 7px;
+
     background: var(--surface);
+
     white-space: nowrap;
   }
-  a.nav-link:hover{ background: var(--teal-tint); border-color: #BFDED4; }
 
-  /* ---------- Pilih ruangan ---------- */
+  a.nav-link:hover{
+    background: var(--teal-tint);
+    border-color: #BFDED4;
+  }
+
+  /* ==============================
+     INFO
+  ============================== */
+
+  .info-box{
+    margin-bottom: 20px;
+
+    padding: 15px 18px;
+
+    background: white;
+
+    border: 1px solid var(--line);
+
+    border-radius: var(--radius);
+
+    color: var(--ink-soft);
+
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .info-box strong{
+    color: var(--ink);
+  }
+
+  /* ==============================
+     PILIH RUANGAN
+  ============================== */
+
+  .pilih-title{
+    margin-bottom: 10px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    color: var(--ink-soft);
+  }
+
   .pilih-ruangan{
     display: flex;
+
     gap: 10px;
+
     flex-wrap: wrap;
+
     margin-bottom: 20px;
   }
 
   .ruangan-chip{
     font-family: inherit;
+
     font-size: 14px;
     font-weight: 600;
+
     padding: 9px 16px;
+
     border-radius: 8px;
+
     border: 1px solid var(--line);
+
     background: var(--surface);
+
     color: var(--ink-soft);
+
     cursor: pointer;
+
+    transition: 0.15s;
   }
-  .ruangan-chip:hover{ background: #FAFBFA; }
+
+  .ruangan-chip:hover{
+    background: #FAFBFA;
+  }
+
   .ruangan-chip.active{
     background: var(--teal);
+
     border-color: var(--teal);
+
     color: #fff;
+  }
+
+  .ruangan-chip:disabled{
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .empty-state{
     padding: 30px 16px;
+
     text-align: center;
+
     color: var(--ink-soft);
+
     font-size: 14px;
   }
 
-  /* ---------- Tabel stok ---------- */
+  /* ==============================
+     PANEL STOK
+  ============================== */
+
   .stok-panel{
     background: var(--surface);
+
     border: 1px solid var(--line);
+
     border-radius: var(--radius);
+
     overflow: hidden;
   }
 
   .stok-head{
     padding: 16px 20px;
+
     border-bottom: 1px solid var(--line);
+
     display: flex;
+
     align-items: baseline;
+
     justify-content: space-between;
+
     gap: 12px;
   }
 
   .stok-head h2{
-    font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 19px;
+    font-family:
+      'Source Serif 4',
+      Georgia,
+      serif;
+
+    font-size: 21px;
+
     font-weight: 600;
+
     margin: 0;
   }
 
   .stok-head .catatan{
     font-size: 12.5px;
+
     color: var(--ink-soft);
+  }
+
+  /* ==============================
+     TABLE
+  ============================== */
+
+  .table-wrapper{
+    overflow-x: auto;
   }
 
   table{
     width: 100%;
+
     border-collapse: collapse;
+
     font-size: 14.5px;
   }
+
   thead th{
     text-align: left;
+
     font-weight: 600;
+
     color: var(--ink-soft);
+
     font-size: 12.5px;
+
     padding: 10px 20px;
+
     border-bottom: 1px solid var(--line);
   }
-  thead th.col-num{ width: 110px; text-align: center; }
+
+  thead th.col-num{
+    width: 120px;
+
+    text-align: center;
+  }
 
   tbody td{
-    padding: 10px 20px;
+    padding: 12px 20px;
+
     border-bottom: 1px solid var(--line-soft);
   }
-  tbody tr:last-child td{ border-bottom: none; }
+
+  tbody tr:last-child td{
+    border-bottom: none;
+  }
 
   td.col-num{
     text-align: center;
+
     font-variant-numeric: tabular-nums;
   }
 
   td.stok-nilai{
     font-weight: 700;
+
     font-size: 15px;
   }
-  td.stok-positif{ color: var(--teal-deep); }
-  td.stok-nol{ color: var(--ink-soft); }
-  td.stok-negatif{ color: var(--danger); }
 
-  .keterangan-box{
-    padding: 14px 20px;
-    background: var(--bg);
-    border-top: 1px solid var(--line);
-    font-size: 12.5px;
+  td.stok-positif{
+    color: var(--teal-deep);
+  }
+
+  td.stok-nol{
     color: var(--ink-soft);
-    line-height: 1.5;
   }
 
-  @media (max-width: 560px){
-    header{ flex-direction: column; align-items: flex-start; gap: 10px; }
-    thead th.col-diantar, td.col-diantar,
-    thead th.col-diambil, td.col-diambil{ display: none; }
+  td.stok-negatif{
+    color: var(--danger);
   }
+
+  /* ==============================
+     LOADING
+  ============================== */
+
+  .loading{
+    padding: 25px;
+
+    text-align: center;
+
+    color: var(--ink-soft);
+  }
+
+  .error-state{
+    padding: 25px;
+
+    text-align: center;
+
+    color: var(--danger);
+  }
+
+  /* ==============================
+     MOBILE
+  ============================== */
+
+  @media (max-width: 650px){
+
+    body{
+      padding: 20px 14px 60px;
+    }
+
+    header{
+      flex-direction: column;
+
+      align-items: flex-start;
+    }
+
+    .header-right{
+      width: 100%;
+
+      justify-content: space-between;
+    }
+
+    h1{
+      font-size: 26px;
+    }
+
+    .stok-head{
+      flex-direction: column;
+
+      align-items: flex-start;
+    }
+
+    thead th.col-diantar,
+    td.col-diantar,
+
+    thead th.col-diambil,
+    td.col-diambil{
+      display: none;
+    }
+
+  }
+
 </style>
+
 </head>
+
 <body>
 
 <div class="wrap">
 
+  <!-- ==========================
+       HEADER
+  =========================== -->
+
   <header>
+
     <div class="brand">
-      <span class="unit">Instalasi Loundry</span>
-      <h1>Stok Linen per Ruangan</h1>
+
+      <span class="unit">
+        Instalasi Laundry
+      </span>
+
+      <h1>
+        Stok Linen per Ruangan
+      </h1>
+
     </div>
-    <a class="nav-link" href="/">← Kembali</a>
+
+    <div class="header-right">
+
+      <span
+        class="role-badge"
+        id="role-badge"
+      >
+        Memuat...
+      </span>
+
+      <a
+        class="nav-link"
+        href="/"
+      >
+        ← Kembali
+      </a>
+
+    </div>
+
   </header>
 
-  <div class="pilih-ruangan" id="pilih-ruangan">
-    <div class="empty-state">Memuat daftar ruangan…</div>
+
+  <!-- ==========================
+       INFO
+  =========================== -->
+
+  <div class="info-box">
+
+    <strong>
+      Informasi:
+    </strong>
+
+    Stok linen ruangan dihitung berdasarkan
+    jumlah linen yang telah diantar ke ruangan
+    dikurangi jumlah linen yang telah diambil
+    oleh Laundry.
+
   </div>
 
-  <div class="stok-panel" id="stok-panel" style="display:none;">
-    <div class="stok-head">
-      <h2 id="nama-ruangan-aktif"></h2>
-      <span class="catatan">Stok = total diantar − total diambil</span>
+
+  <!-- ==========================
+       PILIH RUANGAN
+  =========================== -->
+
+  <div
+    class="pilih-title"
+    id="pilih-title"
+  >
+    Pilih Ruangan
+  </div>
+
+  <div
+    class="pilih-ruangan"
+    id="pilih-ruangan"
+  >
+
+    <div class="loading">
+      Memuat daftar ruangan...
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Jenis Linen</th>
-          <th class="col-num col-diantar">Diantar</th>
-          <th class="col-num col-diambil">Diambil</th>
-          <th class="col-num">Stok</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-stok"></tbody>
-    </table>
-    
+
+  </div>
+
+
+  <!-- ==========================
+       PANEL STOK
+  =========================== -->
+
+  <div
+    class="stok-panel"
+    id="stok-panel"
+    style="display:none;"
+  >
+
+    <div class="stok-head">
+
+      <h2
+        id="nama-ruangan-aktif"
+      >
+      </h2>
+
+      <span class="catatan">
+        Stok = total diantar − total diambil
+      </span>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Jenis Linen
+            </th>
+
+            <th
+              class="col-num col-diantar"
+            >
+              Diantar
+            </th>
+
+            <th
+              class="col-num col-diambil"
+            >
+              Diambil
+            </th>
+
+            <th
+              class="col-num"
+            >
+              Stok
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody
+          id="tbody-stok"
+        >
+
+        </tbody>
+
+      </table>
+
+    </div>
+
   </div>
 
 </div>
 
+
 <script>
-  const pilihRuangan = document.getElementById('pilih-ruangan');
-  const stokPanel = document.getElementById('stok-panel');
-  const namaRuanganAktif = document.getElementById('nama-ruangan-aktif');
-  const tbodyStok = document.getElementById('tbody-stok');
+
+  /* =====================================================
+     ELEMENT
+  ===================================================== */
+
+  const pilihRuangan =
+    document.getElementById(
+      'pilih-ruangan'
+    );
+
+  const stokPanel =
+    document.getElementById(
+      'stok-panel'
+    );
+
+  const namaRuanganAktif =
+    document.getElementById(
+      'nama-ruangan-aktif'
+    );
+
+  const tbodyStok =
+    document.getElementById(
+      'tbody-stok'
+    );
+
+  const roleBadge =
+    document.getElementById(
+      'role-badge'
+    );
+
+  const pilihTitle =
+    document.getElementById(
+      'pilih-title'
+    );
+
+
+  /* =====================================================
+     GLOBAL
+  ===================================================== */
+
+  let currentUser = null;
+
+  let daftarRuangan = [];
 
   let ruanganAktif = null;
 
-  async function muatDaftarRuangan(){
-    try{
-      const res = await fetch('/api/stok-ruangan/ruangan');
-      if(!res.ok) throw new Error('Gagal memuat');
-      const daftarRuangan = await res.json();
 
-      if(daftarRuangan.length === 0){
-        pilihRuangan.innerHTML = '<div class="empty-state">Belum ada ruangan tercatat. Buat dulu transaksi serah terima.</div>';
-        return;
+  /* =====================================================
+     START
+  ===================================================== */
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    mulai
+  );
+
+
+  async function mulai(){
+
+    try{
+
+      await muatUser();
+
+      await muatDaftarRuangan();
+
+    }catch(error){
+
+      console.error(
+        'Error:',
+        error
+      );
+
+      pilihRuangan.innerHTML = `
+        <div class="error-state">
+          Gagal memuat halaman.
+          Silakan muat ulang.
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  /* =====================================================
+     USER
+  ===================================================== */
+
+  async function muatUser(){
+
+    const res =
+      await fetch(
+        '/api/me'
+      );
+
+    if(!res.ok){
+
+      throw new Error(
+        'Sesi login tidak ditemukan.'
+      );
+
+    }
+
+    const data =
+      await res.json();
+
+    currentUser =
+      data.user || data;
+
+
+    const role =
+      currentUser?.role || 'unknown';
+
+
+    if(role === 'admin'){
+
+      roleBadge.textContent =
+        'ADMIN';
+
+    }
+
+    else if(role === 'laundry'){
+
+      roleBadge.textContent =
+        'LAUNDRY';
+
+    }
+
+    else if(role === 'user'){
+
+      roleBadge.textContent =
+        'USER';
+
+    }
+
+    else{
+
+      roleBadge.textContent =
+        role.toUpperCase();
+
+    }
+
+  }
+
+
+  /* =====================================================
+     LOAD MASTER RUANGAN
+  ===================================================== */
+
+  async function muatDaftarRuangan(){
+
+    const res =
+      await fetch(
+        '/api/ruangan'
+      );
+
+
+    if(!res.ok){
+
+      throw new Error(
+        'Gagal mengambil data ruangan.'
+      );
+
+    }
+
+
+    const data =
+      await res.json();
+
+
+    const list =
+      Array.isArray(data)
+        ? data
+        : (
+            data.data ||
+            []
+          );
+
+
+    /*
+     * Normalisasi data.
+     *
+     * API biasanya:
+     *
+     * {
+     *   id: 3,
+     *   nama: "UGD"
+     * }
+     */
+
+    daftarRuangan =
+      list
+        .map(
+          ruangan => ({
+
+            id:
+              ruangan.id,
+
+            nama:
+              ruangan.nama ||
+              ruangan.nama_ruangan ||
+              ruangan.name
+
+          })
+        )
+        .filter(
+          ruangan =>
+            ruangan.nama
+        );
+
+
+    /*
+     * USER
+     *
+     * User hanya boleh melihat
+     * ruangan miliknya sendiri.
+     */
+
+    if(
+      currentUser?.role ===
+      'user'
+    ){
+
+      const roomId =
+        Number(
+          currentUser.ruangan_id
+        );
+
+
+      daftarRuangan =
+        daftarRuangan.filter(
+          ruangan =>
+            Number(
+              ruangan.id
+            ) === roomId
+        );
+
+
+      pilihTitle.textContent =
+        'Ruangan Anda';
+
+    }
+
+
+    /*
+     * ADMIN / LAUNDRY
+     *
+     * Bisa melihat semua ruangan.
+     */
+
+    else{
+
+      pilihTitle.textContent =
+        'Pilih Ruangan';
+
+    }
+
+
+    renderDaftarRuangan();
+
+  }
+
+
+  /* =====================================================
+     RENDER BUTTON RUANGAN
+  ===================================================== */
+
+  function renderDaftarRuangan(){
+
+    if(
+      daftarRuangan.length === 0
+    ){
+
+      pilihRuangan.innerHTML = `
+
+        <div class="empty-state">
+
+          Belum ada ruangan
+          yang tersedia.
+
+        </div>
+
+      `;
+
+      stokPanel.style.display =
+        'none';
+
+      return;
+
+    }
+
+
+    pilihRuangan.innerHTML =
+      '';
+
+
+    daftarRuangan.forEach(
+      ruangan => {
+
+        const chip =
+          document.createElement(
+            'button'
+          );
+
+
+        chip.type =
+          'button';
+
+
+        chip.className =
+          'ruangan-chip';
+
+
+        chip.textContent =
+          ruangan.nama;
+
+
+        chip.addEventListener(
+          'click',
+          () =>
+            pilihRuanganIni(
+              ruangan.nama
+            )
+        );
+
+
+        pilihRuangan.appendChild(
+          chip
+        );
+
+      }
+    );
+
+
+    /*
+     * Otomatis pilih ruangan pertama.
+     */
+
+    pilihRuanganIni(
+      daftarRuangan[0].nama
+    );
+
+  }
+
+
+  /* =====================================================
+     PILIH RUANGAN
+  ===================================================== */
+
+  function pilihRuanganIni(
+    nama
+  ){
+
+    ruanganAktif =
+      nama;
+
+
+    pilihRuangan
+      .querySelectorAll(
+        '.ruangan-chip'
+      )
+      .forEach(
+        chip => {
+
+          chip.classList.toggle(
+            'active',
+            chip.textContent ===
+              nama
+          );
+
+        }
+      );
+
+
+    muatStok(
+      nama
+    );
+
+  }
+
+
+  /* =====================================================
+     LOAD STOK
+  ===================================================== */
+
+  async function muatStok(
+    nama
+  ){
+
+    stokPanel.style.display =
+      'block';
+
+
+    namaRuanganAktif.textContent =
+      nama;
+
+
+    tbodyStok.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="4"
+          class="loading"
+        >
+          Memuat stok...
+        </td>
+
+      </tr>
+
+    `;
+
+
+    try{
+
+      const res =
+        await fetch(
+          `/api/stok-ruangan/${encodeURIComponent(nama)}`
+        );
+
+
+      if(!res.ok){
+
+        throw new Error(
+          'Gagal memuat stok.'
+        );
+
       }
 
-      pilihRuangan.innerHTML = '';
-      daftarRuangan.forEach(nama => {
-        const chip = document.createElement('button');
-        chip.className = 'ruangan-chip';
-        chip.textContent = nama;
-        chip.addEventListener('click', () => pilihRuanganIni(nama));
-        pilihRuangan.appendChild(chip);
-      });
 
-      // Otomatis pilih ruangan pertama
-      pilihRuanganIni(daftarRuangan[0]);
-    }catch(err){
-      pilihRuangan.innerHTML = '<div class="empty-state">Gagal memuat daftar ruangan. Coba muat ulang halaman.</div>';
+      const data =
+        await res.json();
+
+
+      renderStok(
+        data
+      );
+
+
+    }catch(error){
+
+      console.error(
+        error
+      );
+
+
+      tbodyStok.innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="4"
+            class="error-state"
+          >
+
+            Gagal memuat stok
+            ruangan ini.
+
+          </td>
+
+        </tr>
+
+      `;
+
     }
+
   }
 
-  function pilihRuanganIni(nama){
-    ruanganAktif = nama;
 
-    pilihRuangan.querySelectorAll('.ruangan-chip').forEach(chip => {
-      chip.classList.toggle('active', chip.textContent === nama);
-    });
+  /* =====================================================
+     RENDER STOK
+  ===================================================== */
 
-    muatStok(nama);
-  }
+  function renderStok(
+    data
+  ){
 
-  async function muatStok(nama){
-    stokPanel.style.display = 'block';
-    namaRuanganAktif.textContent = nama;
-    tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:24px; color:var(--ink-soft);">Memuat stok…</td></tr>';
+    if(
+      !Array.isArray(data) ||
+      data.length === 0
+    ){
 
-    try{
-      const res = await fetch(`/api/stok-ruangan/${encodeURIComponent(nama)}`);
-      if(!res.ok) throw new Error('Gagal memuat stok');
-      const data = await res.json();
+      tbodyStok.innerHTML = `
 
-      tbodyStok.innerHTML = '';
-      data.forEach(item => {
-        const totalDiambil = Number(item.total_diambil_infeksius) + Number(item.total_diambil_non_infeksius);
-        const stok = Number(item.stok);
-        let kelas = 'stok-nol';
-        if(stok > 0) kelas = 'stok-positif';
-        if(stok < 0) kelas = 'stok-negatif';
+        <tr>
 
-        const tr = document.createElement('tr');
+          <td
+            colspan="4"
+            class="empty-state"
+          >
+
+            Belum ada data transaksi
+            linen untuk ruangan ini.
+
+          </td>
+
+        </tr>
+
+      `;
+
+      return;
+
+    }
+
+
+    tbodyStok.innerHTML =
+      '';
+
+
+    data.forEach(
+      item => {
+
+        const totalDiantar =
+          Number(
+            item.total_diantar || 0
+          );
+
+
+        const totalDiambil =
+          Number(
+            item.total_diambil_infeksius || 0
+          ) +
+
+          Number(
+            item.total_diambil_non_infeksius || 0
+          );
+
+
+        const stok =
+          Number(
+            item.stok || 0
+          );
+
+
+        let kelas =
+          'stok-nol';
+
+
+        if(
+          stok > 0
+        ){
+
+          kelas =
+            'stok-positif';
+
+        }
+
+
+        if(
+          stok < 0
+        ){
+
+          kelas =
+            'stok-negatif';
+
+        }
+
+
+        const tr =
+          document.createElement(
+            'tr'
+          );
+
+
         tr.innerHTML = `
-          <td>${item.jenis_linen_nama}</td>
-          <td class="col-num col-diantar">${item.total_diantar}</td>
-          <td class="col-num col-diambil">${totalDiambil}</td>
-          <td class="col-num stok-nilai ${kelas}">${stok}</td>
+
+          <td>
+            ${escapeHtml(
+              item.jenis_linen_nama ||
+              '-'
+            )}
+          </td>
+
+          <td
+            class="col-num col-diantar"
+          >
+            ${totalDiantar}
+          </td>
+
+          <td
+            class="col-num col-diambil"
+          >
+            ${totalDiambil}
+          </td>
+
+          <td
+            class="
+              col-num
+              stok-nilai
+              ${kelas}
+            "
+          >
+            ${stok}
+          </td>
+
         `;
-        tbodyStok.appendChild(tr);
-      });
-    }catch(err){
-      tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:24px; color:var(--danger);">Gagal memuat stok ruangan ini.</td></tr>';
-    }
+
+
+        tbodyStok.appendChild(
+          tr
+        );
+
+      }
+    );
+
   }
 
-  muatDaftarRuangan();
+
+  /* =====================================================
+     ESCAPE HTML
+  ===================================================== */
+
+  function escapeHtml(
+    value
+  ){
+
+    return String(
+      value ?? ''
+    )
+
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+
+      .replace(
+        /</g,
+        '&lt;'
+      )
+
+      .replace(
+        />/g,
+        '&gt;'
+      )
+
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+
+      .replace(
+        /'/g,
+        '&#039;'
+      );
+
+  }
+
 </script>
 
 </body>

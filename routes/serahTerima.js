@@ -560,9 +560,10 @@ router.get('/:id', async (req, res) => {
 //
 // PENGAMBILAN
 // - dibuat user ruangan
-// - jumlah_diambil_infeksius ATAU
+// - jumlah_diambil_infeksius +
 //   jumlah_diambil_non_infeksius
-// - hanya boleh satu kategori
+// - kedua kategori boleh diisi bersamaan
+// - stok ruangan tidak boleh minus
 // - stok Laundry tidak langsung bertambah
 // ============================================================
 
@@ -652,7 +653,8 @@ router.post('/', async (req, res) => {
     if (access.error) {
 
       return res.status(403).json({
-        error: access.error
+        error:
+          access.error
       });
 
     }
@@ -661,6 +663,10 @@ router.post('/', async (req, res) => {
     // ========================================================
     // CEK SIAPA YANG BOLEH MEMBUAT
     // ========================================================
+
+    // --------------------------------------------------------
+    // PENGANTARAN
+    // --------------------------------------------------------
 
     if (
       jenis_transaksi ===
@@ -682,6 +688,10 @@ router.post('/', async (req, res) => {
     }
 
 
+    // --------------------------------------------------------
+    // PENGAMBILAN
+    // --------------------------------------------------------
+
     if (
       jenis_transaksi ===
       'pengambilan'
@@ -700,6 +710,7 @@ router.post('/', async (req, res) => {
 
 
       // User tidak boleh menentukan ruangan lain
+
       if (
         ruangan.trim() !==
         access.ruangan_nama
@@ -714,6 +725,10 @@ router.post('/', async (req, res) => {
 
     }
 
+
+    // ========================================================
+    // BUAT CONNECTION
+    // ========================================================
 
     const connection =
       await db.getConnection();
@@ -760,7 +775,7 @@ router.post('/', async (req, res) => {
 
 
         // ====================================================
-        // ID LINEN
+        // VALIDASI ID LINEN
         // ====================================================
 
         if (
@@ -801,7 +816,7 @@ router.post('/', async (req, res) => {
 
 
         // ====================================================
-        // PENGANTARAN
+        // VALIDASI PENGANTARAN
         // ====================================================
 
         if (
@@ -809,8 +824,8 @@ router.post('/', async (req, res) => {
           'pengantaran'
         ) {
 
-          // Pengantaran tidak boleh berisi
-          // pengambilan linen kotor
+          // Pengantaran hanya boleh mengisi
+          // jumlah linen bersih yang diantar.
 
           if (
             jumlahInfeksius > 0 ||
@@ -830,7 +845,7 @@ router.post('/', async (req, res) => {
 
 
         // ====================================================
-        // PENGAMBILAN
+        // VALIDASI PENGAMBILAN
         // ====================================================
 
         if (
@@ -838,7 +853,7 @@ router.post('/', async (req, res) => {
           'pengambilan'
         ) {
 
-          // Pengambilan tidak boleh menggunakan jumlah_kotor
+          // Pengambilan tidak boleh menggunakan jumlah_kotor.
 
           if (
             jumlahKotor > 0
@@ -853,16 +868,11 @@ router.post('/', async (req, res) => {
 
           }
 
-
-          
-
-          
-
         }
 
 
         // ====================================================
-        // SEMUA NOL
+        // JIKA SEMUA JUMLAH NOL
         // ====================================================
 
         if (
@@ -921,8 +931,8 @@ router.post('/', async (req, res) => {
 
 
       // ======================================================
-      // CEK STOK
-      // KHUSUS PENGANTARAN
+      // PENGANTARAN
+      // CEK STOK LAUNDRY
       // ======================================================
 
       if (
@@ -937,25 +947,25 @@ router.post('/', async (req, res) => {
           if (
             item.jumlah_kotor <= 0
           ) {
+
             continue;
+
           }
 
+
+          // Kunci baris jenis linen
+          // agar stok Laundry aman.
 
           const [stokRows] =
             await connection.query(
               `
               SELECT
-
                 id,
                 nama,
                 jumlah_stok
-
               FROM jenis_linen
-
               WHERE id = ?
-
               LIMIT 1
-
               FOR UPDATE
               `,
               [
@@ -981,7 +991,7 @@ router.post('/', async (req, res) => {
           const stok =
             Number(
               stokRows[0].jumlah_stok
-            );
+            ) || 0;
 
 
           const namaLinen =
@@ -1005,16 +1015,13 @@ router.post('/', async (req, res) => {
           }
 
 
-          // Kurangi stok Laundry
+          // Kurangi stok Laundry.
 
           await connection.query(
             `
             UPDATE jenis_linen
-
-            SET
-              jumlah_stok =
-                jumlah_stok - ?
-
+            SET jumlah_stok =
+              jumlah_stok - ?
             WHERE id = ?
             `,
             [
@@ -1022,6 +1029,308 @@ router.post('/', async (req, res) => {
               item.jenis_linen_id
             ]
           );
+
+        }
+
+      }
+
+
+      // ======================================================
+      // PENGAMBILAN
+      // CEK STOK RUANGAN
+      // ======================================================
+      //
+      // Stok ruangan:
+      //
+      // total_diantar
+      // -
+      // (total_infeksius + total_non_infeksius)
+      //
+      // Contoh:
+      //
+      // Stok UGD = 4
+      // Infeksius = 5
+      //
+      // => DITOLAK
+      //
+      // Stok UGD = 4
+      // Infeksius = 3
+      // Non-infeksius = 1
+      //
+      // => BOLEH
+      // ======================================================
+
+      if (
+        jenis_transaksi ===
+        'pengambilan'
+      ) {
+
+        // ----------------------------------------------------
+        // KUNCI BARIS RUANGAN
+        // ----------------------------------------------------
+        //
+        // Tujuannya agar dua transaksi pengambilan
+        // untuk ruangan yang sama tidak melewati
+        // pengecekan stok secara bersamaan.
+        // ----------------------------------------------------
+
+        const [ruanganRows] =
+          await connection.query(
+            `
+            SELECT
+              id,
+              nama
+            FROM ruangan
+            WHERE nama = ?
+            LIMIT 1
+            FOR UPDATE
+            `,
+            [
+              access.ruangan_nama
+            ]
+          );
+
+
+        if (
+          ruanganRows.length === 0
+        ) {
+
+          await connection.rollback();
+
+          return res.status(404).json({
+            error:
+              'Ruangan user tidak ditemukan'
+          });
+
+        }
+
+
+        // ----------------------------------------------------
+        // GABUNGKAN JENIS LINEN YANG SAMA
+        // ----------------------------------------------------
+        //
+        // Jika frontend mengirim jenis linen yang sama
+        // lebih dari satu kali, semuanya dijumlahkan.
+        // ----------------------------------------------------
+
+        const permintaanPerLinen =
+          new Map();
+
+
+        for (
+          const item of detailValid
+        ) {
+
+          const jumlahPengambilan =
+            (
+              Number(
+                item.jumlah_diambil_infeksius
+              ) || 0
+            ) +
+            (
+              Number(
+                item.jumlah_diambil_non_infeksius
+              ) || 0
+            );
+
+
+          if (
+            jumlahPengambilan <= 0
+          ) {
+
+            continue;
+
+          }
+
+
+          const existing =
+            permintaanPerLinen.get(
+              item.jenis_linen_id
+            ) || {
+              infeksius: 0,
+              nonInfeksius: 0
+            };
+
+
+          existing.infeksius +=
+            Number(
+              item.jumlah_diambil_infeksius
+            ) || 0;
+
+
+          existing.nonInfeksius +=
+            Number(
+              item.jumlah_diambil_non_infeksius
+            ) || 0;
+
+
+          permintaanPerLinen.set(
+            item.jenis_linen_id,
+            existing
+          );
+
+        }
+
+
+        // ----------------------------------------------------
+        // CEK SETIAP JENIS LINEN
+        // ----------------------------------------------------
+
+        for (
+          const [
+            jenisLinenId,
+            permintaan
+          ]
+          of permintaanPerLinen
+        ) {
+
+          const jumlahAkanDiambil =
+            permintaan.infeksius +
+            permintaan.nonInfeksius;
+
+
+          // --------------------------------------------------
+          // CARI NAMA LINEN
+          // --------------------------------------------------
+
+          const [linenRows] =
+            await connection.query(
+              `
+              SELECT
+                id,
+                nama
+              FROM jenis_linen
+              WHERE id = ?
+              LIMIT 1
+              `,
+              [
+                jenisLinenId
+              ]
+            );
+
+
+          if (
+            linenRows.length === 0
+          ) {
+
+            await connection.rollback();
+
+            return res.status(404).json({
+              error:
+                `Jenis linen dengan ID ${jenisLinenId} tidak ditemukan`
+            });
+
+          }
+
+
+          const namaLinen =
+            linenRows[0].nama;
+
+
+          // --------------------------------------------------
+          // HITUNG STOK RUANGAN
+          // --------------------------------------------------
+          //
+          // Hanya transaksi sesuai ruangan user.
+          //
+          // Pengantaran:
+          // + jumlah_kotor
+          //
+          // Pengambilan:
+          // - infeksius
+          // - non-infeksius
+          //
+          // Data lama yang sudah tersimpan juga
+          // ikut dihitung.
+          // --------------------------------------------------
+
+          const [stokRuanganRows] =
+            await connection.query(
+              `
+              SELECT
+
+                COALESCE(
+                  SUM(
+                    CASE
+                      WHEN st.jenis_transaksi =
+                        'pengantaran'
+                      THEN d.jumlah_kotor
+                      ELSE 0
+                    END
+                  ),
+                  0
+                ) AS total_diantar,
+
+
+                COALESCE(
+                  SUM(
+                    CASE
+                      WHEN st.jenis_transaksi =
+                        'pengambilan'
+                      THEN
+                        d.jumlah_diambil_infeksius +
+                        d.jumlah_diambil_non_infeksius
+                      ELSE 0
+                    END
+                  ),
+                  0
+                ) AS total_diambil
+
+              FROM serah_terima st
+
+              INNER JOIN serah_terima_detail d
+                ON d.serah_terima_id =
+                  st.id
+
+              WHERE st.ruangan = ?
+
+              AND d.jenis_linen_id = ?
+              `,
+              [
+                access.ruangan_nama,
+                jenisLinenId
+              ]
+            );
+
+
+          const totalDiantar =
+            Number(
+              stokRuanganRows[0].total_diantar
+            ) || 0;
+
+
+          const totalDiambil =
+            Number(
+              stokRuanganRows[0].total_diambil
+            ) || 0;
+
+
+          const stokSaatIni =
+            totalDiantar -
+            totalDiambil;
+
+
+          // --------------------------------------------------
+          // CEK STOK
+          // --------------------------------------------------
+
+          if (
+            stokSaatIni <
+            jumlahAkanDiambil
+          ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+              error:
+                `Stok ${namaLinen} di ${access.ruangan_nama} tidak mencukupi. ` +
+                `Stok tersedia: ${stokSaatIni}, ` +
+                `jumlah yang akan diambil: ${jumlahAkanDiambil} ` +
+                `(Infeksius: ${permintaan.infeksius}, ` +
+                `Non-infeksius: ${permintaan.nonInfeksius}).`
+            });
+
+          }
 
         }
 
@@ -1115,7 +1424,6 @@ router.post('/', async (req, res) => {
           )
           `,
           [
-
             serahTerimaId,
 
             item.jenis_linen_id,
@@ -1127,7 +1435,6 @@ router.post('/', async (req, res) => {
             item.jumlah_diambil_non_infeksius,
 
             item.keterangan
-
           ]
         );
 
