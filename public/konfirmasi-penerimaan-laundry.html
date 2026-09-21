@@ -1025,16 +1025,38 @@
         </h3>
 
 
-        
+        <h3 class="section-title">
+  Konfirmasi Penerimaan Laundry
+</h3>
+
+
+<div class="field">
+
+  <label for="nama-${transaction.id}">
+    Nama Penerima Laundry
+  </label>
+
+  <input
+    type="text"
+    id="nama-${transaction.id}"
+    placeholder="Masukkan nama petugas Laundry"
+    autocomplete="off"
+  >
+
+</div>
+
+
+
+  </div>
+
+</div>
 
 
         <!-- SIGNATURE -->
 
         <div>
 
-          <label>
-            Tanda Tangan Penerima Laundry
-          </label>
+          
 
 
           <div class="signature-wrapper">
@@ -1223,86 +1245,181 @@
       }
 
       // ==========================================================
-      // KONFIRMASI PENERIMAAN LAUNDRY
-      // ==========================================================
+// KONFIRMASI PENERIMAAN LAUNDRY
+// ==========================================================
 
-      async function konfirmasiPenerimaanLaundry(transactionId) {
-        clearMessage();
+async function konfirmasiPenerimaanLaundry(transactionId) {
+  clearMessage();
 
-        const canvas = document.getElementById(`signature-${transactionId}`);
+  // --------------------------------------------------------
+  // AMBIL INPUT NAMA
+  // --------------------------------------------------------
 
-        const button = document.getElementById(`submit-${transactionId}`);
+  const namaInput = document.getElementById(
+    `nama-${transactionId}`
+  );
 
-        // --------------------------------------------------------
-        // VALIDASI TTD
-        // --------------------------------------------------------
+  // --------------------------------------------------------
+  // AMBIL CANVAS TTD
+  // --------------------------------------------------------
 
-        if (!hasSignature(transactionId)) {
-          showMessage("Tanda tangan penerima Laundry wajib diisi.");
+  const canvas = document.getElementById(
+    `signature-${transactionId}`
+  );
 
-          return;
-        }
+  // --------------------------------------------------------
+  // AMBIL BUTTON
+  // --------------------------------------------------------
 
-        const tandaTangan = canvas.toDataURL("image/png");
+  const button = document.getElementById(
+    `submit-${transactionId}`
+  );
 
-        try {
-          button.disabled = true;
+  // --------------------------------------------------------
+  // VALIDASI ELEMENT
+  // --------------------------------------------------------
 
-          button.textContent = "Menyimpan...";
+  if (!namaInput) {
+    showMessage(
+      "Input nama penerima Laundry tidak ditemukan."
+    );
 
-          // ------------------------------------------------------
-          // KIRIM KE BACKEND
-          // ------------------------------------------------------
+    return;
+  }
 
-          const res = await fetch(
-            `/api/serah-terima/${transactionId}/konfirmasi-penerimaan-laundry`,
+  if (!canvas) {
+    showMessage(
+      "Kolom tanda tangan tidak ditemukan."
+    );
 
-            {
-              method: "PUT",
+    return;
+  }
 
-              headers: {
-                "Content-Type": "application/json",
-              },
+  if (!button) {
+    showMessage(
+      "Tombol konfirmasi tidak ditemukan."
+    );
 
-              body: JSON.stringify({
-                tanda_tangan_penerima_laundry: tandaTangan,
-              }),
-            },
-          );
+    return;
+  }
 
-          const result = await res.json().catch(() => ({}));
+  // --------------------------------------------------------
+  // AMBIL NAMA
+  // --------------------------------------------------------
 
-          if (!res.ok) {
-            throw new Error(result.error || "Gagal mengonfirmasi penerimaan Laundry.");
-          }
+  const nama = namaInput.value.trim();
 
-          // ------------------------------------------------------
-          // BERHASIL
-          // ------------------------------------------------------
+  // --------------------------------------------------------
+  // VALIDASI NAMA
+  // --------------------------------------------------------
 
-          showMessage(
-            "Penerimaan Laundry berhasil dikonfirmasi. Linen masuk ke Proses Laundry.",
+  if (!nama) {
+    showMessage(
+      "Nama penerima Laundry wajib diisi."
+    );
 
-            "success",
-          );
+    namaInput.focus();
 
-          // ------------------------------------------------------
-          // REFRESH
-          // ------------------------------------------------------
+    return;
+  }
 
-          setTimeout(() => {
-            loadTransactions();
-          }, 1000);
-        } catch (error) {
-          console.error(error);
+  // --------------------------------------------------------
+  // VALIDASI TTD
+  // --------------------------------------------------------
 
-          showMessage(error.message || "Gagal melakukan konfirmasi.");
+  if (!hasSignature(transactionId)) {
+    showMessage(
+      "Tanda tangan penerima Laundry wajib diisi."
+    );
 
-          button.disabled = false;
+    return;
+  }
 
-          button.textContent = "Konfirmasi Penerimaan";
-        }
+  // --------------------------------------------------------
+  // AMBIL DATA TTD
+  // --------------------------------------------------------
+
+  const tandaTangan = canvas.toDataURL(
+    "image/png"
+  );
+
+  try {
+    button.disabled = true;
+
+    button.textContent = "Menyimpan...";
+
+    // ------------------------------------------------------
+    // KIRIM KE BACKEND
+    // ------------------------------------------------------
+
+    const res = await fetch(
+      `/api/serah-terima/${transactionId}/konfirmasi-penerimaan-laundry`,
+      {
+        method: "PUT",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          nama_penerima_laundry: nama,
+
+          tanda_tangan_penerima_laundry:
+            tandaTangan,
+        }),
       }
+    );
+
+    // ------------------------------------------------------
+    // BACA RESPONSE
+    // ------------------------------------------------------
+
+    const result = await res
+      .json()
+      .catch(() => ({}));
+
+    // ------------------------------------------------------
+    // CEK ERROR BACKEND
+    // ------------------------------------------------------
+
+    if (!res.ok) {
+      throw new Error(
+        result.error ||
+        "Gagal mengonfirmasi penerimaan Laundry."
+      );
+    }
+
+    // ------------------------------------------------------
+    // BERHASIL
+    // ------------------------------------------------------
+
+    showMessage(
+      "Penerimaan Laundry berhasil dikonfirmasi. Linen masuk ke Proses Laundry.",
+      "success"
+    );
+
+    // ------------------------------------------------------
+    // REFRESH TRANSAKSI
+    // ------------------------------------------------------
+
+    setTimeout(() => {
+      loadTransactions();
+    }, 1000);
+
+  } catch (error) {
+    console.error(error);
+
+    showMessage(
+      error.message ||
+      "Gagal melakukan konfirmasi."
+    );
+
+    button.disabled = false;
+
+    button.textContent =
+      "Konfirmasi Penerimaan";
+  }
+}
 
       // ==========================================================
       // START

@@ -191,9 +191,10 @@ router.get("/", async (req, res) => {
         st.diserahkan_oleh_user_id,
         st.diserahkan_at,
 
-        st.tanda_tangan_penerima_laundry,
-        st.diterima_laundry_oleh_user_id,
-        st.diterima_laundry_at,
+       st.nama_penerima_laundry,
+st.tanda_tangan_penerima_laundry,
+st.diterima_laundry_oleh_user_id,
+st.diterima_laundry_at,
 
         COALESCE(
           SUM(d.jumlah_kotor),
@@ -266,9 +267,10 @@ router.get("/", async (req, res) => {
         st.diserahkan_oleh_user_id,
         st.diserahkan_at,
 
-        st.tanda_tangan_penerima_laundry,
-        st.diterima_laundry_oleh_user_id,
-        st.diterima_laundry_at
+        st.nama_penerima_laundry,
+st.tanda_tangan_penerima_laundry,
+st.diterima_laundry_oleh_user_id,
+st.diterima_laundry_at
 
       ORDER BY
         st.created_at DESC
@@ -329,9 +331,10 @@ router.get("/:id", async (req, res) => {
         diserahkan_oleh_user_id,
         diserahkan_at,
 
-        tanda_tangan_penerima_laundry,
-        diterima_laundry_oleh_user_id,
-        diterima_laundry_at
+        nama_penerima_laundry,
+tanda_tangan_penerima_laundry,
+diterima_laundry_oleh_user_id,
+diterima_laundry_at
 
       FROM serah_terima
 
@@ -1092,57 +1095,58 @@ router.post("/", async (req, res) => {
 // Menunggu TTD petugas Laundry.
 // ============================================================
 
-router.put("/:id/konfirmasi-penerimaan", async (req, res) => {
-  const { id } = req.params;
+router.put("/:id/konfirmasi-penerimaan",
+  async (req, res) => {
+    const { id } = req.params;
 
-  const { nama_penerima, tanda_tangan } = req.body;
+    const { nama_penerima, tanda_tangan } = req.body;
 
-  // ==========================================================
-  // VALIDASI
-  // ==========================================================
+    // ==========================================================
+    // VALIDASI
+    // ==========================================================
 
-  if (!nama_penerima || !nama_penerima.trim()) {
-    return res.status(400).json({
-      error: "Nama penerima wajib diisi",
-    });
-  }
-
-  if (!tanda_tangan) {
-    return res.status(400).json({
-      error: "Tanda tangan penerima wajib diisi",
-    });
-  }
-
-  try {
-    const access = await getAccessInfo(req);
-
-    if (access.error) {
-      return res.status(403).json({
-        error: access.error,
+    if (!nama_penerima || !nama_penerima.trim()) {
+      return res.status(400).json({
+        error: "Nama penerima wajib diisi",
       });
     }
 
-    // ========================================================
-    // HANYA USER
-    // ========================================================
-
-    if (access.role !== "user") {
-      return res.status(403).json({
-        error: "Hanya user ruangan yang dapat melakukan konfirmasi penerimaan",
+    if (!tanda_tangan) {
+      return res.status(400).json({
+        error: "Tanda tangan penerima wajib diisi",
       });
     }
-
-    const connection = await db.getConnection();
 
     try {
-      await connection.beginTransaction();
+      const access = await getAccessInfo(req);
 
-      // ======================================================
-      // AMBIL TRANSAKSI
-      // ======================================================
+      if (access.error) {
+        return res.status(403).json({
+          error: access.error,
+        });
+      }
+      router.put;
+      // ========================================================
+      // HANYA USER
+      // ========================================================
 
-      const [rows] = await connection.query(
-        `
+      if (access.role !== "user") {
+        return res.status(403).json({
+          error: "Hanya user ruangan yang dapat melakukan konfirmasi penerimaan",
+        });
+      }
+
+      const connection = await db.getConnection();
+
+      try {
+        await connection.beginTransaction();
+
+        // ======================================================
+        // AMBIL TRANSAKSI
+        // ======================================================
+
+        const [rows] = await connection.query(
+          `
             SELECT
 
               id,
@@ -1165,61 +1169,61 @@ router.put("/:id/konfirmasi-penerimaan", async (req, res) => {
 
             FOR UPDATE
             `,
-        [id, access.ruangan_nama],
-      );
+          [id, access.ruangan_nama],
+        );
 
-      if (rows.length === 0) {
-        await connection.rollback();
+        if (rows.length === 0) {
+          await connection.rollback();
 
-        return res.status(404).json({
-          error: "Transaksi tidak ditemukan atau bukan milik ruangan Anda",
-        });
-      }
+          return res.status(404).json({
+            error: "Transaksi tidak ditemukan atau bukan milik ruangan Anda",
+          });
+        }
 
-      const transaksi = rows[0];
+        const transaksi = rows[0];
 
-      // ======================================================
-      // HARUS PENGANTARAN
-      // ======================================================
+        // ======================================================
+        // HARUS PENGANTARAN
+        // ======================================================
 
-      if (transaksi.jenis_transaksi !== "pengantaran") {
-        await connection.rollback();
+        if (transaksi.jenis_transaksi !== "pengantaran") {
+          await connection.rollback();
 
-        return res.status(400).json({
-          error: "Transaksi ini bukan transaksi pengantaran",
-        });
-      }
+          return res.status(400).json({
+            error: "Transaksi ini bukan transaksi pengantaran",
+          });
+        }
 
-      // ======================================================
-      // STATUS
-      // ======================================================
+        // ======================================================
+        // STATUS
+        // ======================================================
 
-      if (transaksi.status === "selesai") {
-        await connection.rollback();
+        if (transaksi.status === "selesai") {
+          await connection.rollback();
 
-        return res.status(400).json({
-          error: "Transaksi ini sudah selesai",
-        });
-      }
+          return res.status(400).json({
+            error: "Transaksi ini sudah selesai",
+          });
+        }
 
-      // ======================================================
-      // JIKA SUDAH TTD
-      // ======================================================
+        // ======================================================
+        // JIKA SUDAH TTD
+        // ======================================================
 
-      if (transaksi.tanda_tangan) {
-        await connection.rollback();
+        if (transaksi.tanda_tangan) {
+          await connection.rollback();
 
-        return res.status(400).json({
-          error: "Penerimaan sudah dikonfirmasi",
-        });
-      }
+          return res.status(400).json({
+            error: "Penerimaan sudah dikonfirmasi",
+          });
+        }
 
-      // ======================================================
-      // SIMPAN TTD RUANGAN
-      // ======================================================
+        // ======================================================
+        // SIMPAN TTD RUANGAN
+        // ======================================================
 
-      await connection.query(
-        `
+        await connection.query(
+          `
           UPDATE serah_terima
 
           SET
@@ -1234,39 +1238,39 @@ router.put("/:id/konfirmasi-penerimaan", async (req, res) => {
 
           WHERE id = ?
           `,
-        [nama_penerima.trim(), tanda_tangan, access.userId, id],
-      );
+          [nama_penerima.trim(), tanda_tangan, access.userId, id],
+        );
 
-      // ======================================================
-      // CEK STATUS
-      // ======================================================
+        // ======================================================
+        // CEK STATUS
+        // ======================================================
 
-      await updateStatusIfComplete(connection, id);
+        await updateStatusIfComplete(connection, id);
 
-      await connection.commit();
+        await connection.commit();
 
-      return res.json({
-        success: true,
+        return res.json({
+          success: true,
 
-        message: "Penerimaan berhasil dikonfirmasi. Transaksi pengantaran selesai.",
+          message: "Penerimaan berhasil dikonfirmasi. Transaksi pengantaran selesai.",
 
-        status: "selesai",
-      });
+          status: "selesai",
+        });
+      } catch (err) {
+        await connection.rollback();
+
+        throw err;
+      } finally {
+        connection.release();
+      }
     } catch (err) {
-      await connection.rollback();
+      console.error("Error konfirmasi penerimaan:", err);
 
-      throw err;
-    } finally {
-      connection.release();
+      return res.status(500).json({
+        error: "Gagal melakukan konfirmasi penerimaan",
+      });
     }
-  } catch (err) {
-    console.error("Error konfirmasi penerimaan:", err);
-
-    return res.status(500).json({
-      error: "Gagal melakukan konfirmasi penerimaan",
-    });
-  }
-});
+  });
 
 // ============================================================
 // LEGACY KONFIRMASI
@@ -1820,7 +1824,19 @@ router.put("/:id/konfirmasi-penyerahan", async (req, res) => {
 router.put("/:id/konfirmasi-penerimaan-laundry", async (req, res) => {
   const { id } = req.params;
 
-  const { tanda_tangan_penerima_laundry } = req.body;
+  const {
+    nama_penerima_laundry,
+    tanda_tangan_penerima_laundry,
+  } = req.body;
+
+  if (
+    !nama_penerima_laundry ||
+    !nama_penerima_laundry.trim()
+  ) {
+    return res.status(400).json({
+      error: "Nama penerima Laundry wajib diisi",
+    });
+  }
 
   if (!tanda_tangan_penerima_laundry) {
     return res.status(400).json({
@@ -1837,7 +1853,10 @@ router.put("/:id/konfirmasi-penerimaan-laundry", async (req, res) => {
       });
     }
 
-    if (access.role !== "admin" && access.role !== "laundry") {
+    if (
+      access.role !== "admin" &&
+      access.role !== "laundry"
+    ) {
       return res.status(403).json({
         error: "Hanya Laundry atau Admin yang dapat menerima linen",
       });
@@ -1854,26 +1873,25 @@ router.put("/:id/konfirmasi-penerimaan-laundry", async (req, res) => {
 
       const [headerRows] = await connection.query(
         `
-            SELECT
+        SELECT
+          id,
+          ruangan,
+          jenis_transaksi,
+          status,
 
-              id,
-              ruangan,
-              jenis_transaksi,
-              status,
+          nama_penyerah,
+          tanda_tangan_penyerah,
 
-              nama_penyerah,
-              tanda_tangan_penyerah,
+          tanda_tangan_penerima_laundry
 
-              tanda_tangan_penerima_laundry
+        FROM serah_terima
 
-            FROM serah_terima
+        WHERE id = ?
 
-            WHERE id = ?
+        LIMIT 1
 
-            LIMIT 1
-
-            FOR UPDATE
-            `,
+        FOR UPDATE
+        `,
         [id],
       );
 
@@ -1929,23 +1947,22 @@ router.put("/:id/konfirmasi-penerimaan-laundry", async (req, res) => {
 
       const [detailRows] = await connection.query(
         `
-            SELECT
+        SELECT
+          d.id,
+          d.jenis_linen_id,
 
-              d.id,
-              d.jenis_linen_id,
+          d.jumlah_diambil_infeksius,
+          d.jumlah_diambil_non_infeksius,
 
-              d.jumlah_diambil_infeksius,
-              d.jumlah_diambil_non_infeksius,
+          d.jumlah_verifikasi_infeksius,
+          d.jumlah_verifikasi_non_infeksius
 
-              d.jumlah_verifikasi_infeksius,
-              d.jumlah_verifikasi_non_infeksius
+        FROM serah_terima_detail d
 
-            FROM serah_terima_detail d
+        WHERE d.serah_terima_id = ?
 
-            WHERE d.serah_terima_id = ?
-
-            FOR UPDATE
-            `,
+        FOR UPDATE
+        `,
         [id],
       );
 
@@ -1958,26 +1975,28 @@ router.put("/:id/konfirmasi-penerimaan-laundry", async (req, res) => {
       }
 
       // ======================================================
-      // SIMPAN TTD LAUNDRY
+      // SIMPAN TTD DAN NAMA LAUNDRY
       // ======================================================
 
       await connection.query(
         `
-          UPDATE serah_terima
+        UPDATE serah_terima
 
-          SET
+        SET
+          nama_penerima_laundry = ?,
+          tanda_tangan_penerima_laundry = ?,
+          diterima_laundry_oleh_user_id = ?,
+          diterima_laundry_at = NOW(),
+          status = 'selesai'
 
-            tanda_tangan_penerima_laundry = ?,
-
-            diterima_laundry_oleh_user_id = ?,
-
-            diterima_laundry_at = NOW(),
-
-            status = 'selesai'
-
-          WHERE id = ?
-          `,
-        [tanda_tangan_penerima_laundry, access.userId, id],
+        WHERE id = ?
+        `,
+        [
+          nama_penerima_laundry.trim(),
+          tanda_tangan_penerima_laundry,
+          access.userId,
+          id,
+        ],
       );
 
       // ======================================================
@@ -1985,30 +2004,30 @@ router.put("/:id/konfirmasi-penerimaan-laundry", async (req, res) => {
       // ======================================================
 
       for (const item of detailRows) {
-        const jumlahInfeksius = Number(item.jumlah_diambil_infeksius) || 0;
+        const jumlahInfeksius =
+          Number(item.jumlah_diambil_infeksius) || 0;
 
-        const jumlahNonInfeksius = Number(item.jumlah_diambil_non_infeksius) || 0;
+        const jumlahNonInfeksius =
+          Number(item.jumlah_diambil_non_infeksius) || 0;
 
-        const jumlahTotal = jumlahInfeksius + jumlahNonInfeksius;
+        const jumlahTotal =
+          jumlahInfeksius + jumlahNonInfeksius;
 
         if (jumlahTotal <= 0) {
           continue;
         }
 
         // Cek apakah sudah ada proses
-
-        const [existingProcess] = await connection.query(
-          `
-              SELECT
-                id
-              FROM proses_laundry
-
-              WHERE serah_terima_detail_id = ?
-
-              LIMIT 1
-              `,
-          [item.id],
-        );
+        const [existingProcess] =
+          await connection.query(
+            `
+            SELECT id
+            FROM proses_laundry
+            WHERE serah_terima_detail_id = ?
+            LIMIT 1
+            `,
+            [item.id],
+          );
 
         if (existingProcess.length > 0) {
           continue;
@@ -2016,37 +2035,43 @@ router.put("/:id/konfirmasi-penerimaan-laundry", async (req, res) => {
 
         await connection.query(
           `
-            INSERT INTO proses_laundry
-            (
-              serah_terima_detail_id,
-              jenis_linen_id,
+          INSERT INTO proses_laundry
+          (
+            serah_terima_detail_id,
+            jenis_linen_id,
 
-              jumlah_infeksius,
-              jumlah_non_infeksius,
-              jumlah_total,
+            jumlah_infeksius,
+            jumlah_non_infeksius,
+            jumlah_total,
 
-              jumlah_verifikasi_infeksius,
-              jumlah_verifikasi_non_infeksius,
+            jumlah_verifikasi_infeksius,
+            jumlah_verifikasi_non_infeksius,
 
-              status
+            status
+          )
 
-            )
+          VALUES
+          (
+            ?,
+            ?,
 
-            VALUES (
-              ?,
-              ?,
+            ?,
+            ?,
+            ?,
 
-              ?,
-              ?,
-              ?,
+            0,
+            0,
 
-              0,
-              0,
-
-              'menunggu_cuci'
-            )
-            `,
-          [item.id, item.jenis_linen_id, jumlahInfeksius, jumlahNonInfeksius, jumlahTotal],
+            'menunggu_cuci'
+          )
+          `,
+          [
+            item.id,
+            item.jenis_linen_id,
+            jumlahInfeksius,
+            jumlahNonInfeksius,
+            jumlahTotal,
+          ],
         );
       }
 
@@ -2058,20 +2083,24 @@ router.put("/:id/konfirmasi-penerimaan-laundry", async (req, res) => {
 
       return res.json({
         success: true,
-
-        message: "Penerimaan Laundry berhasil. Linen masuk ke proses Laundry.",
-
+        message:
+          "Penerimaan Laundry berhasil. Linen masuk ke proses Laundry.",
         status: "selesai",
       });
+
     } catch (err) {
       await connection.rollback();
-
       throw err;
+
     } finally {
       connection.release();
     }
+
   } catch (err) {
-    console.error("Error penerimaan Laundry:", err);
+    console.error(
+      "Error penerimaan Laundry:",
+      err
+    );
 
     return res.status(500).json({
       error: "Gagal menyimpan penerimaan Laundry",
