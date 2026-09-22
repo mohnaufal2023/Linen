@@ -727,23 +727,19 @@
 
           const rows = Array.isArray(result) ? result : result.data || [];
 
-          // ------------------------------------------------------
           // HANYA PENGAMBILAN
-          // YANG SUDAH DITANDATANGANI RUANGAN
-          // TAPI BELUM DITERIMA LAUNDRY
-          // ------------------------------------------------------
+// YANG BELUM DITERIMA LAUNDRY
 
-          const pending = rows.filter((item) => {
-            const jenis = String(item.jenis_transaksi || "").toLowerCase();
+const pending = rows.filter((item) => {
+  const jenis = String(item.jenis_transaksi || "").toLowerCase();
 
-            const isPengambilan = jenis === "pengambilan";
+  const isPengambilan = jenis === "pengambilan";
 
-            const sudahDiserahkan = Boolean(item.tanda_tangan_penyerah);
+  const belumDiterimaLaundry =
+    !Boolean(item.tanda_tangan_penerima_laundry);
 
-            const belumDiterimaLaundry = !Boolean(item.tanda_tangan_penerima_laundry);
-
-            return isPengambilan && sudahDiserahkan && belumDiterimaLaundry;
-          });
+  return isPengambilan && belumDiterimaLaundry;
+});
 
           // ------------------------------------------------------
           // TIDAK ADA

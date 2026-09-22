@@ -531,5 +531,66 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// ==========================================================
+// RESET PASSWORD USER
+// ==========================================================
+router.put('/:id/reset-password', async (req, res) => {
+
+  const { id } = req.params;
+  const { password } = req.body;
+
+  if (!password || password.length < 6) {
+    return res.status(400).json({
+      error: 'Password minimal 6 karakter'
+    });
+  }
+
+  try {
+
+    const [users] = await db.query(`
+      SELECT id, username
+      FROM users
+      WHERE id = ?
+      LIMIT 1
+    `, [id]);
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        error: 'User tidak ditemukan'
+      });
+    }
+
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
+
+    await db.query(`
+      UPDATE users
+      SET password = ?
+      WHERE id = ?
+    `, [
+      hashedPassword,
+      id
+    ]);
+
+    res.json({
+      message:
+        `Password user "${users[0].username}" berhasil direset`
+    });
+
+  } catch (err) {
+
+    console.error(
+      'RESET PASSWORD:',
+      err
+    );
+
+    res.status(500).json({
+      error:
+        'Gagal mereset password'
+    });
+
+  }
+
+});
 
 module.exports = router;

@@ -258,6 +258,7 @@
     }
 
     .edit-btn,
+    .reset-btn,
     .delete-btn {
       border: none;
       padding: 7px 10px;
@@ -274,6 +275,15 @@
 
     .edit-btn:hover {
       background: #dbeafe;
+    }
+
+    .reset-btn {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+    .reset-btn:hover {
+      background: #ffedd5;
     }
 
     .delete-btn {
@@ -421,6 +431,31 @@
     .save-btn:hover {
       background: #1d4ed8;
     }
+
+    /* =========================
+       RESET PASSWORD MODAL
+    ========================= */
+
+    .reset-user-info {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .reset-user-info strong {
+      color: #111827;
+    }
+
+    .reset-warning {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #92400e;
+    }
+
 
     /* =========================
        RESPONSIVE
@@ -747,6 +782,102 @@
   </div>
 
 
+  <!-- =========================
+       RESET PASSWORD MODAL
+  ========================= -->
+
+  <div
+    id="resetPasswordOverlay"
+    class="modal-overlay">
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <h3>
+          Reset Password
+        </h3>
+
+        <button
+          type="button"
+          class="close-btn"
+          onclick="closeResetPasswordModal()">
+          &times;
+        </button>
+
+      </div>
+
+      <form
+        id="resetPasswordForm"
+        onsubmit="resetPassword(event)">
+
+        <div class="modal-body">
+
+          <div
+            id="resetUserInfo"
+            class="reset-user-info">
+          </div>
+
+          <div class="form-group">
+
+            <label for="newPassword">
+              Password Baru
+            </label>
+
+            <input
+              type="password"
+              id="newPassword"
+              minlength="6"
+              autocomplete="new-password"
+              required>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="confirmPassword">
+              Konfirmasi Password Baru
+            </label>
+
+            <input
+              type="password"
+              id="confirmPassword"
+              minlength="6"
+              autocomplete="new-password"
+              required>
+
+            <p class="reset-warning">
+              Password minimal 6 karakter.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+          <button
+            type="button"
+            class="cancel-btn"
+            onclick="closeResetPasswordModal()">
+            Batal
+          </button>
+
+          <button
+            type="submit"
+            class="save-btn">
+            Reset Password
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
   <script>
 
     // ==========================================================
@@ -972,6 +1103,12 @@
                 class="edit-btn"
                 onclick="openEditModal(${user.id})">
                 Edit
+              </button>
+
+              <button
+                class="reset-btn"
+                onclick="openResetPasswordModal(${user.id})">
+                Reset Password
               </button>
 
               <button
@@ -1313,6 +1450,153 @@
 
 
     // ==========================================================
+    // RESET PASSWORD
+    // ==========================================================
+
+    function openResetPasswordModal(id) {
+
+      const user =
+        users.find(
+          item => Number(item.id) === Number(id)
+        );
+
+      if (!user) {
+        return;
+      }
+
+      document.getElementById('resetPasswordForm').reset();
+
+      const info =
+        document.getElementById('resetUserInfo');
+
+      info.dataset.userId = user.id;
+
+      info.innerHTML = `
+        Reset password untuk akun
+        <strong>${escapeHtml(user.username)}</strong>.
+      `;
+
+      document.getElementById('resetPasswordOverlay')
+        .classList.add('active');
+
+      document.getElementById('newPassword').focus();
+    }
+
+
+    async function resetPassword(event) {
+
+      event.preventDefault();
+
+      const newPassword =
+        document.getElementById('newPassword').value;
+
+      const confirmPassword =
+        document.getElementById('confirmPassword').value;
+
+      if (newPassword.length < 6) {
+
+        showMessage(
+          'Password baru minimal 6 karakter.',
+          'error'
+        );
+
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+
+        showMessage(
+          'Konfirmasi password tidak sama.',
+          'error'
+        );
+
+        return;
+      }
+
+      const info =
+        document.getElementById('resetUserInfo');
+
+      const id =
+        info.dataset.userId;
+
+      if (!id) {
+
+        showMessage(
+          'User tidak ditemukan.',
+          'error'
+        );
+
+        return;
+      }
+
+      try {
+
+        const response =
+          await fetch(
+            `/api/users/${id}/reset-password`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                password: newPassword
+              })
+            }
+          );
+
+        const result =
+          await response.json();
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.error ||
+            'Gagal mereset password'
+          );
+        }
+
+        closeResetPasswordModal();
+
+        showMessage(
+          result.message ||
+          'Password berhasil direset.',
+          'success'
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+        showMessage(
+          error.message ||
+          'Terjadi kesalahan saat mereset password.',
+          'error'
+        );
+
+      }
+
+    }
+
+
+    function closeResetPasswordModal() {
+
+      document.getElementById('resetPasswordOverlay')
+        .classList.remove('active');
+
+      document.getElementById('resetPasswordForm')
+        .reset();
+
+      const info =
+        document.getElementById('resetUserInfo');
+
+      info.innerHTML = '';
+
+      delete info.dataset.userId;
+    }
+
+
+    // ==========================================================
     // DELETE USER
     // ==========================================================
 
@@ -1461,6 +1745,16 @@
 
         if (event.target === this) {
           closeModal();
+        }
+
+      });
+
+
+    document.getElementById('resetPasswordOverlay')
+      .addEventListener('click', function(event) {
+
+        if (event.target === this) {
+          closeResetPasswordModal();
         }
 
       });

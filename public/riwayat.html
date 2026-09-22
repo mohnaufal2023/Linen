@@ -940,6 +940,8 @@
 }
 
 
+
+
 // ========================================
 // TAMBAHKAN INI
 // ========================================
@@ -1480,6 +1482,21 @@ function labelJenisTransaksi(jenis) {
                 `
                 : ""
             }
+
+            ${
+  trx.nama_pengantar
+    ? `
+      <div>
+        <span class="nama-label">
+          Pengantar Laundry:
+          <strong>
+            ${escapeHtml(trx.nama_pengantar)}
+          </strong>
+        </span>
+      </div>
+    `
+    : ""
+}
 
             ${
               trx.tanda_tangan_pengantar
