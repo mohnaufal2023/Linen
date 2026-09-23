@@ -129,6 +129,8 @@ const pageAccess = {
     'laundry'
   ],
 
+  '/permintaan-laundry.html': ['laundry'],
+
 
   // ========================================================
   // USER RUANGAN
@@ -137,6 +139,8 @@ const pageAccess = {
   '/user-dashboard.html': [
     'user'
   ],
+
+  '/permintaan-linen.html': ['user'],
 
   '/konfirmasi.html': [
     'user'
@@ -466,6 +470,13 @@ app.use(
   serahTerimaRoutes
 );
 
+const permintaanLinenRoutes =
+  require('./routes/permintaanLinen');
+
+app.use(
+  '/api/permintaan-linen',
+  permintaanLinenRoutes
+);
 
 const stokRuanganRoutes =
   require('./routes/stokRuangan');
@@ -510,6 +521,16 @@ app.use(
   '/api/users',
   usersRoutes
 );
+
+app.get('/api/me', (req, res) => {
+  if (!req.session?.loggedIn || !req.session?.user) {
+    return res.status(401).json({
+      error: 'Silakan login terlebih dahulu'
+    });
+  }
+
+  res.json(req.session.user);
+});
 
 
 // ==========================================================

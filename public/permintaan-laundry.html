@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Permintaan Linen - Laundry</title>
+
+  <style>
+    :root {
+      --green: #2D7A4B;
+      --green-dark: #23633D;
+      --green-tint: #EAF6EE;
+      --blue: #2563EB;
+      --orange: #D97706;
+      --orange-tint: #FFF7E6;
+      --border: #E5E7EB;
+      --text: #1F2937;
+      --muted: #6B7280;
+      --bg: #F5F7F9;
+      --white: #FFFFFF;
+      --danger: #DC2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      width: min(1200px, 92%);
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+      margin-bottom: 30px;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .header-title h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    .header-title p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      background: var(--green);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .back-btn:hover {
+      background: var(--green-dark);
+    }
+
+    /* ALERT */
+    .alert {
+      display: none;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .alert.success {
+      display: block;
+      background: var(--green-tint);
+      color: var(--green-dark);
+    }
+
+    .alert.error {
+      display: block;
+      background: #FEF2F2;
+      color: var(--danger);
+    }
+
+    /* CARD */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .card-header h2 {
+      font-size: 19px;
+    }
+
+    .card-header p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .refresh-btn {
+      border: 1px solid var(--border);
+      background: white;
+      padding: 9px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .refresh-btn:hover {
+      background: #F9FAFB;
+    }
+
+    /* REQUEST */
+    .request {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 15px;
+    }
+
+    .request:last-child {
+      margin-bottom: 0;
+    }
+
+    .request-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .request-room {
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .request-date {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .status {
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .status.menunggu {
+      background: var(--orange-tint);
+      color: var(--orange);
+    }
+
+    .status.diproses {
+      background: #EFF6FF;
+      color: var(--blue);
+    }
+
+    .status.dikirim {
+      background: var(--green-tint);
+      color: var(--green);
+    }
+
+    .linen-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .linen-table th,
+    .linen-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .linen-table th {
+      background: #F9FAFB;
+      font-weight: 600;
+    }
+
+    .linen-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .request-note {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: #F9FAFB;
+      border-radius: 7px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .process-box {
+  margin-top: 18px;
+  padding: 16px;
+  background: #F9FAFB;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.process-box h3 {
+  font-size: 15px;
+  margin-bottom: 14px;
+}
+
+.process-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.process-table th,
+.process-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-size: 14px;
+}
+
+.process-table th {
+  font-weight: 600;
+  background: white;
+}
+
+.qty-input {
+  width: 100px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.note-input {
+  width: 100%;
+  min-height: 70px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.process-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.process-btn {
+  border: none;
+  background: var(--blue);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.process-btn:hover {
+  opacity: 0.9;
+}
+
+    .empty {
+      text-align: center;
+      padding: 45px 20px;
+      color: var(--muted);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 700px) {
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .request-top {
+        flex-direction: column;
+      }
+
+      .linen-table {
+        font-size: 13px;
+      }
+
+      .linen-table th,
+      .linen-table td {
+        padding: 8px 5px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container header-content">
+      <div class="header-title">
+        <h1>Permintaan Linen</h1>
+        <p>Kelola permintaan linen dari ruangan</p>
+      </div>
+
+      <a href="/laundry-dashboard.html" class="back-btn">
+        ← Kembali
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div id="alert" class="alert"></div>
+
+    <section class="card">
+
+      <div class="card-header">
+        <div>
+          <h2>Daftar Permintaan</h2>
+          <p>Permintaan linen yang masuk dari ruangan.</p>
+        </div>
+
+        <button
+          type="button"
+          class="refresh-btn"
+          onclick="loadRequests()"
+        >
+          ↻ Refresh
+        </button>
+      </div>
+
+      <div id="requestList">
+        <div class="loading">
+          Memuat permintaan...
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+
+    const requestList = document.getElementById("requestList");
+    const alertBox = document.getElementById("alert");
+
+    function showAlert(message, type = "success") {
+      alertBox.textContent = message;
+      alertBox.className = `alert ${type}`;
+
+      setTimeout(() => {
+        alertBox.className = "alert";
+      }, 4000);
+    }
+
+    function escapeHtml(value) {
+      if (value === null || value === undefined) {
+        return "";
+      }
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatDate(date) {
+      if (!date) return "-";
+
+      return new Date(date).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      });
+    }
+
+    function statusLabel(status) {
+      if (status === "menunggu_laundry") {
+        return "Menunggu Laundry";
+      }
+
+      if (status === "diproses") {
+        return "Diproses";
+      }
+
+      if (status === "dikirim") {
+        return "Sudah Dikirim";
+      }
+
+      return status;
+    }
+
+    function statusClass(status) {
+      if (status === "menunggu_laundry") {
+        return "menunggu";
+      }
+
+      if (status === "diproses") {
+        return "diproses";
+      }
+
+      return "dikirim";
+    }
+
+    async function loadRequests() {
+
+  requestList.innerHTML = `
+    <div class="loading">
+      Memuat permintaan...
+    </div>
+  `;
+
+  try {
+
+    const response = await fetch("/api/permintaan-linen");
+
+    if (!response.ok) {
+      throw new Error("Gagal mengambil data permintaan.");
+    }
+
+    const requests = await response.json();
+
+    if (!requests.length) {
+
+      requestList.innerHTML = `
+        <div class="empty">
+          <div style="font-size: 40px; margin-bottom: 10px;">
+            📦
+          </div>
+
+          <p>
+            Belum ada permintaan linen dari ruangan.
+          </p>
+        </div>
+      `;
+
+      return;
+    }
+
+    requestList.innerHTML = "";
+
+    for (const request of requests) {
+
+      const detailResponse = await fetch(
+        `/api/permintaan-linen/${request.id}`
+      );
+
+      if (!detailResponse.ok) {
+        continue;
+      }
+
+      const data = await detailResponse.json();
+
+      const details = data.detail || data.details || [];
+
+      const detailRows = details.map(item => `
+        <tr>
+          <td>${escapeHtml(item.nama_linen)}</td>
+          <td>${item.jumlah_diminta}</td>
+          <td>${item.jumlah_diantar}</td>
+        </tr>
+      `).join("");
+
+      const requestElement = document.createElement("div");
+
+      requestElement.className = "request";
+
+      requestElement.innerHTML = `
+        <div class="request-top">
+
+          <div>
+            <div class="request-room">
+              ${escapeHtml(request.nama_ruangan)}
+            </div>
+
+            <div class="request-date">
+              Tanggal: ${formatDate(request.tanggal)}
+            </div>
+          </div>
+
+          <span class="status ${statusClass(request.status)}">
+            ${statusLabel(request.status)}
+          </span>
+
+        </div>
+
+        <table class="linen-table">
+
+          <thead>
+            <tr>
+              <th>Jenis Linen</th>
+              <th>Diminta</th>
+              <th>Akan Dikirim</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${detailRows}
+          </tbody>
+
+        </table>
+
+        ${
+          request.keterangan
+            ? `
+              <div class="request-note">
+                <strong>Keterangan:</strong>
+                ${escapeHtml(request.keterangan)}
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          request.status === "menunggu_laundry"
+            ? `
+              <div class="process-box">
+
+                <h3>Proses Permintaan</h3>
+
+                <table class="process-table">
+
+                  <thead>
+                    <tr>
+                      <th>Jenis Linen</th>
+                      <th>Diminta</th>
+                      <th>Jumlah Dikirim</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    ${details.map(item => `
+                      <tr>
+
+                        <td>
+                          ${escapeHtml(item.nama_linen)}
+                        </td>
+
+                        <td>
+                          ${item.jumlah_diminta}
+                        </td>
+
+                        <td>
+                          <input
+                            type="number"
+                            class="qty-input"
+                            min="0"
+                            max="${item.jumlah_diminta}"
+                            value="${item.jumlah_diminta}"
+                            data-detail-id="${item.id}"
+                            data-max="${item.jumlah_diminta}"
+                          >
+                        </td>
+
+                      </tr>
+                    `).join("")}
+                  </tbody>
+
+                </table>
+
+                <div style="margin-top: 15px;">
+
+                  <label
+                    style="
+                      display:block;
+                      margin-bottom:7px;
+                      font-size:14px;
+                      font-weight:600;
+                    "
+                  >
+                    Keterangan
+                  </label>
+
+                  <textarea
+                    class="note-input"
+                    id="note-${request.id}"
+                    placeholder="Contoh: Stok tidak mencukupi, hanya dapat dikirim sebagian."
+                  ></textarea>
+
+                </div>
+
+                <div class="process-actions">
+
+                  <button
+                    type="button"
+                    class="process-btn"
+                    onclick="processRequest(${request.id})"
+                  >
+                    Proses Permintaan
+                  </button>
+
+                </div>
+
+              </div>
+            `
+            : ""
+        }
+      `;
+
+      requestList.appendChild(requestElement);
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    requestList.innerHTML = `
+      <div class="empty">
+        Gagal memuat data permintaan.
+      </div>
+    `;
+
+    showAlert(error.message, "error");
+  }
+}
+
+async function processRequest(requestId) {
+
+  const requestElement = [...document.querySelectorAll(".request")]
+    .find(element =>
+      element.querySelector(
+        `.process-btn[onclick="processRequest(${requestId})"]`
+      )
+    );
+
+  if (!requestElement) {
+    showAlert("Data permintaan tidak ditemukan.", "error");
+    return;
+  }
+
+  const inputs = requestElement.querySelectorAll(".qty-input");
+
+  const detail = [];
+
+  for (const input of inputs) {
+
+    const jumlahDiantar = Number(input.value);
+    const max = Number(input.dataset.max);
+
+    if (!Number.isInteger(jumlahDiantar) || jumlahDiantar < 0) {
+      showAlert(
+        "Jumlah yang akan dikirim harus berupa angka 0 atau lebih.",
+        "error"
+      );
+      return;
+    }
+
+    if (jumlahDiantar > max) {
+      showAlert(
+        "Jumlah dikirim tidak boleh melebihi jumlah yang diminta.",
+        "error"
+      );
+      return;
+    }
+
+    detail.push({
+      id: Number(input.dataset.detailId),
+      jumlah_diantar: jumlahDiantar
+    });
+  }
+
+  const keterangan =
+    requestElement.querySelector(".note-input")?.value.trim() || "";
+
+  const button =
+    requestElement.querySelector(".process-btn");
+
+  const originalText = button.textContent;
+
+  button.disabled = true;
+  button.textContent = "Menyimpan...";
+
+  try {
+
+    const response = await fetch(
+      `/api/permintaan-linen/${requestId}/proses`,
+      {
+        method: "PUT",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          detail,
+          keterangan
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || "Gagal memproses permintaan."
+      );
+    }
+
+    showAlert(
+      "Permintaan berhasil diproses.",
+      "success"
+    );
+
+    await loadRequests();
+
+  } catch (error) {
+
+    console.error(error);
+
+    showAlert(
+      error.message,
+      "error"
+    );
+
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
+    loadRequests();
+
+  </script>
+
+</body>
+</html>

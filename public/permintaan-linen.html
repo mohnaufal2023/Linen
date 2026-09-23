@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Permintaan Linen</title>
+
+  <style>
+    :root {
+      --green: #2D7A4B;
+      --green-dark: #23633D;
+      --green-tint: #EAF6EE;
+      --border: #E5E7EB;
+      --text: #1F2937;
+      --muted: #6B7280;
+      --bg: #F5F7F9;
+      --white: #FFFFFF;
+      --danger: #DC2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      width: min(1000px, 92%);
+      margin: 0 auto;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+      margin-bottom: 30px;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .header-title h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    .header-title p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      background: var(--green);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .back-btn:hover {
+      background: var(--green-dark);
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 19px;
+      margin-bottom: 6px;
+    }
+
+    .card-description {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .room-info {
+      background: var(--green-tint);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+
+    .room-info span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .room-info strong {
+      color: var(--green-dark);
+      font-size: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 180px auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--green);
+    }
+
+    .add-btn {
+      border: none;
+      background: var(--green);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      height: 40px;
+    }
+
+    .add-btn:hover {
+      background: var(--green-dark);
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .detail-table th,
+    .detail-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 11px 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .detail-table th {
+      background: #F9FAFB;
+    }
+
+    .delete-btn {
+      border: none;
+      background: #FEF2F2;
+      color: var(--danger);
+      padding: 7px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: #FEE2E2;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 25px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .submit-area {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .submit-btn {
+      border: none;
+      background: var(--green);
+      color: white;
+      padding: 12px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .submit-btn:hover {
+      background: var(--green-dark);
+    }
+
+    .alert {
+      display: none;
+      padding: 13px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .alert.success {
+      display: block;
+      background: var(--green-tint);
+      color: var(--green-dark);
+    }
+
+    .alert.error {
+      display: block;
+      background: #FEF2F2;
+      color: var(--danger);
+    }
+
+    @media (max-width: 700px) {
+
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .add-btn {
+        width: 100%;
+      }
+
+      .detail-table {
+        font-size: 13px;
+      }
+
+      .detail-table th,
+      .detail-table td {
+        padding: 8px 5px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container header-content">
+
+      <div class="header-title">
+        <h1>Permintaan Linen</h1>
+        <p>Ajukan kebutuhan linen ke Laundry</p>
+      </div>
+
+      <a
+        href="/user-dashboard.html"
+        class="back-btn"
+      >
+        ← Kembali
+      </a>
+
+    </div>
+  </header>
+
+
+  <main class="container">
+
+    <div id="alert" class="alert"></div>
+
+
+    <!-- INFORMASI RUANGAN -->
+    <section class="card">
+
+      <h2>Informasi Ruangan</h2>
+
+      <p class="card-description">
+        Permintaan akan dikirim ke bagian Laundry.
+      </p>
+
+      <div class="room-info">
+
+        <span>Ruangan</span>
+
+        <strong id="roomName">
+          Memuat...
+        </strong>
+
+      </div>
+
+    </section>
+
+
+    <!-- FORM PERMINTAAN -->
+    <section class="card">
+
+      <h2>Tambah Linen</h2>
+
+      <p class="card-description">
+        Pilih jenis linen dan masukkan jumlah yang dibutuhkan.
+      </p>
+
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label for="linenSelect">
+            Jenis Linen
+          </label>
+
+          <select id="linenSelect">
+            <option value="">
+              Memuat jenis linen...
+            </option>
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="jumlah">
+            Jumlah
+          </label>
+
+          <input
+            type="number"
+            id="jumlah"
+            min="1"
+            value="1"
+          >
+
+        </div>
+
+
+        <button
+          type="button"
+          class="add-btn"
+          onclick="addLinen()"
+        >
+          + Tambah
+        </button>
+
+      </div>
+
+
+      <div id="detailContainer">
+
+        <div class="empty">
+          Belum ada linen yang ditambahkan.
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- KETERANGAN -->
+    <section class="card">
+
+      <h2>Keterangan</h2>
+
+      <p class="card-description">
+        Tambahkan keterangan jika diperlukan.
+      </p>
+
+      <textarea
+        id="keterangan"
+        placeholder="Contoh: Linen dibutuhkan untuk kebutuhan ruangan."
+      ></textarea>
+
+
+      <div class="submit-area">
+
+        <button
+          type="button"
+          class="submit-btn"
+          onclick="submitRequest()"
+        >
+          Kirim Permintaan
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+
+    let currentUser = null;
+    let roomId = null;
+
+    let linenList = [];
+    let requestDetails = [];
+
+
+    const alertBox =
+      document.getElementById("alert");
+
+    const roomName =
+      document.getElementById("roomName");
+
+    const linenSelect =
+      document.getElementById("linenSelect");
+
+    const jumlahInput =
+      document.getElementById("jumlah");
+
+    const detailContainer =
+      document.getElementById("detailContainer");
+
+
+    function showAlert(message, type = "success") {
+
+      alertBox.textContent = message;
+
+      alertBox.className =
+        `alert ${type}`;
+
+      setTimeout(() => {
+
+        alertBox.className = "alert";
+
+      }, 4000);
+    }
+
+
+    function escapeHtml(value) {
+
+      if (
+        value === null ||
+        value === undefined
+      ) {
+        return "";
+      }
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+
+    async function loadUser() {
+
+      try {
+
+        const response =
+          await fetch("/api/me");
+
+        if (!response.ok) {
+          throw new Error(
+            "Gagal mengambil data user."
+          );
+        }
+
+       const data =
+  await response.json();
+
+currentUser = data.user;
+
+roomId = currentUser.ruangan_id;
+
+roomName.textContent =
+  currentUser.ruangan_nama ||
+  "Ruangan tidak diketahui";
+
+      } catch (error) {
+
+        console.error(error);
+
+        roomName.textContent =
+          "Gagal memuat ruangan";
+
+        showAlert(
+          error.message,
+          "error"
+        );
+      }
+    }
+
+
+    async function loadLinen() {
+
+      try {
+
+        const response =
+          await fetch("/api/jenis-linen");
+
+        if (!response.ok) {
+          throw new Error(
+            "Gagal mengambil jenis linen."
+          );
+        }
+
+        linenList =
+          await response.json();
+
+        linenSelect.innerHTML = `
+          <option value="">
+            -- Pilih Jenis Linen --
+          </option>
+        `;
+
+        linenList.forEach(linen => {
+
+          const option =
+            document.createElement("option");
+
+          option.value =
+            linen.id;
+
+          option.textContent =
+            linen.nama;
+
+          linenSelect.appendChild(
+            option
+          );
+
+        });
+
+      } catch (error) {
+
+        console.error(error);
+
+        showAlert(
+          error.message,
+          "error"
+        );
+      }
+    }
+
+
+    function addLinen() {
+
+      const linenId =
+        Number(linenSelect.value);
+
+      const jumlah =
+        Number(jumlahInput.value);
+
+
+      if (!linenId) {
+
+        showAlert(
+          "Pilih jenis linen terlebih dahulu.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (
+        !Number.isInteger(jumlah) ||
+        jumlah <= 0
+      ) {
+
+        showAlert(
+          "Jumlah harus lebih dari 0.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const existing =
+        requestDetails.find(
+          item =>
+            item.jenis_linen_id === linenId
+        );
+
+
+      if (existing) {
+
+        existing.jumlah_diminta +=
+          jumlah;
+
+      } else {
+
+        const linen =
+          linenList.find(
+            item => item.id === linenId
+          );
+
+        requestDetails.push({
+
+          jenis_linen_id: linenId,
+
+          nama_linen: linen.nama,
+
+          jumlah_diminta: jumlah
+
+        });
+
+      }
+
+
+      renderDetails();
+
+      linenSelect.value = "";
+
+      jumlahInput.value = 1;
+    }
+
+
+    function removeLinen(index) {
+
+      requestDetails.splice(
+        index,
+        1
+      );
+
+      renderDetails();
+    }
+
+
+    function renderDetails() {
+
+      if (!requestDetails.length) {
+
+        detailContainer.innerHTML = `
+          <div class="empty">
+            Belum ada linen yang ditambahkan.
+          </div>
+        `;
+
+        return;
+      }
+
+
+      detailContainer.innerHTML = `
+
+        <table class="detail-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Jenis Linen
+              </th>
+
+              <th>
+                Jumlah
+              </th>
+
+              <th>
+                Aksi
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${requestDetails.map(
+              (item, index) => `
+
+              <tr>
+
+                <td>
+                  ${escapeHtml(
+                    item.nama_linen
+                  )}
+                </td>
+
+                <td>
+                  ${item.jumlah_diminta}
+                </td>
+
+                <td>
+
+                  <button
+                    type="button"
+                    class="delete-btn"
+                    onclick="removeLinen(${index})"
+                  >
+                    Hapus
+                  </button>
+
+                </td>
+
+              </tr>
+
+            `
+            ).join("")}
+
+          </tbody>
+
+        </table>
+
+      `;
+    }
+
+
+    async function submitRequest() {
+
+      if (!currentUser) {
+
+        showAlert(
+          "Data user belum tersedia.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (!requestDetails.length) {
+
+        showAlert(
+          "Tambahkan minimal satu jenis linen.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const keterangan =
+        document
+          .getElementById("keterangan")
+          .value
+          .trim();
+
+
+      const detail =
+        requestDetails.map(item => ({
+
+          jenis_linen_id:
+            item.jenis_linen_id,
+
+          jumlah_diminta:
+            item.jumlah_diminta
+
+        }));
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/permintaan-linen",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                ruangan_id:
+                  roomId,
+
+                dibuat_oleh_user_id:
+                  currentUser.id,
+
+                keterangan,
+
+                detail
+
+              })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.message ||
+            "Gagal membuat permintaan."
+          );
+        }
+
+
+        showAlert(
+          "Permintaan linen berhasil dikirim.",
+          "success"
+        );
+
+
+        requestDetails = [];
+
+        renderDetails();
+
+        document
+          .getElementById("keterangan")
+          .value = "";
+
+      } catch (error) {
+
+        console.error(error);
+
+        showAlert(
+          error.message,
+          "error"
+        );
+      }
+    }
+
+
+    async function init() {
+
+      await loadUser();
+
+      await loadLinen();
+
+      renderDetails();
+
+    }
+
+
+    init();
+
+  </script>
+
+</body>
+</html>
