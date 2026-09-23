@@ -294,6 +294,92 @@
   opacity: 0.9;
 }
 
+.send-box {
+  margin-top: 18px;
+  padding: 16px;
+  background: #F9FAFB;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.send-box h3 {
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+.send-form-group {
+  margin-bottom: 15px;
+}
+
+.send-form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+
+.send-form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.signature-wrapper {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.signature-canvas {
+  display: block;
+  width: 100%;
+  height: 180px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.signature-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+
+.clear-signature {
+  border: none;
+  background: #FEF2F2;
+  color: var(--danger);
+  padding: 7px 11px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.send-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.send-btn {
+  border: none;
+  background: var(--green);
+  color: white;
+  padding: 10px 17px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.send-btn:hover {
+  background: var(--green-dark);
+}
+
     .empty {
       text-align: center;
       padding: 45px 20px;
@@ -632,11 +718,91 @@
             `
             : ""
         }
+
+        ${
+  request.status === "diproses"
+    ? `
+      <div class="send-box">
+
+        <h3>Pengiriman Linen</h3>
+
+        <div class="send-form-group">
+
+          <label for="sender-${request.id}">
+            Nama Pengantar
+          </label>
+
+          <input
+            type="text"
+            id="sender-${request.id}"
+            placeholder="Masukkan nama pengantar"
+          >
+
+        </div>
+
+        <div class="send-form-group">
+
+          <label>
+            Tanda Tangan Pengantar
+          </label>
+
+          <div class="signature-wrapper">
+
+            <canvas
+              id="signature-${request.id}"
+              class="signature-canvas"
+            ></canvas>
+
+            <div class="signature-actions">
+
+              <span
+                style="
+                  font-size:12px;
+                  color:var(--muted);
+                "
+              >
+                Tanda tangan di dalam area
+              </span>
+
+              <button
+                type="button"
+                class="clear-signature"
+                onclick="clearSignature(${request.id})"
+              >
+                Hapus TTD
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="send-actions">
+
+          <button
+            type="button"
+            class="send-btn"
+            onclick="sendRequest(${request.id})"
+          >
+            Kirim Linen
+          </button>
+
+        </div>
+
+      </div>
+    `
+    : ""
+}
       `;
 
       requestList.appendChild(requestElement);
+      if (request.status === "diproses") {
+  initSignature(request.id);
+}
     }
 
+    
   } catch (error) {
 
     console.error(error);
@@ -753,7 +919,238 @@ async function processRequest(requestId) {
     button.textContent = originalText;
   }
 }
+  const signaturePads = {};
 
+function initSignature(requestId) {
+
+  const canvas =
+    document.getElementById(
+      `signature-${requestId}`
+    );
+
+  if (!canvas) {
+    return;
+  }
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+  const ratio =
+    window.devicePixelRatio || 1;
+
+  canvas.width =
+    rect.width * ratio;
+
+  canvas.height =
+    rect.height * ratio;
+
+  const ctx =
+    canvas.getContext("2d");
+
+  ctx.scale(ratio, ratio);
+
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  let drawing = false;
+
+  function getPosition(event) {
+
+    const bounds =
+      canvas.getBoundingClientRect();
+
+    return {
+      x: event.clientX - bounds.left,
+      y: event.clientY - bounds.top
+    };
+  }
+
+  canvas.addEventListener(
+    "pointerdown",
+    event => {
+
+      drawing = true;
+
+      canvas.setPointerCapture(
+        event.pointerId
+      );
+
+      const position =
+        getPosition(event);
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        position.x,
+        position.y
+      );
+    }
+  );
+
+  canvas.addEventListener(
+    "pointermove",
+    event => {
+
+      if (!drawing) {
+        return;
+      }
+
+      const position =
+        getPosition(event);
+
+      ctx.lineTo(
+        position.x,
+        position.y
+      );
+
+      ctx.stroke();
+    }
+  );
+
+  canvas.addEventListener(
+    "pointerup",
+    () => {
+      drawing = false;
+    }
+  );
+
+  canvas.addEventListener(
+    "pointercancel",
+    () => {
+      drawing = false;
+    }
+  );
+
+  signaturePads[requestId] = {
+    canvas,
+    ctx
+  };
+}
+
+
+function clearSignature(requestId) {
+
+  const pad =
+    signaturePads[requestId];
+
+  if (!pad) {
+    return;
+  }
+
+  pad.ctx.clearRect(
+    0,
+    0,
+    pad.canvas.width,
+    pad.canvas.height
+  );
+}
+
+async function sendRequest(requestId) {
+
+  const nameInput =
+    document.getElementById(
+      `sender-${requestId}`
+    );
+
+  const pad =
+    signaturePads[requestId];
+
+  if (!nameInput) {
+    showAlert(
+      "Form pengantar tidak ditemukan.",
+      "error"
+    );
+    return;
+  }
+
+  const namaPengantar =
+    nameInput.value.trim();
+
+  if (!namaPengantar) {
+    showAlert(
+      "Nama pengantar wajib diisi.",
+      "error"
+    );
+    nameInput.focus();
+    return;
+  }
+
+  if (!pad) {
+    showAlert(
+      "Area tanda tangan tidak ditemukan.",
+      "error"
+    );
+    return;
+  }
+
+  const signatureData =
+    pad.canvas.toDataURL("image/png");
+
+  const button =
+    document.querySelector(
+      `.send-btn[onclick="sendRequest(${requestId})"]`
+    );
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Mengirim...";
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        `/api/permintaan-linen/${requestId}/kirim`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            nama_pengantar:
+              namaPengantar,
+
+            tanda_tangan_pengantar:
+              signatureData
+          })
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message ||
+        "Gagal mengirim linen."
+      );
+    }
+
+    showAlert(
+      "Linen berhasil dikirim.",
+      "success"
+    );
+
+    await loadRequests();
+
+  } catch (error) {
+
+    console.error(error);
+
+    showAlert(
+      error.message,
+      "error"
+    );
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Kirim Linen";
+    }
+  }
+}
     loadRequests();
 
   </script>
