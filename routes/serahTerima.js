@@ -2717,8 +2717,205 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+
+// ============================================================
+// EXPORT RIWAYAT KE EXCEL
+// ============================================================
+
+router.get("/export/excel", async (req, res) => {
+  try {
+    const access = await getAccessInfo(req);
+
+    if (access.error) {
+      return res.status(403).json({
+        error: access.error,
+      });
+    }
+
+    let query = `
+      SELECT
+        st.id,
+        st.tanggal,
+        st.ruangan,
+        st.jenis_transaksi,
+        st.status,
+
+        l.nama AS jenis_linen,
+
+        d.jumlah_kotor,
+        d.jumlah_diambil_infeksius,
+        d.jumlah_diambil_non_infeksius,
+
+        st.nama_pengantar,
+        st.nama_penerima,
+        st.nama_penyerah,
+        st.nama_penerima_laundry
+
+      FROM serah_terima st
+
+      INNER JOIN serah_terima_detail d
+        ON d.serah_terima_id = st.id
+
+      INNER JOIN jenis_linen l
+        ON l.id = d.jenis_linen_id
+    `;
+
+    const params = [];
+
+    // User hanya boleh export data ruangannya sendiri
+    if (access.role === "user") {
+      query += `
+        WHERE st.ruangan = ?
+      `;
+
+      params.push(access.ruangan_nama);
+    }
+
+    query += `
+      ORDER BY
+        st.created_at DESC,
+        st.id DESC
+    `;
+
+    const [rows] = await db.query(query, params);
+
+    // ========================================================
+    // BUAT FILE EXCEL
+    // ========================================================
+
+    const ExcelJS = require("exceljs");
+
+    const workbook = new ExcelJS.Workbook();
+
+    const worksheet = workbook.addWorksheet("Riwayat Serah Terima");
+
+    // ========================================================
+    // JUDUL
+    // ========================================================
+
+    worksheet.mergeCells("A1:J1");
+
+    worksheet.getCell("A1").value = "RIWAYAT SERAH TERIMA LINEN";
+
+    worksheet.getCell("A1").font = {
+      bold: true,
+      size: 16,
+    };
+
+    worksheet.getCell("A1").alignment = {
+      horizontal: "center",
+    };
+
+    // ========================================================
+    // HEADER
+    // ========================================================
+
+    worksheet.addRow([]);
+
+    worksheet.addRow([
+      "No",
+      "Tanggal",
+      "Ruangan",
+      "Jenis Transaksi",
+      "Jenis Linen",
+      "Jumlah Diantar",
+      "Infeksius",
+      "Non-Infeksius",
+      "Pengantar",
+      "Penerima",
+    ]);
+
+    const headerRow = worksheet.getRow(3);
+
+    headerRow.font = {
+      bold: true,
+    };
+
+    headerRow.alignment = {
+      horizontal: "center",
+      vertical: "middle",
+    };
+
+    // ========================================================
+    // DATA
+    // ========================================================
+
+    rows.forEach((item, index) => {
+      worksheet.addRow([
+        index + 1,
+        item.tanggal,
+        item.ruangan,
+        item.jenis_transaksi,
+        item.jenis_linen,
+        Number(item.jumlah_kotor) || 0,
+        Number(item.jumlah_diambil_infeksius) || 0,
+        Number(item.jumlah_diambil_non_infeksius) || 0,
+        item.nama_pengantar || "-",
+        item.nama_penerima || item.nama_penyerah || "-",
+      ]);
+    });
+
+    // ========================================================
+    // LEBAR KOLOM
+    // ========================================================
+
+    worksheet.columns = [
+      { width: 6 },
+      { width: 15 },
+      { width: 20 },
+      { width: 18 },
+      { width: 25 },
+      { width: 16 },
+      { width: 14 },
+      { width: 17 },
+      { width: 22 },
+      { width: 22 },
+    ];
+
+    // ========================================================
+    // BORDER
+    // ========================================================
+
+    worksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
+    });
+
+    // ========================================================
+    // RESPONSE DOWNLOAD
+    // ========================================================
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="riwayat-serah-terima.xlsx"'
+    );
+
+    await workbook.xlsx.write(res);
+
+    res.end();
+
+  } catch (err) {
+    console.error("Error export Excel:", err);
+
+    return res.status(500).json({
+      error: "Gagal membuat file Excel",
+    });
+  }
+});
+
+
 // ============================================================
 // EXPORT ROUTER
 // ============================================================
-
 module.exports = router;
