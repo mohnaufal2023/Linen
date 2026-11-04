@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const ExcelJS = require('exceljs');
 
 
 // ==========================================================
@@ -107,7 +108,188 @@ router.get('/', async (req, res) => {
 
 });
 
+// ==========================================================
+// EXPORT EXCEL RIWAYAT PROSES LAUNDRY
+// Hanya mengambil data dengan status selesai
+// ==========================================================
+router.get('/export/excel', async (req, res) => {
+  try {
+    const { bulan, tahun, ruangan } = req.query;
 
+    // Validasi bulan dan tahun
+    const month = Number(bulan);
+    const year = Number(tahun);
+
+    if (
+      !Number.isInteger(month) || month < 1 || month > 12 ||
+      !Number.isInteger(year) || year < 2000 || year > 9999
+    ) {
+      return res.status(400).json({
+        error: 'Bulan atau tahun tidak valid'
+      });
+    }
+
+    // Menentukan rentang tanggal
+    const pad = (value) => String(value).padStart(2, '0');
+
+    const tanggalMulai = `${year}-${pad(month)}-01 00:00:00`;
+
+    const nextMonth = new Date(year, month, 1);
+    const tanggalAkhir =
+      `${nextMonth.getFullYear()}-${pad(nextMonth.getMonth() + 1)}-01 00:00:00`;
+
+    // Query data yang sudah selesai
+    let sql = `
+      SELECT
+        p.id,
+        p.created_at,
+        p.selesai_at,
+        p.jumlah_infeksius,
+        p.jumlah_non_infeksius,
+        p.jumlah_total,
+        p.jumlah_layak,
+        p.jumlah_rusak,
+        p.status,
+        l.nama AS jenis_linen_nama,
+        st.ruangan
+
+      FROM proses_laundry p
+
+      JOIN jenis_linen l
+        ON l.id = p.jenis_linen_id
+
+      JOIN serah_terima_detail d
+        ON d.id = p.serah_terima_detail_id
+
+      JOIN serah_terima st
+        ON st.id = d.serah_terima_id
+
+      WHERE p.status = 'selesai'
+        AND p.selesai_at >= ?
+        AND p.selesai_at < ?
+    `;
+
+    const params = [tanggalMulai, tanggalAkhir];
+
+    if (ruangan && ruangan !== 'semua') {
+      sql += ` AND st.ruangan = ?`;
+      params.push(ruangan);
+    }
+
+    sql += ` ORDER BY p.selesai_at ASC`;
+
+    const [rows] = await db.query(sql, params);
+
+    // Membuat workbook
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Riwayat Proses Laundry');
+
+    worksheet.columns = [
+      { header: 'No', key: 'no', width: 8 },
+      { header: 'Tanggal Masuk Proses', key: 'created_at', width: 22 },
+      { header: 'Ruangan', key: 'ruangan', width: 20 },
+      { header: 'Jenis Linen', key: 'jenis_linen_nama', width: 25 },
+      { header: 'Infeksius', key: 'infeksius', width: 15 },
+      { header: 'Non-Infeksius', key: 'non_infeksius', width: 18 },
+      { header: 'Jumlah Total', key: 'jumlah_total', width: 15 },
+      { header: 'Jumlah Layak', key: 'jumlah_layak', width: 15 },
+      { header: 'Jumlah Rusak', key: 'jumlah_rusak', width: 15 },
+      { header: 'Status', key: 'status', width: 18 },
+      { header: 'Tanggal Selesai', key: 'selesai_at', width: 22 }
+    ];
+
+    // Judul laporan
+    worksheet.insertRow(1, [
+      `LAPORAN RIWAYAT PROSES LAUNDRY`
+    ]);
+
+    worksheet.mergeCells('A1:K1');
+    worksheet.getCell('A1').font = {
+      bold: true,
+      size: 16
+    };
+    worksheet.getCell('A1').alignment = {
+      horizontal: 'center'
+    };
+
+    worksheet.insertRow(2, [
+      `Periode: ${pad(month)}/${year} | Ruangan: ${
+        ruangan && ruangan !== 'semua' ? ruangan : 'Semua Ruangan'
+      }`
+    ]);
+
+    worksheet.mergeCells('A2:K2');
+
+    // Header tabel
+    const headerRow = worksheet.getRow(4);
+    headerRow.values = worksheet.columns.map(column => column.header);
+    headerRow.font = { bold: true };
+    headerRow.alignment = { horizontal: 'center' };
+
+    headerRow.eachCell(cell => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+
+    // Isi laporan
+    rows.forEach((item, index) => {
+      const row = worksheet.addRow({
+        no: index + 1,
+        created_at: item.created_at,
+        ruangan: item.ruangan,
+        jenis_linen_nama: item.jenis_linen_nama,
+        infeksius: item.jumlah_infeksius,
+        non_infeksius: item.jumlah_non_infeksius,
+        jumlah_total: item.jumlah_total,
+        jumlah_layak: item.jumlah_layak,
+        jumlah_rusak: item.jumlah_rusak,
+        status: item.status,
+        selesai_at: item.selesai_at
+      });
+
+      row.getCell('created_at').numFmt = 'dd/mm/yyyy hh:mm';
+      row.getCell('selesai_at').numFmt = 'dd/mm/yyyy hh:mm';
+
+      row.eachCell(cell => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+    });
+
+    if (rows.length === 0) {
+      worksheet.getCell('A5').value = 'Tidak ada data proses laundry yang selesai pada periode ini.';
+      worksheet.mergeCells('A5:K5');
+    }
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=laporan-proses-laundry-${year}-${pad(month)}.xlsx`
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+
+  } catch (err) {
+    console.error('EXPORT EXCEL PROSES LAUNDRY:', err);
+
+    res.status(500).json({
+      error: 'Gagal membuat laporan Excel'
+    });
+  }
+});
 // ==========================================================
 // GET DETAIL SATU PROSES
 // ==========================================================

@@ -749,6 +749,28 @@
 
   </div>
 
+  <!-- FILTER LAPORAN EXCEL -->
+<div class="filters" style="margin-top: 16px;">
+
+  <input
+    class="input"
+    type="month"
+    id="export-periode"
+  >
+
+  <select class="select" id="export-ruangan">
+    <option value="semua">Semua Ruangan</option>
+  </select>
+
+  <button
+    class="refresh"
+    id="btn-export-excel"
+    type="button"
+  >
+    📥 Download Excel
+  </button>
+
+</div>
 
   <div id="error-container"></div>
 
@@ -891,12 +913,13 @@
 
 
       semuaData =
-        Array.isArray(data)
-          ? data
-          : [];
+  Array.isArray(data)
+    ? data
+    : [];
 
+isiFilterRuangan();
 
-      render();
+render();
 
 
     }catch(err){
@@ -921,6 +944,37 @@
 
   }
 
+
+
+function isiFilterRuangan() {
+
+  const select =
+    document.getElementById('export-ruangan');
+
+  const ruanganSebelumnya = select.value;
+
+  const daftarRuangan = [
+    ...new Set(
+      semuaData
+        .map(item => item.ruangan)
+        .filter(Boolean)
+    )
+  ].sort();
+
+  select.innerHTML = `
+    <option value="semua">Semua Ruangan</option>
+    ${daftarRuangan.map(nama => `
+      <option value="${escapeHtml(nama)}">
+        ${escapeHtml(nama)}
+      </option>
+    `).join('')}
+  `;
+
+  if (daftarRuangan.includes(ruanganSebelumnya)) {
+    select.value = ruanganSebelumnya;
+  }
+
+}
 
   // ========================================================
   // FILTER + RENDER
@@ -1661,6 +1715,45 @@
       }
     );
 
+    // ==========================================================
+// DOWNLOAD EXCEL RIWAYAT PROSES LAUNDRY
+// ==========================================================
+
+const inputPeriode =
+  document.getElementById('export-periode');
+
+const selectRuangan =
+  document.getElementById('export-ruangan');
+
+const tombolExport =
+  document.getElementById('btn-export-excel');
+
+// Default periode ke bulan sekarang
+inputPeriode.value =
+  new Date().toISOString().slice(0, 7);
+
+tombolExport.addEventListener('click', function () {
+
+  const periode = inputPeriode.value;
+  const ruangan = selectRuangan.value;
+
+  if (!periode) {
+    alert('Silakan pilih bulan dan tahun terlebih dahulu.');
+    return;
+  }
+
+  const [tahun, bulan] = periode.split('-');
+
+  const params = new URLSearchParams({
+    bulan,
+    tahun,
+    ruangan
+  });
+
+  window.location.href =
+    `/api/proses-laundry/export/excel?${params.toString()}`;
+
+});
 
   // ========================================================
   // START
