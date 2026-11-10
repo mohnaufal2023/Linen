@@ -541,28 +541,24 @@
 
       const role =
         result.user.role;
+      console.log("Role pengguna:", role);
 
 
       if(
-        role !== 'laundry' &&
-        role !== 'admin'
-      ){
-
-        window.location.href =
-          '/user-dashboard.html';
-
-        return false;
-
-      }
+  role !== 'laundry' &&
+  role !== 'admin' &&
+  role !== 'user' 
+){
+  window.location.href = '/login.html';
+  return false;
+}
 
 
       if(role === 'admin'){
-
-        document
-          .getElementById('back-link')
-          .href = '/';
-
-      }
+  document.getElementById('back-link').href = '/';
+} else if(role === 'user'){
+  document.getElementById('back-link').href = '/user-dashboard.html';
+}
 
 
       return true;

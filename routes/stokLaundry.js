@@ -3,10 +3,10 @@ const router = express.Router();
 const db = require('../config/db');
 
 
+
 // ==========================================================
 // MIDDLEWARE
-// Admin dan Laundry boleh melihat stok Laundry.
-// User ruangan tidak boleh.
+// Admin, Laundry, dan User boleh melihat stok Laundry.
 // ==========================================================
 function requireLaundryAccess(req, res, next) {
 
@@ -20,15 +20,17 @@ function requireLaundryAccess(req, res, next) {
 
   if (
     user.role !== 'admin' &&
-    user.role !== 'laundry'
+    user.role !== 'laundry' &&
+    user.role !== 'user'
   ) {
     return res.status(403).json({
-      error: 'Akses hanya untuk Admin atau Laundry'
+      error: 'Akses hanya untuk Admin, Laundry, atau User'
     });
   }
 
   next();
 }
+
 
 
 router.use(requireLaundryAccess);

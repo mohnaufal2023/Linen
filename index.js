@@ -77,14 +77,17 @@ const pageAccess = {
   ],
 
 
-  // ========================================================
-  // ADMIN + LAUNDRY
-  // ========================================================
+ 
+ 
 
-  '/stok-laundry.html': [
-    'admin',
-    'laundry'
-  ],
+  // ADMIN + LAUNDRY + USER
+// ========================================================
+
+'/stok-laundry.html': [
+  'admin',
+  'laundry',
+  'user'
+],
 
   '/proses-laundry.html': [
     'admin',
